@@ -1,5 +1,7 @@
+#!/bin/bash
+
 sleep 10s
-echo "70"!/bin/bash
+echo "70"
 
 #Ryan Schilder - April 2023
 

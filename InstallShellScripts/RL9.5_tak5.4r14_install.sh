@@ -1,16 +1,24 @@
 #!/bin/bash
-##This will install Tak V5.2r16 on Rocky Linux 8.9, create a Root CA and Intermediate (signing) CA, enable certificate enrollment, enable channels, and create an admin and user .p12 certificate
+##This will install TAK Server on Rocky Linux 9.x, create a Root CA and Intermediate (signing) CA,
+##enable certificate enrollment, enable channels, and create an admin and user .p12 certificate.
 ##The /opt/tak/certs/files/admin.p12 certificate needs to be installed into firefox/chrome as a user certificate in order to conenct to the WebGUI as an admin
 ## If using an online hosting provider (linode, Digital Ocean, ssdnode, etc...) you may have to configure your firewall in their web interface
 ## ensure tcp 8089, 8443, 8446, and 80 are allowed through the firewall. 80 is only needed if you plan to use LetsEncrypt certificates
 
 ##Ryan Schilder - March 2024
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "Increase MAX connections"
-echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf
+if ! sudo grep -qE '^\*\s+soft\s+nofile\s+32768$' /etc/security/limits.conf; then
+	echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf >/dev/null
+fi
 
 echo "++++++++++++++++++++++++++++++++++++++++++"
 #done
 
+sudo dnf install -y dnf-plugins-core
 sudo dnf install vim -y
 
 sudo dnf config-manager --set-enabled crb
@@ -66,10 +74,13 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ INSTALL TAK SERVER ++++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
-##Install TAK Server v4.10 rel 60
-echo "Install TAK server v5.0 REL69"
-#sudo dnf install takserver-4.10-RELEASE50.noarch.rpm -y
-sudo dnf install takserver-5.6-RELEASE22.noarch.rpm -y
+echo "Install TAK server v5.6 RELEASE22"
+TAK_RPM="$SCRIPT_DIR/takserver-5.6-RELEASE22.noarch.rpm"
+if [ -f "$TAK_RPM" ]; then
+	sudo dnf install -y "$TAK_RPM"
+else
+	sudo dnf install -y takserver-5.6-RELEASE22.noarch.rpm
+fi
 #done
 echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
@@ -79,7 +90,7 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ INSTALL CHECKPOLICY +++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
-sudo dnf install checkpolicy
+sudo dnf install -y checkpolicy
 #done
 
 cd /opt/tak && sudo ./apply-selinux.sh && sudo semodule -l | grep takserver
@@ -90,9 +101,6 @@ cd -
 ##check java version
 echo "Check JAVA version, should be 17.x"
 java -version
-
-echo "choose the java 17.x (openjdk) option (3?)"
-sudo alternatives --config java
 
 
 ##Configure Tak Server
@@ -131,15 +139,15 @@ sudo firewall-cmd --reload
 echo "Install Complete, creating tak certificates!!"
 
 echo "copying certificate scripts to correct locations"
-sudo cp createTakCerts.sh /opt/tak/certs
-sudo cp takUserCreateCerts_doNotRunAsRoot.sh /opt/tak/certs
+sudo cp "$SCRIPT_DIR/createTakCerts.sh" /opt/tak/certs
+sudo cp "$SCRIPT_DIR/takUserCreateCerts_doNotRunAsRoot.sh" /opt/tak/certs
 
 ##allow script execution
 sudo chmod +x /opt/tak/certs/createTakCerts.sh
 sudo chmod +x /opt/tak/certs/takUserCreateCerts_doNotRunAsRoot.sh
-sudo chmod +x takserver_createLECerts.sh
-sudo chmod +x createTakCerts.sh
-sudo chmod +x promoteAdmin.sh
+sudo chmod +x "$SCRIPT_DIR/takserver_createLECerts.sh"
+sudo chmod +x "$SCRIPT_DIR/createTakCerts.sh"
+sudo chmod +x "$SCRIPT_DIR/promoteAdmin.sh"
 
 echo "running certificate script"
 cd /opt/tak/certs/
@@ -148,7 +156,7 @@ sudo ./createTakCerts.sh
 cd -
 
 echo "promoting certs to admin"
-./promoteAdmin.sh
+"$SCRIPT_DIR/promoteAdmin.sh"
 
 
 echo "+++++++++++++++ ALL DONE! ++++++++++++++++"

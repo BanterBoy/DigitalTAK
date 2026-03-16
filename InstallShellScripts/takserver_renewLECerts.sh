@@ -9,15 +9,37 @@
 
 ##If you don't have all of this, do NOT run this script. It will fail.
 
+set -euo pipefail
 
-certNameVar="takserver.leigh-services.net"
 
-## Conduct a certificate renewal dry run to verify permissions and path
-sudo certbot renew --force-renewal
+CERT_NAME="${1:-${CERT_NAME:-}}"
+
+if [ -z "$CERT_NAME" ] && [ -f /etc/takserver_renew.conf ]; then
+	# shellcheck disable=SC1091
+	source /etc/takserver_renew.conf
+	CERT_NAME="${CERT_NAME:-}"
+fi
+
+if [ -z "$CERT_NAME" ]; then
+	echo "ERROR: Certificate name not provided."
+	echo "Provide as arg: sudo ./takserver_renewLECerts.sh tak.example.com"
+	echo "Or set CERT_NAME in /etc/takserver_renew.conf"
+	exit 1
+fi
+
+LE_CERT_DIR="/etc/letsencrypt/live/$CERT_NAME"
+
+if [ ! -f "$LE_CERT_DIR/fullchain.pem" ] || [ ! -f "$LE_CERT_DIR/privkey.pem" ]; then
+	echo "ERROR: Missing Let's Encrypt files under $LE_CERT_DIR"
+	exit 1
+fi
+
+## Renew certificates if needed
+sudo certbot renew
 
 ######## Edit this line
 #Create our PKCS12 certificate from our signed certificate and private key
-sudo openssl pkcs12 -export -in /etc/letsencrypt/live/$certNameVar/fullchain.pem -inkey /etc/letsencrypt/live/$certNameVar/privkey.pem -out takserver-le.p12 -name $certNameVar -password pass:atakatak
+sudo openssl pkcs12 -export -in "$LE_CERT_DIR/fullchain.pem" -inkey "$LE_CERT_DIR/privkey.pem" -out takserver-le.p12 -name "$CERT_NAME" -password pass:atakatak
 
 #View our PKCS12 content
 #sudo openssl pkcs12 -info -in takserver-le.p12
@@ -26,8 +48,8 @@ sudo openssl pkcs12 -export -in /etc/letsencrypt/live/$certNameVar/fullchain.pem
 sudo keytool -importkeystore -srcstorepass atakatak -deststorepass atakatak -destkeystore takserver-le.jks -srckeystore takserver-le.p12 -srcstoretype pkcs12
 
 #remove the old jks and p12 files
-sudo rm /opt/tak/certs/files/takserver-le.jks
-sudo rm /opt/tak/certs/files/takserver-le.p12
+sudo rm -f /opt/tak/certs/files/takserver-le.jks
+sudo rm -f /opt/tak/certs/files/takserver-le.p12
 
 #Move the certificate to the TAK certificate directory
 sudo mv takserver-le.jks /opt/tak/certs/files/

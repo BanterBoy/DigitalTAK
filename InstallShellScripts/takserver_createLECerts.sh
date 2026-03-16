@@ -9,17 +9,23 @@
 
 ##If you don't have all of this, do NOT run this script. It will fail.
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 #allow renewal script to be executed
-sudo chmod +x takserver_renewLECerts.sh
+sudo chmod +x "$SCRIPT_DIR/takserver_renewLECerts.sh"
 
 ## Install snapd
-sudo yum install snapd -y
+sudo dnf install -y snapd
 
 ## Enable snapd
 sudo systemctl enable --now snapd.socket
 
 ## Create the symbolic link for snap
-sudo ln -s /var/lib/snapd/snap /snap
+if [ ! -e /snap ]; then
+	sudo ln -s /var/lib/snapd/snap /snap
+fi
 
 ## Add 80/TCP to our public zone and make it permanent
 #configure firewall
@@ -47,7 +53,9 @@ snap wait system seed.loaded
 sudo snap install --classic certbot
 
 ## Create the symbolic links to certbot
-sudo ln -s /snap/bin/certbot /usr/bin/certbot
+if [ ! -e /usr/bin/certbot ]; then
+	sudo ln -s /snap/bin/certbot /usr/bin/certbot
+fi
 
 ## must be on the correct server, with port 80 open, and DNS setup...
 
@@ -59,14 +67,14 @@ sudo certbot certonly --standalone
 
 read -p 'Certificate Name (FQDN) [ex: tak.domain.com]: ' certNameVar
 
-openssl x509 -text -in /etc/letsencrypt/live/$certNameVar/fullchain.pem -noout
+openssl x509 -text -in "/etc/letsencrypt/live/$certNameVar/fullchain.pem" -noout
 
 ## Conduct a certificate renewal dry run to verify permissions and path
 sudo certbot renew --dry-run
 
 ######## Edit this line
 ## Create our PKCS12 certificate from our signed certificate and private key
-sudo openssl pkcs12 -export -in /etc/letsencrypt/live/$certNameVar/fullchain.pem -inkey /etc/letsencrypt/live/$certNameVar/privkey.pem -out takserver-le.p12 -name $certNameVar -password pass:atakatak
+sudo openssl pkcs12 -export -in "/etc/letsencrypt/live/$certNameVar/fullchain.pem" -inkey "/etc/letsencrypt/live/$certNameVar/privkey.pem" -out takserver-le.p12 -name "$certNameVar" -password pass:atakatak
 
 ## View our PKCS12 content
 #sudo openssl pkcs12 -info -in takserver-le.p12
@@ -100,15 +108,14 @@ cd -
 
 echo "let's make a monthly cron job to renew the LE cert"
 
-echo "modifying the renew script for your domain entered previously"
-
-sed -i 's/certNameVar="PUT_DOMAIN_HERE"/certNameVar='"$certNameVar"'/g' takserver_renewLECerts.sh
-
-echo "modified."
+echo "writing renewal config to /etc/takserver_renew.conf"
+sudo tee /etc/takserver_renew.conf > /dev/null <<EOF
+CERT_NAME="$certNameVar"
+EOF
 
 
 #allow renewal script to be executed
 #sudo chmod +x /home/atak/Downloads/takserver_renewLECerts.sh
-sudo cp takserver_renewLECerts.sh /etc/cron.monthly/
+sudo install -m 0755 "$SCRIPT_DIR/takserver_renewLECerts.sh" /etc/cron.monthly/takserver_renewLECerts.sh
 echo "copied to /etc/cron.monthly"
 echo "the takserver LE certificate should be renewed monthly"
