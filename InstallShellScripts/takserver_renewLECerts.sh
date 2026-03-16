@@ -13,17 +13,26 @@ set -euo pipefail
 
 
 CERT_NAME="${1:-${CERT_NAME:-}}"
+CERT_PASSWORD="${2:-${CERT_PASSWORD:-}}"
 
 if [ -z "$CERT_NAME" ] && [ -f /etc/takserver_renew.conf ]; then
 	# shellcheck disable=SC1091
 	source /etc/takserver_renew.conf
 	CERT_NAME="${CERT_NAME:-}"
+	CERT_PASSWORD="${CERT_PASSWORD:-}"
 fi
 
 if [ -z "$CERT_NAME" ]; then
 	echo "ERROR: Certificate name not provided."
 	echo "Provide as arg: sudo ./takserver_renewLECerts.sh tak.example.com"
 	echo "Or set CERT_NAME in /etc/takserver_renew.conf"
+	exit 1
+fi
+
+if [ -z "$CERT_PASSWORD" ]; then
+	echo "ERROR: Certificate password not provided."
+	echo "Provide as arg: sudo ./takserver_renewLECerts.sh tak.example.com 'yourPassword'"
+	echo "Or set CERT_PASSWORD in /etc/takserver_renew.conf"
 	exit 1
 fi
 
@@ -39,13 +48,13 @@ sudo certbot renew
 
 ######## Edit this line
 #Create our PKCS12 certificate from our signed certificate and private key
-sudo openssl pkcs12 -export -in "$LE_CERT_DIR/fullchain.pem" -inkey "$LE_CERT_DIR/privkey.pem" -out takserver-le.p12 -name "$CERT_NAME" -password pass:atakatak
+sudo openssl pkcs12 -export -in "$LE_CERT_DIR/fullchain.pem" -inkey "$LE_CERT_DIR/privkey.pem" -out takserver-le.p12 -name "$CERT_NAME" -password "pass:$CERT_PASSWORD"
 
 #View our PKCS12 content
 #sudo openssl pkcs12 -info -in takserver-le.p12
 
 #Create our Java Keystore from our PKCS12 certificate
-sudo keytool -importkeystore -srcstorepass atakatak -deststorepass atakatak -destkeystore takserver-le.jks -srckeystore takserver-le.p12 -srcstoretype pkcs12
+sudo keytool -importkeystore -srcstorepass "$CERT_PASSWORD" -deststorepass "$CERT_PASSWORD" -destkeystore takserver-le.jks -srckeystore takserver-le.p12 -srcstoretype pkcs12
 
 #remove the old jks and p12 files
 sudo rm -f /opt/tak/certs/files/takserver-le.jks

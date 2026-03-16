@@ -62,6 +62,20 @@ fi
 ## Begin our certificate signing process for a standalone webserver
 sudo certbot certonly --standalone
 
+read -s -p 'Password for LE PKCS12/JKS keystores: ' certPassword
+echo ""
+if [ -z "$certPassword" ]; then
+	echo "Password cannot be empty."
+	exit 1
+fi
+
+read -s -p 'Confirm keystore password: ' certPasswordConfirm
+echo ""
+if [ "$certPassword" != "$certPasswordConfirm" ]; then
+	echo "Passwords do not match."
+	exit 1
+fi
+
 ########Edit this next line
 ## Verify our newly signed certificate by viewing the contents
 
@@ -74,13 +88,13 @@ sudo certbot renew --dry-run
 
 ######## Edit this line
 ## Create our PKCS12 certificate from our signed certificate and private key
-sudo openssl pkcs12 -export -in "/etc/letsencrypt/live/$certNameVar/fullchain.pem" -inkey "/etc/letsencrypt/live/$certNameVar/privkey.pem" -out takserver-le.p12 -name "$certNameVar" -password pass:atakatak
+sudo openssl pkcs12 -export -in "/etc/letsencrypt/live/$certNameVar/fullchain.pem" -inkey "/etc/letsencrypt/live/$certNameVar/privkey.pem" -out takserver-le.p12 -name "$certNameVar" -password "pass:$certPassword"
 
 ## View our PKCS12 content
 #sudo openssl pkcs12 -info -in takserver-le.p12
 
 ## Create our Java Keystore from our PKCS12 certificate
-sudo keytool -importkeystore -srcstorepass atakatak -deststorepass atakatak -destkeystore takserver-le.jks -srckeystore takserver-le.p12 -srcstoretype pkcs12
+sudo keytool -importkeystore -srcstorepass "$certPassword" -deststorepass "$certPassword" -destkeystore takserver-le.jks -srckeystore takserver-le.p12 -srcstoretype pkcs12
 
 ## Move the certificate to the TAK certificate directory
 sudo mv takserver-le.jks /opt/tak/certs/files
@@ -94,7 +108,8 @@ sudo systemctl stop takserver
 
 ###use sed to replace the existing 8446 connector with 
 
-sed -i 's|<connector port="8446" clientAuth="false" _name="cert_https"/>|<connector port="8446" clientAuth="false" _name="LetsEncrypt" keystore="JKS" keystoreFile="certs/files/takserver-le.jks" keystorePass="atakatak"/>|g' /opt/tak/CoreConfig.xml
+escapedCertPassword=$(printf '%s' "$certPassword" | sed 's/[&|]/\\&/g')
+sed -i "s|<connector port=\"8446\" clientAuth=\"false\" _name=\"cert_https\"/>|<connector port=\"8446\" clientAuth=\"false\" _name=\"LetsEncrypt\" keystore=\"JKS\" keystoreFile=\"certs/files/takserver-le.jks\" keystorePass=\"$escapedCertPassword\"/>|g" /opt/tak/CoreConfig.xml
 
 rm CoreConfig.example.xml
 cp CoreConfig.xml CoreConfig.example.xml
@@ -109,9 +124,11 @@ cd -
 echo "let's make a monthly cron job to renew the LE cert"
 
 echo "writing renewal config to /etc/takserver_renew.conf"
-sudo tee /etc/takserver_renew.conf > /dev/null <<EOF
-CERT_NAME="$certNameVar"
-EOF
+{
+	printf 'CERT_NAME=%q\n' "$certNameVar"
+	printf 'CERT_PASSWORD=%q\n' "$certPassword"
+} | sudo tee /etc/takserver_renew.conf > /dev/null
+sudo chmod 600 /etc/takserver_renew.conf
 
 
 #allow renewal script to be executed

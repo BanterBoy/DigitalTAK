@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 sleep 10s
 echo "70"
 
@@ -29,6 +31,20 @@ read -p 'STATE: ' statevar
 read -p 'CITY: ' cityvar
 read -p 'ORGANIZATION: ' orgvar
 read -p 'ORGANIZATIONAL_UNIT: ' ouvar
+
+read -s -p 'TAK certificate keystore password: ' takCertPass
+echo ""
+if [ -z "$takCertPass" ]; then
+	echo "Password cannot be empty."
+	exit 1
+fi
+
+read -s -p 'Confirm TAK certificate keystore password: ' takCertPassConfirm
+echo ""
+if [ "$takCertPass" != "$takCertPassConfirm" ]; then
+	echo "Passwords do not match."
+	exit 1
+fi
 
 
 
@@ -92,7 +108,8 @@ echo "complete"
 
 echo "enabling TAKserver signing, enrolled user certificates will be valid for 3650 days"
 
-sed -i 's|<vbm enabled="false"/>|<certificateSigning CA="TAKServer"><certificateConfig>\n<nameEntries>\n<nameEntry name="O" value="TAK"/>\n<nameEntry name="OU" value="TAK"/>\n</nameEntries>\n</certificateConfig>\n<TAKServerCAConfig keystore="JKS" keystoreFile="certs/files/intermediate-ca-signing.jks"  keystorePass="atakatak" validityDays="3650" signatureAlg="SHA256WithRSA" />\n</certificateSigning>\n <vbm enabled="false"/>|g' /opt/tak/CoreConfig.xml
+escapedTakCertPass=$(printf '%s' "$takCertPass" | sed 's/[&|]/\\&/g')
+sed -i "s|<vbm enabled=\"false\"/>|<certificateSigning CA=\"TAKServer\"><certificateConfig>\\n<nameEntries>\\n<nameEntry name=\"O\" value=\"TAK\"/>\\n<nameEntry name=\"OU\" value=\"TAK\"/>\\n</nameEntries>\\n</certificateConfig>\\n<TAKServerCAConfig keystore=\"JKS\" keystoreFile=\"certs/files/intermediate-ca-signing.jks\"  keystorePass=\"$escapedTakCertPass\" validityDays=\"3650\" signatureAlg=\"SHA256WithRSA\" />\\n</certificateSigning>\\n <vbm enabled=\"false\"/>|g" /opt/tak/CoreConfig.xml
 
 sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
 

@@ -8,6 +8,9 @@
 
 set -euo pipefail
 
+# Set OPENFIRE_OPEN_ADMIN_PORTS=false to keep 9090/9091 closed on host firewall.
+OPENFIRE_OPEN_ADMIN_PORTS="${OPENFIRE_OPEN_ADMIN_PORTS:-true}"
+
 echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ DISABLE COCKPIT (port 9090 conflict) +"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
@@ -16,8 +19,7 @@ echo "++++++++++++++++++++++++++++++++++++++++++++"
 # This directly conflicts with the Openfire admin console on the same port.
 # Cockpit is not needed on this server (administration is done via SSH), so disable it.
 echo "Stopping and disabling Cockpit to free port 9090..."
-sudo systemctl stop cockpit.socket cockpit
-sudo systemctl disable cockpit.socket cockpit
+sudo systemctl disable --now cockpit.socket cockpit >/dev/null 2>&1 || true
 echo "Cockpit disabled."
 
 echo "++++++++++++++++++++++++++++++++++++++++++++"
@@ -109,6 +111,8 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ CONFIGURE FIREWALL ++++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
+sudo systemctl enable --now firewalld
+
 # TAK Server ports - these should already be open from RL9.5_tak5.4r14_install.sh.
 # --permanent is idempotent so re-adding them is safe.
 echo "Ensuring TAK Server ports are open..."
@@ -134,11 +138,15 @@ sudo firewall-cmd --zone=public --permanent --add-port=7443/tcp   # Web Binding 
 echo "Opening Openfire file transfer port..."
 sudo firewall-cmd --zone=public --permanent --add-port=7777/tcp   # File Transfer Proxy
 
-# Openfire admin console ports 9090 (HTTP) and 9091 (HTTPS) are NOT opened here.
-# Access to these ports is restricted at the Digital Ocean firewall level.
-echo "Opening Openfire admin console ports..."
-sudo firewall-cmd --zone=public --permanent --add-port=9090/tcp   # Openfire Admin Console HTTP
-sudo firewall-cmd --zone=public --permanent --add-port=9091/tcp   # Openfire Admin Console HTTPS
+# Openfire admin console ports are optional.
+# Use OPENFIRE_OPEN_ADMIN_PORTS=false to keep these closed on host firewall.
+if [ "$OPENFIRE_OPEN_ADMIN_PORTS" = "true" ]; then
+    echo "Opening Openfire admin console ports..."
+    sudo firewall-cmd --zone=public --permanent --add-port=9090/tcp   # Openfire Admin Console HTTP
+    sudo firewall-cmd --zone=public --permanent --add-port=9091/tcp   # Openfire Admin Console HTTPS
+else
+    echo "Leaving Openfire admin console ports closed (OPENFIRE_OPEN_ADMIN_PORTS=false)."
+fi
 
 sudo firewall-cmd --reload
 
@@ -195,8 +203,12 @@ echo "5269       tcp    Openfire XMPP server-to-server (optional federation only
 echo "7070       tcp    Openfire Web Binding HTTP (websocket/BOSH for web clients)"
 echo "7443       tcp    Openfire Web Binding HTTPS (websocket/BOSH for web clients)"
 echo "7777       tcp    Openfire File Transfer Proxy (xmpp file transfers)"
-echo "9090       tcp    Openfire Admin Console HTTP  (restricted at Digital Ocean firewall)"
-echo "9091       tcp    Openfire Admin Console HTTPS (restricted at Digital Ocean firewall)"
+if [ "$OPENFIRE_OPEN_ADMIN_PORTS" = "true" ]; then
+echo "9090       tcp    Openfire Admin Console HTTP"
+echo "9091       tcp    Openfire Admin Console HTTPS"
+else
+echo "9090/9091  tcp    Openfire Admin Console (closed on host firewall)"
+fi
 echo "8080       udp    TAK Server CoT/QUIC (ATAK 4.6+, optional)"
 echo ""
 
