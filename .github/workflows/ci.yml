@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches: [prod, main]
+  pull_request:
+
+jobs:
+  # ─── Pester unit tests ──────────────────────────────────────────────────────
+  pester:
+    name: Pester Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PowerShell
+        run: |
+          wget -q "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update -q
+          sudo apt-get install -y powershell
+
+      - name: Install Pester and Posh-SSH
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module Pester    -MinimumVersion 5.0 -Force -Scope CurrentUser
+          Install-Module Posh-SSH  -Force -Scope CurrentUser
+
+      - name: Run TAKServerPS tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './TAKServerPS/Tests'
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-TAKServerPS.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
+      - name: Run TAKInstall tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './TAKInstall/Tests'
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-TAKInstall.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-results
+          path: TestResults-*.xml
+
+  # ─── PSScriptAnalyzer lint ──────────────────────────────────────────────────
+  psscriptanalyzer:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PowerShell
+        run: |
+          wget -q "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update -q
+          sudo apt-get install -y powershell
+
+      - name: Lint TAKServerPS and TAKInstall
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+
+          $settings = './TAKServerPS/PSScriptAnalyzerSettings.psd1'
+          $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings
+          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse
+
+          $all = @($r1) + @($r2)
+          if ($all) {
+              $all | Format-Table RuleName, Severity, ScriptName, Line, Message -AutoSize
+              Write-Error "PSScriptAnalyzer reported $($all.Count) violation(s)."
+              exit 1
+          }
+          Write-Host "PSScriptAnalyzer: no violations found."
+
+  # ─── ShellCheck ─────────────────────────────────────────────────────────────
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ShellCheck on InstallShellScripts
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './InstallShellScripts'
+          severity: warning
+
+  # ─── TXT mirror sync check ──────────────────────────────────────────────────
+  txt-sync:
+    name: TXT Mirror Sync Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify TXT mirrors match .sh files
+        run: |
+          fail=0
+          for f in InstallShellScripts/*.sh; do
+            base=$(basename "$f" .sh)
+            txt="TXTScripts/$base.txt"
+            if [ ! -f "$txt" ]; then
+              echo "MISSING: $txt (no TXT mirror for $f)"
+              fail=1
+            elif ! diff -q "$f" "$txt" > /dev/null 2>&1; then
+              echo "OUT OF SYNC: $txt does not match $f"
+              diff "$f" "$txt" || true
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then
+            echo ""
+            echo "Run ./Sync-TXTMirrors.ps1 to update TXT mirrors after editing .sh files."
+            exit 1
+          fi
+          echo "All TXT mirrors are in sync."

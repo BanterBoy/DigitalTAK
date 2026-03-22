@@ -20,7 +20,9 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 #done
 
 sudo dnf install -y dnf-plugins-core
-sudo dnf install vim -y
+
+INSTALL_VIM="${INSTALL_VIM:-false}"
+[ "$INSTALL_VIM" = "true" ] && sudo dnf install -y vim || true
 
 echo "Install epel-release"
 sudo dnf install epel-release -y
@@ -151,10 +153,12 @@ echo "Install Complete, creating tak certificates!!"
 echo "copying certificate scripts to correct locations"
 sudo cp "$SCRIPT_DIR/createTakCerts.sh" /opt/tak/certs
 sudo cp "$SCRIPT_DIR/takUserCreateCerts_doNotRunAsRoot.sh" /opt/tak/certs
+sudo cp "$SCRIPT_DIR/utils.sh" /opt/tak/certs
 
 ##allow script execution
 sudo chmod +x /opt/tak/certs/createTakCerts.sh
 sudo chmod +x /opt/tak/certs/takUserCreateCerts_doNotRunAsRoot.sh
+sudo chmod 755 /opt/tak/certs/utils.sh
 sudo chmod +x "$SCRIPT_DIR/takserver_createLECerts.sh"
 sudo chmod +x "$SCRIPT_DIR/createTakCerts.sh"
 sudo chmod +x "$SCRIPT_DIR/promoteAdmin.sh"

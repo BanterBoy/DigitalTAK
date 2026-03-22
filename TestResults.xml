@@ -1,0 +1,777 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="198" errors="0" failures="78" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-03-22" time="21:31:34">
+  <environment user-domain="AzureAD" cwd="C:\GitRepos\DigitalTAK" platform="Microsoft Windows 11 Pro|C:\Windows|\Device\Harddisk0\Partition3" machine-name="LUKE" clr-version="10.0.5" nunit-version="2.5.8.0" user="LukeLeigh" os-version="10.0.26200" />
+  <culture-info current-culture="en-GB" current-uiculture="en-GB" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="4.4331" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\Connect-TAKServer.Tests.ps1" executed="True" result="Success" success="True" time="0.9303" asserts="0" description="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\Connect-TAKServer.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Connect-TAKServer — Successful Connection" executed="True" result="Success" success="True" time="0.4034" asserts="0" description="Connect-TAKServer — Successful Connection">
+            <results>
+              <test-case description="returns a session object on success" name="Connect-TAKServer — Successful Connection.returns a session object on success" time="0.1997" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="returned object has PSTypeName TAKServer.Session" name="Connect-TAKServer — Successful Connection.returned object has PSTypeName TAKServer.Session" time="0.0126" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="stores the HostName in the session" name="Connect-TAKServer — Successful Connection.stores the HostName in the session" time="0.0193" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="BaseUrl defaults to port 8443" name="Connect-TAKServer — Successful Connection.BaseUrl defaults to port 8443" time="0.0076" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="respects a custom Port parameter" name="Connect-TAKServer — Successful Connection.respects a custom Port parameter" time="0.0098" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="stores the session in module scope ($script:TAKSession)" name="Connect-TAKServer — Successful Connection.stores the session in module scope ($script:TAKSession)" time="0.0089" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="stores Credential in session when Credential parameter set is used" name="Connect-TAKServer — Successful Connection.stores Credential in session when Credential parameter set is used" time="0.0849" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="stores Token in session when Token parameter set is used" name="Connect-TAKServer — Successful Connection.stores Token in session when Token parameter set is used" time="0.0088" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="SkipCertificateCheck defaults to $true in the session" name="Connect-TAKServer — Successful Connection.SkipCertificateCheck defaults to $true in the session" time="0.0098" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="stores SkipCertCheck=$false when explicitly set to $false" name="Connect-TAKServer — Successful Connection.stores SkipCertCheck=$false when explicitly set to $false" time="0.0089" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Connect-TAKServer — Connection Failure" executed="True" result="Success" success="True" time="0.4678" asserts="0" description="Connect-TAKServer — Connection Failure">
+            <results>
+              <test-case description="throws a terminating error when the connectivity probe fails" name="Connect-TAKServer — Connection Failure.throws a terminating error when the connectivity probe fails" time="0.0317" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="clears $script:TAKSession when connectivity probe fails" name="Connect-TAKServer — Connection Failure.clears $script:TAKSession when connectivity probe fails" time="0.0266" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Connect-TAKServer — Parameter Validation" executed="True" result="Success" success="True" time="0.5321" asserts="0" description="Connect-TAKServer — Parameter Validation">
+            <results>
+              <test-case description="Port must be within 1-65535 (rejects 0)" name="Connect-TAKServer — Parameter Validation.Port must be within 1-65535 (rejects 0)" time="0.0148" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Port must be within 1-65535 (rejects 65536)" name="Connect-TAKServer — Parameter Validation.Port must be within 1-65535 (rejects 65536)" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="HostName is mandatory" name="Connect-TAKServer — Parameter Validation.HostName is mandatory" time="0.0188" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Credential parameter is mandatory in the Credential parameter set" name="Connect-TAKServer — Parameter Validation.Credential parameter is mandatory in the Credential parameter set" time="0.0141" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Token parameter is mandatory in the Token parameter set" name="Connect-TAKServer — Parameter Validation.Token parameter is mandatory in the Token parameter set" time="0.0079" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Disconnect-TAKServer" executed="True" result="Success" success="True" time="0.6092" asserts="0" description="Disconnect-TAKServer">
+            <results>
+              <test-case description="clears $script:TAKSession after disconnect" name="Disconnect-TAKServer.clears $script:TAKSession after disconnect" time="0.0685" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="does not throw when called with no active session" name="Disconnect-TAKServer.does not throw when called with no active session" time="0.0042" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\Invoke-TAKRequest.Tests.ps1" executed="True" result="Success" success="True" time="0.4721" asserts="0" description="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\Invoke-TAKRequest.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Invoke-TAKRequest — Session Guard" executed="True" result="Success" success="True" time="0.0207" asserts="0" description="Invoke-TAKRequest — Session Guard">
+            <results>
+              <test-case description="throws a terminating error when no session is active" name="Invoke-TAKRequest — Session Guard.throws a terminating error when no session is active" time="0.0082" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="error has ErrorId TAKNotConnected" name="Invoke-TAKRequest — Session Guard.error has ErrorId TAKNotConnected" time="0.0041" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="error message instructs the user to run Connect-TAKServer" name="Invoke-TAKRequest — Session Guard.error message instructs the user to run Connect-TAKServer" time="0.0039" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRequest — URI Construction" executed="True" result="Success" success="True" time="0.19" asserts="0" description="Invoke-TAKRequest — URI Construction">
+            <results>
+              <test-case description="builds URI from session BaseUrl and the supplied Path" name="Invoke-TAKRequest — URI Construction.builds URI from session BaseUrl and the supplied Path" time="0.0758" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="preserves port 8443 from the session BaseUrl" name="Invoke-TAKRequest — URI Construction.preserves port 8443 from the session BaseUrl" time="0.0097" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="encodes query parameter strings in the URI" name="Invoke-TAKRequest — URI Construction.encodes query parameter strings in the URI" time="0.0151" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="includes all non-null query parameters" name="Invoke-TAKRequest — URI Construction.includes all non-null query parameters" time="0.0099" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="omits query parameters whose value is null" name="Invoke-TAKRequest — URI Construction.omits query parameters whose value is null" time="0.0297" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="uses HTTP GET by default" name="Invoke-TAKRequest — URI Construction.uses HTTP GET by default" time="0.0121" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="passes the specified HTTP method to Invoke-RestMethod" name="Invoke-TAKRequest — URI Construction.passes the specified HTTP method to Invoke-RestMethod" time="0.0132" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRequest — Authentication Priority" executed="True" result="Success" success="True" time="0.3113" asserts="0" description="Invoke-TAKRequest — Authentication Priority">
+            <results>
+              <test-suite type="TestFixture" name="Invoke-TAKRequest — Authentication Priority.Certificate (highest priority)" executed="True" result="Success" success="True" time="0.0372" asserts="0" description="Invoke-TAKRequest — Authentication Priority.Certificate (highest priority)">
+                <results>
+                  <test-case description="passes the Certificate to Invoke-RestMethod" name="Invoke-TAKRequest — Authentication Priority.Certificate (highest priority).passes the Certificate to Invoke-RestMethod" time="0.0199" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="does NOT set Authentication=Bearer when Certificate is present" name="Invoke-TAKRequest — Authentication Priority.Certificate (highest priority).does NOT set Authentication=Bearer when Certificate is present" time="0.0143" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Invoke-TAKRequest — Authentication Priority.Bearer Token (when no Certificate)" executed="True" result="Success" success="True" time="0.0694" asserts="0" description="Invoke-TAKRequest — Authentication Priority.Bearer Token (when no Certificate)">
+                <results>
+                  <test-case description="sets Authentication=Bearer" name="Invoke-TAKRequest — Authentication Priority.Bearer Token (when no Certificate).sets Authentication=Bearer" time="0.0166" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="passes the Token to Invoke-RestMethod" name="Invoke-TAKRequest — Authentication Priority.Bearer Token (when no Certificate).passes the Token to Invoke-RestMethod" time="0.0114" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Invoke-TAKRequest — Authentication Priority.Basic Credential (when no Certificate or Token)" executed="True" result="Success" success="True" time="0.1183" asserts="0" description="Invoke-TAKRequest — Authentication Priority.Basic Credential (when no Certificate or Token)">
+                <results>
+                  <test-case description="sets Authentication=Basic" name="Invoke-TAKRequest — Authentication Priority.Basic Credential (when no Certificate or Token).sets Authentication=Basic" time="0.029" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="passes the Credential to Invoke-RestMethod" name="Invoke-TAKRequest — Authentication Priority.Basic Credential (when no Certificate or Token).passes the Credential to Invoke-RestMethod" time="0.0165" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRequest — SkipCertificateCheck" executed="True" result="Success" success="True" time="0.3479" asserts="0" description="Invoke-TAKRequest — SkipCertificateCheck">
+            <results>
+              <test-case description="passes SkipCertificateCheck=$true when session flag is true" name="Invoke-TAKRequest — SkipCertificateCheck.passes SkipCertificateCheck=$true when session flag is true" time="0.0197" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="does NOT pass SkipCertificateCheck when session flag is false" name="Invoke-TAKRequest — SkipCertificateCheck.does NOT pass SkipCertificateCheck when session flag is false" time="0.0139" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRequest — Response Handling" executed="True" result="Success" success="True" time="0.4089" asserts="0" description="Invoke-TAKRequest — Response Handling">
+            <results>
+              <test-case description="unwraps the .data property of a TAK ApiResponse wrapper by default" name="Invoke-TAKRequest — Response Handling.unwraps the .data property of a TAK ApiResponse wrapper by default" time="0.0207" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="returns the full response object when -Raw is specified" name="Invoke-TAKRequest — Response Handling.returns the full response object when -Raw is specified" time="0.0093" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="returns the response as-is when the response has no .data property" name="Invoke-TAKRequest — Response Handling.returns the response as-is when the response has no .data property" time="0.0081" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="serialises a Body object as JSON and passes ContentType application/json" name="Invoke-TAKRequest — Response Handling.serialises a Body object as JSON and passes ContentType application/json" time="0.0196" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\TAKServerPS.Module.Tests.ps1" executed="True" result="Success" success="True" time="1.5751" asserts="0" description="C:\GitRepos\DigitalTAK\TAKServerPS\Tests\TAKServerPS.Module.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="TAKServer — Module Manifest" executed="True" result="Success" success="True" time="1.0172" asserts="0" description="TAKServer — Module Manifest">
+            <results>
+              <test-case description="passes Test-ModuleManifest without error" name="TAKServer — Module Manifest.passes Test-ModuleManifest without error" time="0.1662" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="has PowerShellVersion 7.0" name="TAKServer — Module Manifest.has PowerShellVersion 7.0" time="0.1647" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares RootModule as TAKServer.psm1" name="TAKServer — Module Manifest.declares RootModule as TAKServer.psm1" time="0.1588" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="exports exactly 44 functions in the manifest" name="TAKServer — Module Manifest.exports exactly 44 functions in the manifest" time="0.1632" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares a non-empty Author" name="TAKServer — Module Manifest.declares a non-empty Author" time="0.1876" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares a non-empty ModuleVersion" name="TAKServer — Module Manifest.declares a non-empty ModuleVersion" time="0.1727" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKServer — Module Import and Exports" executed="True" result="Success" success="True" time="1.3337" asserts="0" description="TAKServer — Module Import and Exports">
+            <results>
+              <test-case description="module is discoverable after import" name="TAKServer — Module Import and Exports.module is discoverable after import" time="0.0054" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="exports exactly 44 commands at runtime" name="TAKServer — Module Import and Exports.exports exactly 44 commands at runtime" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="TAKServer — Module Import and Exports.exports &lt;_&gt;" executed="True" result="Success" success="True" time="0.271" asserts="0" description="exports &lt;_&gt;">
+                <results>
+                  <test-case description="exports Connect-TAKServer" name="TAKServer — Module Import and Exports.exports Connect-TAKServer" time="0.0102" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Disconnect-TAKServer" name="TAKServer — Module Import and Exports.exports Disconnect-TAKServer" time="0.0092" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKCertificate" name="TAKServer — Module Import and Exports.exports Get-TAKCertificate" time="0.0058" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKContact" name="TAKServer — Module Import and Exports.exports Get-TAKContact" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKCoT" name="TAKServer — Module Import and Exports.exports Get-TAKCoT" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKDataFeed" name="TAKServer — Module Import and Exports.exports Get-TAKDataFeed" time="0.0054" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKDeviceProfile" name="TAKServer — Module Import and Exports.exports Get-TAKDeviceProfile" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKFederate" name="TAKServer — Module Import and Exports.exports Get-TAKFederate" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKGroup" name="TAKServer — Module Import and Exports.exports Get-TAKGroup" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKInput" name="TAKServer — Module Import and Exports.exports Get-TAKInput" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKMapLayer" name="TAKServer — Module Import and Exports.exports Get-TAKMapLayer" time="0.0053" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKMission" name="TAKServer — Module Import and Exports.exports Get-TAKMission" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKMissionChange" name="TAKServer — Module Import and Exports.exports Get-TAKMissionChange" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKMissionContact" name="TAKServer — Module Import and Exports.exports Get-TAKMissionContact" time="0.0068" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKMissionSubscription" name="TAKServer — Module Import and Exports.exports Get-TAKMissionSubscription" time="0.0063" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKOutgoingConnection" name="TAKServer — Module Import and Exports.exports Get-TAKOutgoingConnection" time="0.0054" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKPlugin" name="TAKServer — Module Import and Exports.exports Get-TAKPlugin" time="0.0063" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKSecurityConfig" name="TAKServer — Module Import and Exports.exports Get-TAKSecurityConfig" time="0.0056" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKSubscription" name="TAKServer — Module Import and Exports.exports Get-TAKSubscription" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKUser" name="TAKServer — Module Import and Exports.exports Get-TAKUser" time="0.0058" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKVersion" name="TAKServer — Module Import and Exports.exports Get-TAKVersion" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Get-TAKVideo" name="TAKServer — Module Import and Exports.exports Get-TAKVideo" time="0.0061" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Invoke-TAKCertificateSign" name="TAKServer — Module Import and Exports.exports Invoke-TAKCertificateSign" time="0.0058" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKDataFeed" name="TAKServer — Module Import and Exports.exports New-TAKDataFeed" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKInput" name="TAKServer — Module Import and Exports.exports New-TAKInput" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKMission" name="TAKServer — Module Import and Exports.exports New-TAKMission" time="0.0063" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKOutgoingConnection" name="TAKServer — Module Import and Exports.exports New-TAKOutgoingConnection" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKUser" name="TAKServer — Module Import and Exports.exports New-TAKUser" time="0.0071" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports New-TAKVideo" name="TAKServer — Module Import and Exports.exports New-TAKVideo" time="0.0063" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Register-TAKMissionSubscription" name="TAKServer — Module Import and Exports.exports Register-TAKMissionSubscription" time="0.01" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKCertificate" name="TAKServer — Module Import and Exports.exports Remove-TAKCertificate" time="0.0066" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKDataFeed" name="TAKServer — Module Import and Exports.exports Remove-TAKDataFeed" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKInput" name="TAKServer — Module Import and Exports.exports Remove-TAKInput" time="0.0069" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKMapLayer" name="TAKServer — Module Import and Exports.exports Remove-TAKMapLayer" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKMission" name="TAKServer — Module Import and Exports.exports Remove-TAKMission" time="0.0063" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKOutgoingConnection" name="TAKServer — Module Import and Exports.exports Remove-TAKOutgoingConnection" time="0.006" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKSubscription" name="TAKServer — Module Import and Exports.exports Remove-TAKSubscription" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKToken" name="TAKServer — Module Import and Exports.exports Remove-TAKToken" time="0.0068" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKUser" name="TAKServer — Module Import and Exports.exports Remove-TAKUser" time="0.006" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Remove-TAKVideo" name="TAKServer — Module Import and Exports.exports Remove-TAKVideo" time="0.006" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Set-TAKSecurityConfig" name="TAKServer — Module Import and Exports.exports Set-TAKSecurityConfig" time="0.0056" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Set-TAKUserGroup" name="TAKServer — Module Import and Exports.exports Set-TAKUserGroup" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Set-TAKUserPassword" name="TAKServer — Module Import and Exports.exports Set-TAKUserPassword" time="0.0065" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Unregister-TAKMissionSubscription" name="TAKServer — Module Import and Exports.exports Unregister-TAKMissionSubscription" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKServer — Function Metadata" executed="True" result="Success" success="True" time="1.5148" asserts="0" description="TAKServer — Function Metadata">
+            <results>
+              <test-case description="all exported functions use [CmdletBinding()]" name="TAKServer — Function Metadata.all exported functions use [CmdletBinding()]" time="0.0066" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Connect-TAKServer has exactly four parameter sets" name="TAKServer — Function Metadata.Connect-TAKServer has exactly four parameter sets" time="0.0103" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Connect-TAKServer HostName parameter is mandatory" name="TAKServer — Function Metadata.Connect-TAKServer HostName parameter is mandatory" time="0.0093" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Connect-TAKServer has a Port parameter" name="TAKServer — Function Metadata.Connect-TAKServer has a Port parameter" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Connect-TAKServer has a SkipCertificateCheck parameter" name="TAKServer — Function Metadata.Connect-TAKServer has a SkipCertificateCheck parameter" time="0.0073" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="TAKServer — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" executed="True" result="Success" success="True" time="0.0735" asserts="0" description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)">
+                <results>
+                  <test-case description="Remove-TAKCertificate supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKCertificate supports -WhatIf and -Confirm (ShouldProcess)" time="0.0081" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKDataFeed supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKDataFeed supports -WhatIf and -Confirm (ShouldProcess)" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKInput supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKInput supports -WhatIf and -Confirm (ShouldProcess)" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKMapLayer supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKMapLayer supports -WhatIf and -Confirm (ShouldProcess)" time="0.007" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKMission supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKMission supports -WhatIf and -Confirm (ShouldProcess)" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKOutgoingConnection supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKOutgoingConnection supports -WhatIf and -Confirm (ShouldProcess)" time="0.0106" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKSubscription supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKSubscription supports -WhatIf and -Confirm (ShouldProcess)" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKToken supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKToken supports -WhatIf and -Confirm (ShouldProcess)" time="0.0085" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKUser supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKUser supports -WhatIf and -Confirm (ShouldProcess)" time="0.0068" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Remove-TAKVideo supports -WhatIf and -Confirm (ShouldProcess)" name="TAKServer — Function Metadata.Remove-TAKVideo supports -WhatIf and -Confirm (ShouldProcess)" time="0.008" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="ParameterizedTest" name="TAKServer — Function Metadata.&lt;_&gt; supports -WhatIf (ShouldProcess)" executed="True" result="Success" success="True" time="0.0351" asserts="0" description="&lt;_&gt; supports -WhatIf (ShouldProcess)">
+                <results>
+                  <test-case description="New-TAKDataFeed supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKDataFeed supports -WhatIf (ShouldProcess)" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="New-TAKInput supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKInput supports -WhatIf (ShouldProcess)" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="New-TAKMission supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKMission supports -WhatIf (ShouldProcess)" time="0.0059" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="New-TAKOutgoingConnection supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKOutgoingConnection supports -WhatIf (ShouldProcess)" time="0.0052" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="New-TAKUser supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKUser supports -WhatIf (ShouldProcess)" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="New-TAKVideo supports -WhatIf (ShouldProcess)" name="TAKServer — Function Metadata.New-TAKVideo supports -WhatIf (ShouldProcess)" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKInstall\Tests\ConvertTo-TAKBashArg.Tests.ps1" executed="True" result="Failure" success="False" time="0.1523" asserts="0" description="C:\GitRepos\DigitalTAK\TAKInstall\Tests\ConvertTo-TAKBashArg.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="ConvertTo-TAKBashArg — Basic wrapping" executed="True" result="Failure" success="False" time="0" asserts="0" description="ConvertTo-TAKBashArg — Basic wrapping">
+            <results>
+              <test-case description="wraps a simple string in single quotes" name="ConvertTo-TAKBashArg — Basic wrapping.wraps a simple string in single quotes" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="wraps an empty string in single quotes" name="ConvertTo-TAKBashArg — Basic wrapping.wraps an empty string in single quotes" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="wraps a string with spaces in single quotes" name="ConvertTo-TAKBashArg — Basic wrapping.wraps a string with spaces in single quotes" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="returns a string type" name="ConvertTo-TAKBashArg — Basic wrapping.returns a string type" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="ConvertTo-TAKBashArg — Single-quote escaping" executed="True" result="Failure" success="False" time="0" asserts="0" description="ConvertTo-TAKBashArg — Single-quote escaping">
+            <results>
+              <test-case description="escapes a single embedded apostrophe: it's -&gt; 'it'\\''s'" name="ConvertTo-TAKBashArg — Single-quote escaping.escapes a single embedded apostrophe: it's -&gt; 'it'\\''s'" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="escapes multiple embedded apostrophes: don't can't" name="ConvertTo-TAKBashArg — Single-quote escaping.escapes multiple embedded apostrophes: don't can't" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="handles a value that is only a single quote" name="ConvertTo-TAKBashArg — Single-quote escaping.handles a value that is only a single quote" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="handles consecutive single quotes" name="ConvertTo-TAKBashArg — Single-quote escaping.handles consecutive single quotes" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged" executed="True" result="Failure" success="False" time="0" asserts="0" description="ConvertTo-TAKBashArg — Special bash characters pass through unchanged">
+            <results>
+              <test-case description="passes dollar sign through unchanged" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged.passes dollar sign through unchanged" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes backtick through unchanged" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged.passes backtick through unchanged" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes backslash through unchanged" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged.passes backslash through unchanged" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes double-quote through unchanged" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged.passes double-quote through unchanged" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes exclamation mark through unchanged" name="ConvertTo-TAKBashArg — Special bash characters pass through unchanged.passes exclamation mark through unchanged" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="ConvertTo-TAKBashArg — Pipeline support" executed="True" result="Failure" success="False" time="0" asserts="0" description="ConvertTo-TAKBashArg — Pipeline support">
+            <results>
+              <test-case description="accepts pipeline input" name="ConvertTo-TAKBashArg — Pipeline support.accepts pipeline input" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="processes multiple pipeline values" name="ConvertTo-TAKBashArg — Pipeline support.processes multiple pipeline values" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="handles pipeline with an empty string" name="ConvertTo-TAKBashArg — Pipeline support.handles pipeline with an empty string" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="ConvertTo-TAKBashArg — Representative real-world values" executed="True" result="Failure" success="False" time="0" asserts="0" description="ConvertTo-TAKBashArg — Representative real-world values">
+            <results>
+              <test-suite type="ParameterizedTest" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;" executed="True" result="Failure" success="False" time="0" asserts="0" description="&lt;Label&gt;">
+                <results>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Simple CA name&quot;,&quot;TAK-CA&quot;,&quot;'TAK-CA'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;CA name with spaces&quot;,&quot;My TAK CA&quot;,&quot;'My TAK CA'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Uppercase state code&quot;,&quot;TX&quot;,&quot;'TX'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Password with apostrophe&quot;,&quot;P@ss'word&quot;,&quot;'P@ss'\''word'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Path string&quot;,&quot;/opt/tak/certs&quot;,&quot;'/opt/tak/certs'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Org with ampersand&quot;,&quot;A&amp;B Corp&quot;,&quot;'A&amp;B Corp'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;Label&gt;" name="ConvertTo-TAKBashArg — Representative real-world values.&lt;Label&gt;(&quot;Number as string&quot;,&quot;8443&quot;,&quot;'8443'&quot;)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKInstall\Tests\Invoke-TAKRemoteCommand.Tests.ps1" executed="True" result="Failure" success="False" time="0.0492" asserts="0" description="C:\GitRepos\DigitalTAK\TAKInstall\Tests\Invoke-TAKRemoteCommand.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Invoke-TAKRemoteCommand — Success (exit code 0)" executed="True" result="Failure" success="False" time="0" asserts="0" description="Invoke-TAKRemoteCommand — Success (exit code 0)">
+            <results>
+              <test-case description="calls Invoke-SSHCommand exactly once" name="Invoke-TAKRemoteCommand — Success (exit code 0).calls Invoke-SSHCommand exactly once" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes the command string to Invoke-SSHCommand" name="Invoke-TAKRemoteCommand — Success (exit code 0).passes the command string to Invoke-SSHCommand" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="passes the SSH session to Invoke-SSHCommand" name="Invoke-TAKRemoteCommand — Success (exit code 0).passes the SSH session to Invoke-SSHCommand" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="returns the result object when exit code is 0" name="Invoke-TAKRemoteCommand — Success (exit code 0).returns the result object when exit code is 0" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="writes a verbose message when Description is supplied" name="Invoke-TAKRemoteCommand — Success (exit code 0).writes a verbose message when Description is supplied" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRemoteCommand — Non-zero Exit Code" executed="True" result="Failure" success="False" time="0" asserts="0" description="Invoke-TAKRemoteCommand — Non-zero Exit Code">
+            <results>
+              <test-case description="throws a terminating error when exit code is non-zero" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.throws a terminating error when exit code is non-zero" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="error has ErrorId TAKRemoteCommandFailed" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.error has ErrorId TAKRemoteCommandFailed" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="error message includes the exit status code" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.error message includes the exit status code" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="error message includes the failed command" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.error message includes the failed command" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="error message includes the stderr output" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.error message includes the stderr output" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="error message includes the Description when supplied" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.error message includes the Description when supplied" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="does NOT throw when -AllowFailure is specified" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.does NOT throw when -AllowFailure is specified" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="returns the result when -AllowFailure is specified and exit code is non-zero" name="Invoke-TAKRemoteCommand — Non-zero Exit Code.returns the result when -AllowFailure is specified and exit code is non-zero" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Invoke-TAKRemoteCommand — Parameter Validation" executed="True" result="Failure" success="False" time="0" asserts="0" description="Invoke-TAKRemoteCommand — Parameter Validation">
+            <results>
+              <test-case description="Command parameter is mandatory" name="Invoke-TAKRemoteCommand — Parameter Validation.Command parameter is mandatory" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="Session parameter is mandatory" name="Invoke-TAKRemoteCommand — Parameter Validation.Session parameter is mandatory" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="Command must not be empty (ValidateNotNullOrEmpty)" name="Invoke-TAKRemoteCommand — Parameter Validation.Command must not be empty (ValidateNotNullOrEmpty)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKInstall\Tests\TAKInstall.Module.Tests.ps1" executed="True" result="Failure" success="False" time="1.2231" asserts="0" description="C:\GitRepos\DigitalTAK\TAKInstall\Tests\TAKInstall.Module.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="TAKInstall — Module Manifest" executed="True" result="Success" success="True" time="1.1662" asserts="0" description="TAKInstall — Module Manifest">
+            <results>
+              <test-case description="passes Test-ModuleManifest without error" name="TAKInstall — Module Manifest.passes Test-ModuleManifest without error" time="0.1951" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="has PowerShellVersion 7.0" name="TAKInstall — Module Manifest.has PowerShellVersion 7.0" time="0.197" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares RootModule as TAKInstall.psm1" name="TAKInstall — Module Manifest.declares RootModule as TAKInstall.psm1" time="0.185" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="exports exactly 6 functions in the manifest" name="TAKInstall — Module Manifest.exports exactly 6 functions in the manifest" time="0.2056" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the Posh-SSH module" name="TAKInstall — Module Manifest.requires the Posh-SSH module" time="0.1989" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares a non-empty Author" name="TAKInstall — Module Manifest.declares a non-empty Author" time="0.1808" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKInstall — Module Import and Exports" executed="True" result="Failure" success="False" time="1.1828" asserts="0" description="TAKInstall — Module Import and Exports">
+            <results>
+              <test-case description="module is discoverable after import" name="TAKInstall — Module Import and Exports.module is discoverable after import" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="exports exactly 6 commands at runtime" name="TAKInstall — Module Import and Exports.exports exactly 6 commands at runtime" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-suite type="ParameterizedTest" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;" executed="True" result="Failure" success="False" time="0" asserts="0" description="exports &lt;_&gt;">
+                <results>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="exports &lt;_&gt;" name="TAKInstall — Module Import and Exports.exports &lt;_&gt;()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+              <test-suite type="ParameterizedTest" name="TAKInstall — Module Import and Exports.does NOT export private helpers" executed="True" result="Failure" success="False" time="0" asserts="0" description="does NOT export private helpers">
+                <results>
+                  <test-case description="does NOT export private helpers" name="TAKInstall — Module Import and Exports.does NOT export private helpers()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="does NOT export private helpers" name="TAKInstall — Module Import and Exports.does NOT export private helpers()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="does NOT export private helpers" name="TAKInstall — Module Import and Exports.does NOT export private helpers()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKInstall — Function Metadata" executed="True" result="Failure" success="False" time="1.1981" asserts="0" description="TAKInstall — Function Metadata">
+            <results>
+              <test-case description="all exported functions use [CmdletBinding()]" name="TAKInstall — Function Metadata.all exported functions use [CmdletBinding()]" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="Install-TAKServer has a mandatory SshSession parameter" name="TAKInstall — Function Metadata.Install-TAKServer has a mandatory SshSession parameter" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="Install-TAKServer has a mandatory RpmPath parameter" name="TAKInstall — Function Metadata.Install-TAKServer has a mandatory RpmPath parameter" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="Install-TAKServer has a -SkipGpgVerification switch" name="TAKInstall — Function Metadata.Install-TAKServer has a -SkipGpgVerification switch" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-suite type="ParameterizedTest" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" executed="True" result="Failure" success="False" time="0" asserts="0" description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)">
+                <results>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" name="TAKInstall — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+              <test-suite type="ParameterizedTest" name="TAKInstall — Function Metadata.New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params" executed="True" result="Failure" success="False" time="0" asserts="0" description="New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params">
+                <results>
+                  <test-case description="New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params" name="TAKInstall — Function Metadata.New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params" name="TAKInstall — Function Metadata.New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params" name="TAKInstall — Function Metadata.New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                  <test-case description="New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params" name="TAKInstall — Function Metadata.New-TAKServerCertificate has mandatory State, City, Organization, OrganizationalUnit params()" time="0" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                      <stack-trace />
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\GitRepos\DigitalTAK\TAKInstall\Tests\Wait-TAKServiceReady.Tests.ps1" executed="True" result="Failure" success="False" time="0.0311" asserts="0" description="C:\GitRepos\DigitalTAK\TAKInstall\Tests\Wait-TAKServiceReady.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Wait-TAKServiceReady — Service Active Immediately" executed="True" result="Failure" success="False" time="0" asserts="0" description="Wait-TAKServiceReady — Service Active Immediately">
+            <results>
+              <test-case description="returns without throwing when the first poll returns active" name="Wait-TAKServiceReady — Service Active Immediately.returns without throwing when the first poll returns active" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="polls Invoke-SSHCommand exactly once when service is immediately active" name="Wait-TAKServiceReady — Service Active Immediately.polls Invoke-SSHCommand exactly once when service is immediately active" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="does NOT call Start-Sleep when service is immediately active" name="Wait-TAKServiceReady — Service Active Immediately.does NOT call Start-Sleep when service is immediately active" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="checks the correct service name in the systemctl command" name="Wait-TAKServiceReady — Service Active Immediately.checks the correct service name in the systemctl command" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="defaults ServiceName to takserver" name="Wait-TAKServiceReady — Service Active Immediately.defaults ServiceName to takserver" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Wait-TAKServiceReady — Service Active After Retries" executed="True" result="Failure" success="False" time="0" asserts="0" description="Wait-TAKServiceReady — Service Active After Retries">
+            <results>
+              <test-case description="returns successfully when service becomes active on the third poll" name="Wait-TAKServiceReady — Service Active After Retries.returns successfully when service becomes active on the third poll" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="polls Invoke-SSHCommand multiple times before finding active" name="Wait-TAKServiceReady — Service Active After Retries.polls Invoke-SSHCommand multiple times before finding active" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Wait-TAKServiceReady — Timeout Error Structure" executed="True" result="Failure" success="False" time="0" asserts="0" description="Wait-TAKServiceReady — Timeout Error Structure">
+            <results>
+              <test-case description="TAKServiceTimeout error record targets TAKServiceTimeout as ErrorId" name="Wait-TAKServiceReady — Timeout Error Structure.TAKServiceTimeout error record targets TAKServiceTimeout as ErrorId" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="TAKServiceTimeout error is based on System.TimeoutException" name="Wait-TAKServiceReady — Timeout Error Structure.TAKServiceTimeout error is based on System.TimeoutException" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="TAKServiceTimeout error category is OperationTimeout" name="Wait-TAKServiceReady — Timeout Error Structure.TAKServiceTimeout error category is OperationTimeout" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Wait-TAKServiceReady — Parameter Validation" executed="True" result="Failure" success="False" time="0" asserts="0" description="Wait-TAKServiceReady — Parameter Validation">
+            <results>
+              <test-case description="TimeoutSeconds must be at least 30 (rejects 29)" name="Wait-TAKServiceReady — Parameter Validation.TimeoutSeconds must be at least 30 (rejects 29)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="TimeoutSeconds must be at most 600 (rejects 601)" name="Wait-TAKServiceReady — Parameter Validation.TimeoutSeconds must be at most 600 (rejects 601)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="PollIntervalSeconds must be at least 5 (rejects 4)" name="Wait-TAKServiceReady — Parameter Validation.PollIntervalSeconds must be at least 5 (rejects 4)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+              <test-case description="PollIntervalSeconds must be at most 60 (rejects 61)" name="Wait-TAKServiceReady — Parameter Validation.PollIntervalSeconds must be at most 60 (rejects 61)" time="0" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>This test should run but it did not. Most likely a setup in some parent block failed.</message>
+                  <stack-trace />
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

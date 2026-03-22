@@ -10,6 +10,13 @@ function Invoke-TAKRequest {
         ({ version, type, nodeId, data }) and returns the inner .data value unless
         -Raw is specified.
 
+        Transient failures (network errors, HTTP 429/503) are retried up to RetryCount
+        times with a configurable delay.
+
+        When -AutoPage is specified and the response contains a .data array, the
+        function automatically pages through all results using TAK's offset/limit
+        pattern and returns the combined collection.
+
         This function is private. Use Connect-TAKServer to establish a session before
         calling any public cmdlet.
 
@@ -30,6 +37,18 @@ function Invoke-TAKRequest {
 
     .PARAMETER Raw
         When specified, returns the full response object instead of unwrapping .data.
+
+    .PARAMETER RetryCount
+        Number of retry attempts on transient failures (HttpRequestException or HTTP
+        429/503). Defaults to 2. Set to 0 to disable retries.
+
+    .PARAMETER RetryDelaySeconds
+        Seconds to wait between retry attempts. Defaults to 3.
+
+    .PARAMETER AutoPage
+        When specified, automatically pages through all results for list endpoints
+        that return a TAK ApiResponse wrapper with a .data array, using TAK's
+        offset/limit query parameters (default page size: 100).
     #>
     [CmdletBinding()]
     [OutputType([object])]
@@ -52,7 +71,18 @@ function Invoke-TAKRequest {
         [string] $ContentType = 'application/json',
 
         [Parameter()]
-        [switch] $Raw
+        [switch] $Raw,
+
+        [Parameter()]
+        [ValidateRange(0, 5)]
+        [int] $RetryCount = 2,
+
+        [Parameter()]
+        [ValidateRange(1, 30)]
+        [int] $RetryDelaySeconds = 3,
+
+        [Parameter()]
+        [switch] $AutoPage
     )
 
     if (-not $script:TAKSession) {
@@ -67,7 +97,36 @@ function Invoke-TAKRequest {
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
-    # Build URI
+    # ── AutoPage: collect all pages and return combined result ────────────────
+    if ($AutoPage) {
+        $pageSize   = 100
+        $offset     = 0
+        $allResults = [System.Collections.Generic.List[object]]::new()
+
+        do {
+            $pagedQuery = @{ limit = $pageSize; offset = $offset }
+            if ($QueryParameters) {
+                foreach ($k in $QueryParameters.Keys) { $pagedQuery[$k] = $QueryParameters[$k] }
+            }
+            $page = Invoke-TAKRequest -Path $Path -Method $Method -QueryParameters $pagedQuery `
+                        -Body $Body -ContentType $ContentType `
+                        -RetryCount $RetryCount -RetryDelaySeconds $RetryDelaySeconds
+
+            # $page is already the unwrapped .data array (or array-like object)
+            if ($null -ne $page) {
+                $pageArray = @($page)
+                $allResults.AddRange($pageArray)
+                $offset += $pageSize
+            }
+            else {
+                break
+            }
+        } while ($pageArray.Count -ge $pageSize)
+
+        return $allResults.ToArray()
+    }
+
+    # ── Build URI ─────────────────────────────────────────────────────────────
     $uriString = $script:TAKSession.BaseUrl.TrimEnd('/') + $Path
     $uriBuilder = [System.UriBuilder]::new($uriString)
 
@@ -113,23 +172,61 @@ function Invoke-TAKRequest {
         $irmParams['ContentType'] = $ContentType
     }
 
-    try {
-        $response = Invoke-RestMethod @irmParams
-    }
-    catch [System.Net.Http.HttpRequestException] {
+    # ── Invoke with retry ─────────────────────────────────────────────────────
+    $attempt   = 0
+    $lastError = $null
+
+    do {
+        try {
+            $response  = Invoke-RestMethod @irmParams
+            $lastError = $null
+            break
+        }
+        catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+            $statusCode = [int]$PSItem.Exception.Response.StatusCode
+            if ($statusCode -in 429, 503 -and $attempt -lt $RetryCount) {
+                $attempt++
+                Write-Verbose "[TAKRequest] HTTP $statusCode — attempt $attempt of $RetryCount. Retrying in ${RetryDelaySeconds}s..."
+                Start-Sleep -Seconds $RetryDelaySeconds
+                $lastError = $PSItem
+            }
+            else {
+                $PSCmdlet.ThrowTerminatingError($PSItem)
+            }
+        }
+        catch [System.Net.Http.HttpRequestException] {
+            if ($attempt -lt $RetryCount) {
+                $attempt++
+                Write-Verbose "[TAKRequest] Network error — attempt $attempt of $RetryCount. Retrying in ${RetryDelaySeconds}s..."
+                Start-Sleep -Seconds $RetryDelaySeconds
+                $lastError = $PSItem
+            }
+            else {
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    $PSItem.Exception,
+                    'TAKHttpError',
+                    [System.Management.Automation.ErrorCategory]::ConnectionError,
+                    $uriBuilder.Uri
+                )
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($PSItem)
+        }
+    } while ($attempt -le $RetryCount)
+
+    if ($lastError) {
         $errorRecord = [System.Management.Automation.ErrorRecord]::new(
-            $PSItem.Exception,
+            $lastError.Exception,
             'TAKHttpError',
             [System.Management.Automation.ErrorCategory]::ConnectionError,
             $uriBuilder.Uri
         )
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-    catch {
-        $PSCmdlet.ThrowTerminatingError($PSItem)
-    }
 
-    # Unwrap TAK ApiResponse wrapper when .data is present
+    # ── Unwrap TAK ApiResponse wrapper when .data is present ──────────────────
     if (-not $Raw -and $null -ne $response -and
         ($response.PSObject.Properties.Name -contains 'data')) {
         return $response.data

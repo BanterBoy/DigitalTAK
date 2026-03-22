@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Openfire XMPP Server + TAK Chat Addendum
-## Run AFTER RL9.5_tak5.4r14_install.sh has completed successfully.
+## Run AFTER RL9_tak5.7r8_install.sh has completed successfully.
 ## Installs Openfire 5.0.3, configures firewall ports, and provides setup guidance for TAK Chat.
 ## All install files are expected to be located in /atakciv.
 
@@ -35,9 +35,25 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "Ensuring Java 17 is installed..."
 sudo dnf install -y java-17-openjdk
 
+# OPENFIRE_RPM_SHA256: expected SHA-256 hash of the Openfire 5.0.3 RPM.
+# Obtain the authoritative value from the release page:
+#   https://github.com/igniterealtime/Openfire/releases/tag/v5.0.3
+# Set this variable (or export it before running the script) to enable checksum
+# verification. Leave empty to skip (NOT recommended for production).
+OPENFIRE_RPM_SHA256="${OPENFIRE_RPM_SHA256:-}"
+
 echo "Downloading Openfire 5.0.3 RPM from GitHub releases..."
-curl -L -o /atakciv/openfire-5.0.3-1.noarch.rpm \
+curl -fL -o /atakciv/openfire-5.0.3-1.noarch.rpm \
     "https://github.com/igniterealtime/Openfire/releases/download/v5.0.3/openfire-5.0.3-1.noarch.rpm"
+
+if [ -n "$OPENFIRE_RPM_SHA256" ]; then
+    echo "Verifying Openfire RPM checksum..."
+    echo "$OPENFIRE_RPM_SHA256  /atakciv/openfire-5.0.3-1.noarch.rpm" | sha256sum --check
+    echo "Checksum verified."
+else
+    echo "WARNING: OPENFIRE_RPM_SHA256 is not set. Skipping checksum verification."
+    echo "         Set this variable to the expected SHA-256 for production deployments."
+fi
 
 echo "Installing Openfire..."
 # Openfire's RPM expects /etc/init.d to exist as a directory/symlink target.

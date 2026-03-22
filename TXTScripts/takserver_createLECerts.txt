@@ -12,6 +12,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=utils.sh
+source "$SCRIPT_DIR/utils.sh"
 
 #allow renewal script to be executed
 sudo chmod +x "$SCRIPT_DIR/takserver_renewLECerts.sh"
@@ -106,10 +108,15 @@ sudo chown -R tak:tak /opt/tak
 cd /opt/tak
 sudo systemctl stop takserver
 
-###use sed to replace the existing 8446 connector with 
+### Use sed to replace the existing 8446 connector with the LetsEncrypt-backed connector
 
-escapedCertPassword=$(printf '%s' "$certPassword" | sed 's/[&|]/\\&/g')
+escapedCertPassword="$(sed_replace_quote "$certPassword")"
 sed -i "s|<connector port=\"8446\" clientAuth=\"false\" _name=\"cert_https\"/>|<connector port=\"8446\" clientAuth=\"false\" _name=\"LetsEncrypt\" keystore=\"JKS\" keystoreFile=\"certs/files/takserver-le.jks\" keystorePass=\"$escapedCertPassword\"/>|g" /opt/tak/CoreConfig.xml
+if ! grep -q 'keystorePass=' /opt/tak/CoreConfig.xml; then
+    echo "ERROR: Failed to patch 8446 connector in CoreConfig.xml. Check that the original connector is present."
+    exit 1
+fi
+echo "8446 connector updated with LetsEncrypt keystore."
 
 rm CoreConfig.example.xml
 cp CoreConfig.xml CoreConfig.example.xml
@@ -124,9 +131,12 @@ cd -
 echo "let's make a monthly cron job to renew the LE cert"
 
 echo "writing renewal config to /etc/takserver_renew.conf"
+# SECURITY NOTE: /etc/takserver_renew.conf stores the keystore password in plaintext
+# (root-only, chmod 600). For production environments consider using systemd-creds
+# (systemd-creds encrypt) or a secrets vault instead of a plain config file.
 {
-	printf 'CERT_NAME=%q\n' "$certNameVar"
-	printf 'CERT_PASSWORD=%q\n' "$certPassword"
+	printf 'CERT_NAME=%s\n' "$(sed_replace_quote "$certNameVar")"
+	printf 'CERT_PASSWORD=%s\n' "$(sed_replace_quote "$certPassword")"
 } | sudo tee /etc/takserver_renew.conf > /dev/null
 sudo chmod 600 /etc/takserver_renew.conf
 

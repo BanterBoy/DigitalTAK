@@ -63,8 +63,9 @@
 
     PrivateData       = @{
         PSData = @{
-            Tags        = @('TAK', 'TAKServer', 'ATAK', 'WinTAK', 'CoT', 'REST')
-            ProjectUri  = 'https://github.com/DigitalTAK/DigitalTAK'
+            Tags         = @('TAK', 'TAKServer', 'ATAK', 'WinTAK', 'CoT', 'REST')
+            ProjectUri   = 'https://github.com/BanterBoy/DigitalTAK'
+            ReleaseNotes = 'v1.0.0 — Initial release. 44 cmdlets covering TAK Server 5.7 REST API: users, groups, missions, certs, inputs, data feeds, video, federation, and more.'
         }
     }
 }

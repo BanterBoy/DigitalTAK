@@ -153,7 +153,7 @@ function Connect-TAKServer {
 
     # Test connectivity with a lightweight version call
     try {
-        $null = Invoke-TAKRequest -Path '/Marti/api/ver' -ErrorAction Stop
+        $null = Invoke-TAKRequest -Path '/Marti/api/version/info' -ErrorAction Stop
         Write-Verbose "Successfully connected to $baseUrl"
     }
     catch {
