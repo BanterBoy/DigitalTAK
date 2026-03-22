@@ -106,10 +106,19 @@ echo "configuring intermediate ca for use"
 sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="certs/files/truststore-intermediate-ca.jks|g' /opt/tak/CoreConfig.xml
 echo "complete"
 
-echo "enabling TAKserver signing, enrolled user certificates will be valid for 3650 days"
+echo "enabling TAKserver signing, enrolled user certificates will be valid for 30 days"
 
-escapedTakCertPass=$(printf '%s' "$takCertPass" | sed 's/[&|]/\\&/g')
-sed -i "s|<vbm enabled=\"false\"/>|<certificateSigning CA=\"TAKServer\"><certificateConfig>\\n<nameEntries>\\n<nameEntry name=\"O\" value=\"TAK\"/>\\n<nameEntry name=\"OU\" value=\"TAK\"/>\\n</nameEntries>\\n</certificateConfig>\\n<TAKServerCAConfig keystore=\"JKS\" keystoreFile=\"certs/files/intermediate-ca-signing.jks\"  keystorePass=\"$escapedTakCertPass\" validityDays=\"3650\" signatureAlg=\"SHA256WithRSA\" />\\n</certificateSigning>\\n <vbm enabled=\"false\"/>|g" /opt/tak/CoreConfig.xml
+escapedTakCertPass=$(printf '%s' "$takCertPass" | sed \
+	-e 's/\\/\\\\/g' \
+	-e 's/[&|]/\\&/g' \
+	-e 's/"/\\"/g' \
+	-e 's/\$/\\$/g' \
+	-e 's/`/\\`/g')
+sed -i "s|<vbm enabled=\"false\"/>|<certificateSigning CA=\"TAKServer\"><certificateConfig>\\n<nameEntries>\\n<nameEntry name=\"O\" value=\"TAK\"/>\\n<nameEntry name=\"OU\" value=\"TAK\"/>\\n</nameEntries>\\n</certificateConfig>\\n<TAKServerCAConfig keystore=\"JKS\" keystoreFile=\"certs/files/intermediate-ca-signing.jks\"  keystorePass=\"$escapedTakCertPass\" validityDays=\"30\" signatureAlg=\"SHA256WithRSA\" />\\n</certificateSigning>\\n <vbm enabled=\"false\"/>|g" /opt/tak/CoreConfig.xml
+if ! grep -q 'keystorePass=' /opt/tak/CoreConfig.xml; then
+	echo "ERROR: CoreConfig.xml certificate signing block was not written. Verify <vbm enabled=\"false\"/> is present in CoreConfig.xml."
+	exit 1
+fi
 
 sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
 

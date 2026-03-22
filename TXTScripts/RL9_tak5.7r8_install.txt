@@ -6,6 +6,7 @@
 ## ensure tcp 8089, 8443, 8446, and 80 are allowed through the firewall. 80 is only needed if you plan to use LetsEncrypt certificates
 
 ##Ryan Schilder - March 2024
+##Updated for TAK Server 5.7-RELEASE8 - March 2026
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,8 +21,6 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 
 sudo dnf install -y dnf-plugins-core
 sudo dnf install vim -y
-
-sudo dnf config-manager --set-enabled crb
 
 echo "Install epel-release"
 sudo dnf install epel-release -y
@@ -39,10 +38,8 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ INSTALL POSTGRESQL ++++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
-sudo rpm --import https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
-
-echo "Install Postgres"
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+echo "Install Postgres repository"
+sudo dnf --disablerepo='*' -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 #done
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
@@ -57,29 +54,42 @@ echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "Manual Install - JDK 17"
 sudo dnf install java-17-openjdk-devel -y
 echo "Installed JDK 17"
+if ! java -version 2>&1 | grep -q '"17\.'; then
+	echo "WARNING: Active Java is not version 17. Run: sudo alternatives --config java"
+fi
 #done
 
 echo "++++++++++++++++++++++++++++++++++++++++++"
-echo "++++++ ENABLE POWER TOOLS ++++++++++++++++"
-echo "++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++ ENABLE POWER TOOLS (CRB) +++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
 
-#sudo dnf config-manager --set-enabled powertools
-#sudo dnf config-manager --set-enabled crb
+#sudo dnf config-manager --set-enabled powertools  # Rocky Linux 8 / RHEL 8 only
+sudo dnf config-manager --set-enabled crb
 
-echo "++++++++++++++++++++++++++++++++++++++++++"
-echo "Install Postgres Complete"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
+echo "Install Postgres and Java Complete"
 
 
 echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "++++++ INSTALL TAK SERVER ++++++++++++++++"
 echo "++++++++++++++++++++++++++++++++++++++++++"
 
-echo "Install TAK server v5.6 RELEASE22"
-TAK_RPM="$SCRIPT_DIR/takserver-5.6-RELEASE22.noarch.rpm"
+echo "Install TAK server v5.7 RELEASE8"
+TAK_RPM="$SCRIPT_DIR/takserver-5.7-RELEASE8.noarch.rpm"
+TAK_GPG_KEY="$SCRIPT_DIR/takserver-public-gpg.key"
+if [ -f "$TAK_GPG_KEY" ] && [ -f "$TAK_RPM" ]; then
+	echo "Importing TAK Server GPG key and verifying RPM signature..."
+	sudo rpm --import "$TAK_GPG_KEY"
+	rpm --checksig "$TAK_RPM" || { echo "ERROR: RPM signature verification failed"; exit 1; }
+	echo "GPG signature verified OK"
+else
+	echo "WARNING: Skipping GPG verification (key or RPM not found in $SCRIPT_DIR)"
+	echo "Download takserver-public-gpg.key from tak.gov to enable verification"
+fi
 if [ -f "$TAK_RPM" ]; then
 	sudo dnf install -y "$TAK_RPM"
 else
-	sudo dnf install -y takserver-5.6-RELEASE22.noarch.rpm
+	sudo dnf install -y takserver-5.7-RELEASE8.noarch.rpm
 fi
 #done
 echo "++++++++++++++++++++++++++++++++++++++++++"

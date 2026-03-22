@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "promoting admin.pem to administrator"
-java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/admin.pem
+sudo java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/admin.pem
 
 echo "restarting tak server"
 sudo systemctl restart takserver
