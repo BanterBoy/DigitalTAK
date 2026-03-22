@@ -36,11 +36,11 @@ echo "Ensuring Java 17 is installed..."
 sudo dnf install -y java-17-openjdk
 
 # OPENFIRE_RPM_SHA256: expected SHA-256 hash of the Openfire 5.0.3 RPM.
-# Obtain the authoritative value from the release page:
+# Default value is from the official release page:
 #   https://github.com/igniterealtime/Openfire/releases/tag/v5.0.3
-# Set this variable (or export it before running the script) to enable checksum
-# verification. Leave empty to skip (NOT recommended for production).
-OPENFIRE_RPM_SHA256="${OPENFIRE_RPM_SHA256:-}"
+# Override this variable before running the script only if you are using a
+# different Openfire build. Set to empty string to skip verification (not recommended).
+OPENFIRE_RPM_SHA256="${OPENFIRE_RPM_SHA256:-a08493cb19bef6dd2b51ebe88d4ffd121553e2e4473ddbecf94f5ff350e367aa}"
 
 echo "Downloading Openfire 5.0.3 RPM from GitHub releases..."
 curl -fL -o /atakciv/openfire-5.0.3-1.noarch.rpm \

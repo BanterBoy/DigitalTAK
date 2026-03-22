@@ -138,6 +138,7 @@ echo "writing renewal config to /etc/takserver_renew.conf"
 	printf 'CERT_NAME=%s\n' "$(sed_replace_quote "$certNameVar")"
 	printf 'CERT_PASSWORD=%s\n' "$(sed_replace_quote "$certPassword")"
 } | sudo tee /etc/takserver_renew.conf > /dev/null
+sudo chown root:root /etc/takserver_renew.conf
 sudo chmod 600 /etc/takserver_renew.conf
 
 
