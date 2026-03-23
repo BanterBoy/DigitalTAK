@@ -146,10 +146,10 @@ function New-TAKServerCertificate {
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Patching cert-metadata.sh' -PercentComplete 10
         # Use | as the sed delimiter so / in values does not break the pattern.
         $sedCmds = @(
-            "sudo sed -i 's|STATE=\${STATE}|STATE=$State|g' /opt/tak/certs/cert-metadata.sh"
-            "sudo sed -i 's|CITY=\${CITY}|CITY=$City|g' /opt/tak/certs/cert-metadata.sh"
-            "sudo sed -i 's|ORGANIZATION=\${ORGANIZATION:-TAK}|ORGANIZATION=$Organization|g' /opt/tak/certs/cert-metadata.sh"
-            "sudo sed -i 's|ORGANIZATIONAL_UNIT=\${ORGANIZATIONAL_UNIT}|ORGANIZATIONAL_UNIT=$OrganizationalUnit|g' /opt/tak/certs/cert-metadata.sh"
+            "sudo sed -i 's|STATE=`${STATE}|STATE=$State|g' /opt/tak/certs/cert-metadata.sh"
+            "sudo sed -i 's|CITY=`${CITY}|CITY=$City|g' /opt/tak/certs/cert-metadata.sh"
+            "sudo sed -i 's|ORGANIZATION=`${ORGANIZATION:-TAK}|ORGANIZATION=$Organization|g' /opt/tak/certs/cert-metadata.sh"
+            "sudo sed -i 's|ORGANIZATIONAL_UNIT=`${ORGANIZATIONAL_UNIT}|ORGANIZATIONAL_UNIT=$OrganizationalUnit|g' /opt/tak/certs/cert-metadata.sh"
         )
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Patch cert-metadata.sh' -Command ($sedCmds -join '; ')
 
@@ -182,7 +182,7 @@ function New-TAKServerCertificate {
         # ── 8. First takserver restart ────────────────────────────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Restarting takserver (1/2)' -PercentComplete 55
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Restart takserver' -Command `
-            'sudo systemctl restart takserver'
+            'sudo systemctl restart --no-block takserver'
         Wait-TAKServiceReady -Session $SshSession -ServiceName 'takserver' -TimeoutSeconds $ServiceRestartTimeout
 
         # ── 9. CoreConfig.xml — x509 input on port 8089 ────────────────────────
@@ -206,20 +206,20 @@ sudo sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="c
         $signingBlock += '<nameEntry name="OU" value="TAK"/>'
         $signingBlock += '</nameEntries>'
         $signingBlock += '</certificateConfig>'
-        $signingBlock += "<TAKServerCAConfig keystore=`"JKS`" keystoreFile=`"certs/files/intermediate-ca-signing.jks`" keystorePass=$bPass validityDays=`"30`" signatureAlg=`"SHA256WithRSA`" />"
+        $signingBlock += "<TAKServerCAConfig keystore=`"JKS`" keystoreFile=`"certs/files/intermediate-ca-signing.jks`" keystorePass=`"$bPass`" validityDays=`"30`" signatureAlg=`"SHA256WithRSA`" />"
         $signingBlock += '</certificateSigning>'
         $signingBlock += ' <vbm enabled="false"/>'
 
         $signingCmd = "sudo sed -i 's|<vbm enabled=`"false`"/>|$signingBlock|g' /opt/tak/CoreConfig.xml"
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Insert certificate signing block' -Command $signingCmd
 
-        # Validate that the keystorePass was written
+        # Validate that the keystorePass attribute was written with XML quotes.
         $validate = Invoke-TAKRemoteCommand -Session $SshSession -Description 'Validate CoreConfig.xml signing block' -Command `
-            "grep -c 'keystorePass=' /opt/tak/CoreConfig.xml" -AllowFailure
+            'grep -c ''keystorePass="'' /opt/tak/CoreConfig.xml' -AllowFailure
         if ($validate.Output.Trim() -eq '0') {
             $errorRecord = [System.Management.Automation.ErrorRecord]::new(
                 [System.InvalidOperationException]::new(
-                    'CoreConfig.xml certificate signing block was not written. Verify <vbm enabled="false"/> is present in the original file.'),
+                    'CoreConfig.xml certificate signing block was not written correctly. Verify <vbm enabled="false"/> is present in the original file and the keystorePass attribute is quoted.'),
                 'TAKCoreCfgPatchFailed',
                 [System.Management.Automation.ErrorCategory]::WriteError,
                 '/opt/tak/CoreConfig.xml'
@@ -235,7 +235,7 @@ sudo sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
         # ── 13. Second takserver restart ──────────────────────────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Restarting takserver (2/2)' -PercentComplete 88
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Final restart' -Command `
-            'sudo systemctl restart takserver'
+            'sudo systemctl restart --no-block takserver'
         Wait-TAKServiceReady -Session $SshSession -ServiceName 'takserver' -TimeoutSeconds $ServiceRestartTimeout
 
         Write-Progress -Activity 'Creating TAK certificates' -Completed

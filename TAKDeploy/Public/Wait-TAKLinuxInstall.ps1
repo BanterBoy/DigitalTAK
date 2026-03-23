@@ -27,6 +27,10 @@
 .PARAMETER RetryIntervalSeconds
     Seconds between SSH connection attempts. Defaults to 10.
 
+.PARAMETER Credential
+    Optional PSCredential to reuse for the SSH connection. When omitted, the
+    operator is prompted during the workflow.
+
 .EXAMPLE
     PS> $session = Wait-TAKLinuxInstall -VMName 'TAKServer'
     PS> Install-TAKServer -SshSession $session -RpmPath '.\tak.rpm'
@@ -55,7 +59,10 @@ function Wait-TAKLinuxInstall {
 
         [Parameter()]
         [ValidateRange(5, 120)]
-        [int] $RetryIntervalSeconds = 10
+        [int] $RetryIntervalSeconds = 10,
+
+        [Parameter()]
+        [PSCredential] $Credential
     )
 
     # ── Wait for operator to complete installation ────────────────────────
@@ -101,9 +108,11 @@ function Wait-TAKLinuxInstall {
     }
 
     # ── Get SSH credentials ───────────────────────────────────────────────
-    Write-Host ''
-    Write-Host 'Enter SSH credentials for the VM (the user you created during installation).' -ForegroundColor Yellow
-    $credential = Get-Credential -Message "SSH credentials for $vmIp"
+    if (-not $Credential) {
+        Write-Host ''
+        Write-Host 'Enter SSH credentials for the VM (the user you created during installation).' -ForegroundColor Yellow
+        $Credential = Get-Credential -Message "SSH credentials for $vmIp"
+    }
 
     # ── SSH connection retry loop ─────────────────────────────────────────
     Write-Host ''
@@ -121,7 +130,7 @@ function Wait-TAKLinuxInstall {
             -PercentComplete ([math]::Min(99, ($elapsed / $TimeoutSeconds * 100)))
 
         try {
-            $session = New-SSHSession -ComputerName $vmIp -Credential $credential -AcceptKey -Force -ErrorAction Stop
+            $session = New-SSHSession -ComputerName $vmIp -Credential $Credential -AcceptKey -Force -ErrorAction Stop
             break
         }
         catch {

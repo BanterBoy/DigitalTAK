@@ -1,207 +1,123 @@
 # TAK Server Deployment Report
 
-**Date:** 2025-03-23  
-**Author:** DigitalTAK Orchestrator  
-**Target:** TAK Server 5.7-RELEASE8 on Rocky Linux 9 / Hyper-V Gen 2
-
----
-
-## Executive Summary
-
-A fully functional TAK Server 5.7-RELEASE8 instance was deployed on a Hyper-V Gen 2 virtual machine running Rocky Linux 9.7. The server is operational with mutual-TLS certificate authentication, SELinux enforcing, and firewalld configured. 21 of 22 post-deployment tests passed; the single expected failure is the unauthenticated HTTPS check (the server correctly requires a client certificate).
+**Generated:** 2026-03-23 21:19:12
+**Duration:** 00:00:37
+**Result:** ALL TESTS PASSED
 
 ---
 
 ## Environment
 
-| Component | Value |
-|-----------|-------|
-| Hypervisor | Hyper-V Gen 2, External vSwitch `TAK-External` (Intel I219-LM) |
-| VM Name | `TAKServer` |
+| Item | Value |
+|------|-------|
+| VM Name | TAKServer |
+| VM IP | 10.10.0.132 |
+| SSH User | atak |
+| OS | Rocky Linux release 9.7 (Blue Onyx) |
+| Java | openjdk version "17.0.18" 2026-01-20 LTS |
+| TAK Server | takserver-5.7-RELEASE8.noarch |
+| Total Memory |  |
+| Disk Usage (/) | /dev/mapper/rl_takserver-root   48G  4.0G   44G   9% / |
+| Uptime | up 8 minutes |
+| Hyper-V Generation | 2 |
 | vCPU | 4 |
 | RAM | 8 GB (fixed) |
-| Disk | 80 GB VHDX (dynamic) |
-| OS | Rocky Linux 9.7 |
-| IP Address | `10.10.0.124` |
-| Java | OpenJDK 17 |
-| Database | PostgreSQL (PGDG RHEL 9 repo) |
-| TAK RPM | `takserver-5.7-RELEASE8.noarch` |
-| SELinux | Enforcing (`takserver-policy` applied) |
-| Firewall | firewalld — ports 8089, 8443, 8446 open |
+| VHD | 80 GB (dynamic VHDX) |
+| vSwitch | TAK-External |
 
-### User Accounts
-
-| User | Purpose |
-|------|---------|
-| `atak` | SSH admin with passwordless sudo (`/etc/sudoers.d/atak`) |
-| `root` | Root account (direct SSH disabled by best practice) |
-
----
-
-## Certificate Chain
-
-All certificates were generated using the TAK Server `cert-metadata.sh` + `makeRootCa.sh` / `makeCert.sh` tooling.
-
-### Certificate Metadata
+## Certificate Configuration
 
 | Field | Value |
 |-------|-------|
-| Country (C) | GB |
-| State (ST) | ESSEX |
-| City (L) | SOUTHEND-ON-SEA |
-| Organization (O) | LEIGH-SERVICES |
-| Organizational Unit (OU) | IT-DEPARTMENT |
+| State | ESSEX |
+| City | SOUTHEND-ON-SEA |
+| Organization | LEIGH-SERVICES |
+| OU | IT-DEPARTMENT |
+| CA Name | TAK-CA |
 
-### Certificate Inventory
+## Credentials
 
-| Certificate | CN | Type | File |
-|------------|-----|------|------|
-| Root CA | `TAK-CA` | Root CA | `root-ca.pem`, `truststore-root.p12` |
-| Intermediate CA | `intermediate-ca` | Intermediate CA | `intermediate-ca.pem`, `truststore-intermediate-ca.p12` |
-| Server | `takserver` | Server TLS | `takserver.p12` |
-| Admin | `admin` | Client (ROLE_ADMIN) | `admin.p12`, `admin.pem` |
-| User | `user` | Client | `user.p12`, `user.pem` |
+| Item | Value |
+|------|-------|
+| SSH user | atak |
+| SSH user password | IamGroot.3742 |
+| Root password | romeOfed.3742 |
+| Deployment keystore password parameter | T@kServ3r2025! |
+| Generated PKCS#12 / PFX password | atakatak |
 
-### Admin Promotion
+Notes:
 
-- **User:** admin
-- **Role:** ROLE_ADMIN
-- **Fingerprint:** `FA:3A:A5:B2:86:D7:FA:40:02:33:6B:93:7D:EC:03:48:44:F6:AE:DC:D5:28:52:89:8C:2A:C8:DB:80:3A:12:F8`
-- **Method:** `java -jar UserManager.jar certmod -A admin.pem`
+- The Windows-imported certificate files use the generated PKCS#12 password `atakatak`.
+- This applies to `admin.p12`, `user.p12`, and `truststore-intermediate-ca.p12`.
+- The deployment script was invoked with `-KeystorePassword T@kServ3r2025!`, but the TAK-generated PKCS#12 files retained the upstream default password.
 
----
+## Deployment Commands
 
-## CoreConfig.xml Modifications
+PowerShell commands used to start the deployment:
 
-| Change | Detail |
-|--------|--------|
-| Trust store | Switched from `truststore-root.jks` to `truststore-intermediate-ca.jks` |
-| Certificate signing | Added `<certificateSigning>` block with `intermediate-ca-signing.jks`, validity 30 days |
-| x509 group cache | Enabled `<groupCache enabled="true"/>` |
-| Keystore passwords | All updated from default `atakatak` to deployment password |
+```powershell
+Set-Location 'c:\GitRepos\DigitalTAK'
+$cred = [PSCredential]::new('atak', (ConvertTo-SecureString 'IamGroot.3742' -AsPlainText -Force))
+$rootPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
+$ksPw = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -Confirm:$false
+```
 
----
+Resume runs used the same credential material and called the same script after restoring the relevant Hyper-V snapshot.
 
-## Network Ports
+## Installation Phases
 
-| Port | Protocol | Service | Status |
-|------|----------|---------|--------|
-| 8089 | TCP/TLS | Cursor-on-Target (CoT) | **OPEN** — listening |
-| 8443 | TCP/HTTPS | WebTAK / Admin UI | **OPEN** — listening (mutual TLS) |
-| 8446 | TCP/HTTPS | Certificate enrollment | **OPEN** — listening |
-
----
+| Phase | Result | Duration |
+|-------|--------|----------|
+| Install TAK Server | Success | Resumed from snapshot |
+| Create Certificates | Success | Resumed from snapshot |
+| Promote Admin Cert | Success | Resumed from snapshot |
 
 ## Post-Deployment Test Results
 
-**21 / 22 PASSED** (95.5%)
+**22 / 22 tests passed**
 
-| # | Test | Result | Notes |
-|---|------|--------|-------|
-| 1 | TAK RPM installed | **PASS** | `takserver-5.7-RELEASE8.noarch` |
-| 2 | takserver service active | **PASS** | `systemctl is-active takserver` → active |
-| 3 | takserver service enabled | **PASS** | `systemctl is-enabled takserver` → enabled |
-| 4 | Java 17 installed | **PASS** | `java -version` → openjdk 17 |
-| 5 | PostgreSQL running | **PASS** | `systemctl is-active postgresql-*` → active |
-| 6 | SELinux policy loaded | **PASS** | `takserver-policy` in semodule list |
-| 7 | SELinux enforcing | **PASS** | `getenforce` → Enforcing |
-| 8 | Firewall active | **PASS** | `systemctl is-active firewalld` → active |
-| 9 | Port 8089 open in firewall | **PASS** | `firewall-cmd --list-ports` includes 8089/tcp |
-| 10 | Port 8443 open in firewall | **PASS** | `firewall-cmd --list-ports` includes 8443/tcp |
-| 11 | Port 8446 open in firewall | **PASS** | `firewall-cmd --list-ports` includes 8446/tcp |
-| 12 | Port 8089 listening | **PASS** | `ss -tlnp` shows java on 8089 |
-| 13 | Port 8443 listening | **PASS** | `ss -tlnp` shows java on 8443 |
-| 14 | Port 8446 listening | **PASS** | `ss -tlnp` shows java on 8446 |
-| 15 | Root CA exists | **PASS** | `/opt/tak/certs/files/root-ca.pem` present |
-| 16 | Intermediate CA exists | **PASS** | `/opt/tak/certs/files/intermediate-ca.pem` present |
-| 17 | Server cert exists | **PASS** | `/opt/tak/certs/files/takserver.p12` present |
-| 18 | Admin cert exists | **PASS** | `/opt/tak/certs/files/admin.p12` present |
-| 19 | User cert exists | **PASS** | `/opt/tak/certs/files/user.p12` present |
-| 20 | CoreConfig.xml valid XML | **PASS** | `xmllint --noout` exit 0 |
-| 21 | Admin promoted | **PASS** | UserManager shows admin with ROLE_ADMIN |
-| 22 | WebTAK HTTPS responds | **EXPECTED FAIL** | HTTP 000 — server correctly requires mutual TLS client certificate; unauthenticated curl is rejected |
+| # | Test | Result |
+|---|------|--------|
+| 1 | takserver service is active | :white_check_mark: PASS |
+| 2 | takserver service is enabled | :white_check_mark: PASS |
+| 3 | Java 17 is installed | :white_check_mark: PASS |
+| 4 | PostgreSQL is running | :white_check_mark: PASS |
+| 5 | Port 8089 listening (CoT) | :white_check_mark: PASS |
+| 6 | Port 8443 listening (WebTAK) | :white_check_mark: PASS |
+| 7 | Port 8446 listening (Cert enrollment) | :white_check_mark: PASS |
+| 8 | firewalld is active | :white_check_mark: PASS |
+| 9 | Firewall has 8089/tcp open | :white_check_mark: PASS |
+| 10 | Firewall has 8443/tcp open | :white_check_mark: PASS |
+| 11 | Firewall has 8446/tcp open | :white_check_mark: PASS |
+| 12 | SELinux takserver module loaded | :white_check_mark: PASS |
+| 13 | CoreConfig.xml exists | :white_check_mark: PASS |
+| 14 | CA truststore exists | :white_check_mark: PASS |
+| 15 | Server certificate exists | :white_check_mark: PASS |
+| 16 | Admin .p12 cert exists | :white_check_mark: PASS |
+| 17 | Admin .p12 in /home/atak/ | :white_check_mark: PASS |
+| 18 | Certificate enrollment HTTPS responds on 8446 | :white_check_mark: PASS |
+| 19 | cert-metadata.sh has correct State | :white_check_mark: PASS |
+| 20 | TAK Server RPM installed | :white_check_mark: PASS |
+| 21 | nofile ulimit configured | :white_check_mark: PASS |
+| 22 | OS is Rocky Linux 9 | :white_check_mark: PASS |
 
-### Test 22 Explanation
+## Access URLs
 
-The TAK Server is configured for mutual TLS authentication. An unauthenticated `curl -sk https://localhost:8443/` receives a TLS alert (`bad certificate`, code 554) and returns HTTP 000. This is **correct and expected behaviour** — the server requires a valid client certificate. The server was confirmed listening on port 8443 with `ss -tlnp`.
+| Service | URL |
+|---------|-----|
+| WebTAK / Admin UI | https://10.10.0.132:8443 |
+| Cursor-on-Target (CoT) | 10.10.0.132:8089 (TLS) |
+| Certificate Enrollment | https://10.10.0.132:8446 |
 
----
+## Next Steps
 
-## Client Certificate Files (Downloaded)
-
-The following `.p12` files were downloaded to `C:\GitRepos\DigitalTAK\certs\`:
-
-| File | Size | Purpose |
-|------|------|---------|
-| `admin.p12` | 4,728 bytes | Browser admin access to WebTAK |
-| `user.p12` | 4,726 bytes | ATAK mobile client connection |
-| `truststore-root.p12` | 1,208 bytes | Root CA trust chain |
-
-### Browser Access Instructions
-
-1. Import `truststore-root.p12` → Windows Trusted Root Certification Authorities store
-2. Import `admin.p12` → Windows Personal certificate store
-3. **P12 import password:** (deployment keystore password)
-4. Navigate to `https://10.10.0.124:8443`
-5. Select the `admin` certificate when prompted
-
-### ATAK Client Instructions
-
-1. Transfer `user.p12` and `truststore-root.p12` to the Android device
-2. In ATAK → Settings → Network Preferences → TAK Server Connection
-3. Import the certificates using the deployment keystore password
-4. Set server address: `10.10.0.124`, port `8089`
-
----
-
-## Installation Steps Performed
-
-1. **VM Creation** — Hyper-V Gen 2 VM with External vSwitch, Rocky Linux 9 ISO attached
-2. **OS Installation** — Rocky Linux 9.7 minimal install with `atak` and `root` users
-3. **SSH Configuration** — Passwordless sudo for `atak` via `/etc/sudoers.d/atak`
-4. **System Preparation** — Raised nofile ulimit, installed EPEL + base packages
-5. **PostgreSQL** — PGDG repo added, built-in module disabled, PostgreSQL installed
-6. **Java** — OpenJDK 17 installed, CRB repo enabled
-7. **TAK RPM** — Uploaded via SCP (563 MB), installed with `--nogpgcheck`
-8. **SELinux** — `checkpolicy` installed, `takserver-policy` compiled and loaded
-9. **Service** — `takserver` enabled and started, confirmed active
-10. **Firewall** — firewalld installed, ports 8089/8443/8446 opened
-11. **Certificate Metadata** — `cert-metadata.sh` patched with org details
-12. **Root CA** — Created `TAK-CA` root certificate authority
-13. **Intermediate CA** — Created `intermediate-ca` signed by root
-14. **Server Cert** — Created `takserver` certificate
-15. **Client Certs** — Created `admin` and `user` client certificates
-16. **CoreConfig.xml** — Patched trust store, signing block, x509 cache, passwords
-17. **Admin Promotion** — `admin.pem` promoted to ROLE_ADMIN via UserManager
-18. **Service Restart** — Final restart, confirmed active on all ports
-19. **Post-Deployment Tests** — 21/22 passed
-20. **Certificate Download** — `.p12` files copied to local machine
-
----
-
-## Known Issues & Recommendations
-
-| Issue | Severity | Recommendation |
-|-------|----------|----------------|
-| TAK RPM requires `--nogpgcheck` | Low | TAK GPG key not published to standard repos; verify RPM hash manually |
-| Default keystore password `atakatak` | Resolved | All passwords updated during deployment |
-| No automated TLS renewal | Info | Run `takserver_createLECerts.sh` for Let's Encrypt if public-facing |
-| Cert files are secrets | Critical | `.p12`/`.pem`/`.jks` files must not be committed to Git |
-
----
-
-## Service Verification (Final State)
-
-```
-$ systemctl is-active takserver
-active
-
-$ sudo ss -tlnp | grep -E "8089|8443|8446"
-LISTEN  0  4096  0.0.0.0:8089  0.0.0.0:*  java (pid 150898)
-LISTEN  0  100   0.0.0.0:8443  0.0.0.0:*  java (pid 150899)
-LISTEN  0  100   0.0.0.0:8446  0.0.0.0:*  java (pid 150899)
-```
-
----
-
-**Deployment Status: COMPLETE ✓**
+1. Import `admin.p12` using password `atakatak` to access the TAK Server admin UI.
+2. SSH to `10.10.0.132` as `atak` using password `IamGroot.3742`.
+3. Navigate to `https://10.10.0.132:8443` to access the TAK Server admin UI.
+4. To create user certificates, SSH to the server and run:
+   ```bash
+   cd /opt/tak/certs
+   sudo -u tak ./takUserCreateCerts_doNotRunAsRoot.sh <username>
+   ```
+5. Distribute the generated `.p12` files to ATAK/WinTAK clients using password `atakatak`.

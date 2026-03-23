@@ -11,14 +11,47 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 
 ```
 DigitalTAK/
+├── Wiki/                       ← In-repo wiki section for operators and maintainers
 ├── InstallShellScripts/        ← Bash deployment scripts (run on the server)
 ├── TXTScripts/                 ← Byte-identical TXT mirrors of every .sh file
 ├── TAKServerPS/                ← PowerShell module — TAK Server REST API (44 cmdlets)
 ├── TAKInstall/                 ← PowerShell module — remote provisioning via SSH (6 cmdlets)
 ├── Documentation/              ← Official TAK Server 5.7 & Federation Hub guides (PDF)
 ├── channels.zip                ← ATAK client data package for device distribution
-└── TEST-REPORT.md              ← Pester test results (179/179 passing)
+└── reports/                    ← Deployment and test reports
 ```
+
+---
+
+## General Deployment Script
+
+The repository also includes a general Hyper-V deployment entry point:
+
+- `Deploy-TAKServer.ps1` — canonical end-to-end deployment script for building a TAK Server VM from your own configuration
+- `Deploy-TAKTestServer.ps1` — backward-compatible wrapper that forwards to `Deploy-TAKServer.ps1`
+
+Use `Deploy-TAKServer.ps1` when you want to deploy a server from this repository using your own VM sizing, credentials, RPM path, certificate subject metadata, and snapshot-resume behavior.
+
+Detailed operator guidance is in [Documentation/Deploy-TAKServer.md](Documentation/Deploy-TAKServer.md).
+
+The repository wiki section for the deployment script and both PowerShell modules is in [Wiki/Home.md](Wiki/Home.md).
+
+Quick start:
+
+```powershell
+Set-Location .
+$cred = Get-Credential -UserName 'atak'
+$rootPw = Read-Host -AsSecureString -Prompt 'Root password'
+$ksPw = Read-Host -AsSecureString -Prompt 'TAK keystore password'
+
+.\Deploy-TAKServer.ps1 `
+    -Credential $cred `
+    -RootPassword $rootPw `
+    -KeystorePassword $ksPw `
+    -Confirm:$false
+```
+
+If you do not pass `-State`, `-City`, `-Organization`, `-OrganizationalUnit`, or `-CAName`, the script now prompts for them instead of silently applying fixed lab metadata.
 
 ---
 
@@ -219,7 +252,7 @@ Run a single file to avoid memory pressure:
 Invoke-Pester -Path .\TAKServerPS\Tests\TAKServerPS.Module.Tests.ps1 -Output Detailed
 ```
 
-Full results: [TEST-REPORT.md](TEST-REPORT.md)
+Full results: [reports/TEST-REPORT.md](reports/TEST-REPORT.md)
 
 ---
 
@@ -227,10 +260,15 @@ Full results: [TEST-REPORT.md](TEST-REPORT.md)
 
 | File | Description |
 |------|-------------|
+| `Wiki/Home.md` | Wiki index for deployment, `TAKInstall`, and `TAKServerPS` |
+| `Wiki/Deploy-TAKServer.md` | Wiki page for the general deployment entry point |
+| `Wiki/TAKInstall.md` | Wiki page for the SSH provisioning module and its exported functions |
+| `Wiki/TAKServerPS.md` | Wiki page for the REST API module and its exported functions |
+| `Wiki/_Sidebar.md` | Wiki navigation sidebar for the in-repo wiki section |
 | `Documentation/TAK_Server_Configuration_Guide_5.7.pdf` | Official TAK Server 5.7 configuration guide |
 | `Documentation/Federation_Hub_Configuration_Guide.pdf` | Federation Hub configuration and setup guide |
 | `channels.zip` | ATAK client data package — distribute to devices via TAK Server data packages |
-| `TEST-REPORT.md` | Pester test results with per-test breakdown and bug fix notes |
+| `reports/TEST-REPORT.md` | Pester test results with per-test breakdown and bug fix notes |
 
 ---
 

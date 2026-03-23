@@ -57,25 +57,55 @@ function Set-TAKAdminCertificate {
         return
     }
 
+    Wait-TAKServiceReady -Session $SshSession -ServiceName 'takserver' -TimeoutSeconds $ServiceRestartTimeout
+    Wait-TAKAdminApiReady -Session $SshSession -TimeoutSeconds $ServiceRestartTimeout
+
     # ── 1. Promote admin.pem to administrator ──────────────────────────────
-    Write-Progress -Activity 'Setting TAK admin certificate' -Status 'Promoting admin.pem' -PercentComplete 20
-    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Promote admin.pem to administrator role' -Command `
-        'sudo java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/admin.pem'
+    $promotionCommand = 'sudo java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/admin.pem'
+    $attemptIntervalSeconds = 10
+    $maxAttempts = [Math]::Max(1, [Math]::Floor($ServiceRestartTimeout / $attemptIntervalSeconds))
+    $retryableErrorPattern = 'distributed-user-file-manager|IgniteException|Failed to find deployed service'
+
+    for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+        $percentComplete = [Math]::Min(20 + [int](($attempt / $maxAttempts) * 20), 40)
+        Write-Progress -Activity 'Setting TAK admin certificate' -Status "Promoting admin.pem (attempt $attempt/$maxAttempts)" -PercentComplete $percentComplete
+        Write-Host "  Waiting for TAK admin backend... attempt $attempt/$maxAttempts" -ForegroundColor Yellow
+
+        $result = Invoke-TAKRemoteCommand -Session $SshSession -Description 'Promote admin.pem to administrator role' -Command $promotionCommand -AllowFailure
+        if ($result.ExitStatus -eq 0) {
+            Write-Host '  [OK] Admin certificate promoted' -ForegroundColor Green
+            break
+        }
+
+        $errorDetail = ((@($result.Output) + @($result.Error)) | Out-String).Trim()
+        $isRetryable = $errorDetail -match $retryableErrorPattern
+
+        if (-not $isRetryable -or $attempt -eq $maxAttempts) {
+            $msg = "Remote command failed (exit $($result.ExitStatus)): Promote admin.pem to administrator role`nCommand: $promotionCommand"
+            if ($errorDetail) { $msg += "`nRemote output:  $errorDetail" }
+            $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                [System.InvalidOperationException]::new($msg),
+                'TAKAdminPromotionFailed',
+                [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                $promotionCommand
+            )
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
+        }
+
+        Start-Sleep -Seconds $attemptIntervalSeconds
+    }
 
     # ── 2. Restart takserver ───────────────────────────────────────────────
     Write-Progress -Activity 'Setting TAK admin certificate' -Status 'Restarting takserver' -PercentComplete 45
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Restart takserver' -Command `
-        'sudo systemctl restart takserver'
+        'sudo systemctl restart --no-block takserver'
 
     Wait-TAKServiceReady -Session $SshSession -ServiceName 'takserver' -TimeoutSeconds $ServiceRestartTimeout
 
     # ── 3. Copy admin.p12 to /home/atak/ ──────────────────────────────────
     Write-Progress -Activity 'Setting TAK admin certificate' -Status 'Copying admin.p12 to /home/atak/' -PercentComplete 85
-    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Copy admin.p12 and set ownership' -Command @'
-sudo cp /opt/tak/certs/files/admin.p12 /home/atak/
-sudo chown atak:atak /home/atak/admin.p12
-sudo chmod 640 /home/atak/admin.p12
-'@
+    $copyAdminCommand = 'sudo mkdir -p /home/atak; sudo chown atak:atak /home/atak; sudo cp /opt/tak/certs/files/admin.p12 /home/atak/; sudo chown atak:atak /home/atak/admin.p12; sudo chmod 640 /home/atak/admin.p12'
+    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Copy admin.p12 and set ownership' -Command $copyAdminCommand
 
     Write-Progress -Activity 'Setting TAK admin certificate' -Completed
     Write-Verbose 'Admin certificate promotion complete.'

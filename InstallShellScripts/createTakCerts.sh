@@ -28,7 +28,7 @@ sudo rm -vRf /opt/tak/certs/files
 # ── Collect certificate metadata ──────────────────────────────────────────────
 echo ""
 echo "The following will edit cert-metadata.sh to create the correct certificates."
-echo "Enter values in CAPS with NO SPACES (letters and digits only)."
+echo "Enter values in CAPS with NO SPACES (letters, digits, and hyphens only)."
 echo ""
 
 read -r -p 'STATE (e.g. VA): ' statevar
@@ -36,11 +36,11 @@ read -r -p 'CITY  (e.g. ARLINGTON): ' cityvar
 read -r -p 'ORGANIZATION (e.g. MYORG): ' orgvar
 read -r -p 'ORGANIZATIONAL_UNIT (e.g. MYUNIT): ' ouvar
 
-# Validate cert fields — must be UPPERCASE letters and digits only
+# Validate cert fields — must be UPPERCASE letters, digits, and hyphens only
 for field_name in statevar cityvar orgvar ouvar; do
     field_val="${!field_name}"
-    if [[ ! "$field_val" =~ ^[A-Z0-9]+$ ]]; then
-        echo "ERROR: $field_name must be UPPERCASE letters and digits only. Got: $field_val"
+    if [[ ! "$field_val" =~ ^[A-Z0-9-]+$ ]]; then
+        echo "ERROR: $field_name must be UPPERCASE letters, digits, and hyphens only. Got: $field_val"
         exit 1
     fi
 done

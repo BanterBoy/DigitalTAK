@@ -91,7 +91,8 @@ Describe 'TAKInstall — Module Import and Exports' {
     It 'does NOT export private helpers' -ForEach @(
         'ConvertTo-TAKBashArg',
         'Invoke-TAKRemoteCommand',
-        'Wait-TAKServiceReady'
+        'Wait-TAKServiceReady',
+        'Wait-TAKAdminApiReady'
     ) {
         Get-Command -Name $_ -Module 'TAKInstall' -ErrorAction SilentlyContinue |
             Should -BeNullOrEmpty -Because "$_ is a private function"

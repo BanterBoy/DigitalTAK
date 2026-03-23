@@ -53,7 +53,8 @@ function Assert-HyperVPrerequisites {
     $results.PoshSSH = ($null -ne (Get-Module -ListAvailable -Name 'Posh-SSH'))
 
     # ── TAKInstall module ─────────────────────────────────────────────────
-    $takInstallPath = Join-Path (Split-Path $PSScriptRoot) 'TAKInstall' 'TAKInstall.psd1'
+    $repoRoot = Split-Path (Split-Path $PSScriptRoot)
+    $takInstallPath = Join-Path $repoRoot 'TAKInstall\TAKInstall.psd1'
     $results.TAKInstall = (Test-Path $takInstallPath)
 
     # ── ISO file ──────────────────────────────────────────────────────────

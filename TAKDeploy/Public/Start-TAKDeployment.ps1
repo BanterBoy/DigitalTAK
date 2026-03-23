@@ -8,8 +8,8 @@
 
       Phase 0: Prerequisites check (Hyper-V, Posh-SSH, TAKInstall, ISO, RPM)
       Phase 1: Create a Hyper-V Gen 2 VM and boot the Rocky Linux ISO
-      Phase 1b: Wait for the operator to complete the Rocky Linux installation,
-                then establish SSH connectivity to the new VM
+    Phase 1b: Wait for the operator to complete the Rocky Linux installation,
+            then establish SSH connectivity to the new VM
       Phase 2: Run TAKInstall cmdlets — Install-TAKServer, New-TAKServerCertificate,
                Set-TAKAdminCertificate, and optionally Install-TAKOpenfire and
                New-TAKLetsEncryptCertificate
@@ -66,11 +66,13 @@ function Start-TAKDeployment {
     Write-Host ''
 
     # ── Import TAKInstall module ──────────────────────────────────────────
-    $takInstallPath = Join-Path (Split-Path $PSScriptRoot) 'TAKInstall' 'TAKInstall.psd1'
+    $repoRoot = Split-Path (Split-Path $PSScriptRoot)
+    $takInstallPath = Join-Path $repoRoot 'TAKInstall\TAKInstall.psd1'
     Import-Module $takInstallPath -Force -ErrorAction Stop
     Write-Verbose 'TAKInstall module imported.'
 
     $session = $null
+    $credential = $null
 
     try {
         if (-not $SkipVMCreation) {
@@ -89,7 +91,8 @@ function Start-TAKDeployment {
             # ── Phase 1b: Wait for OS install + SSH ───────────────────────
             Write-Host '── Phase 1b: Waiting for Rocky Linux Installation ──' -ForegroundColor Magenta
 
-            $session = Wait-TAKLinuxInstall -VMName $config.VMName
+            $credential = Get-Credential -Message 'SSH credentials for the TAK Server once Rocky Linux installation completes'
+            $session = Wait-TAKLinuxInstall -VMName $config.VMName -Credential $credential
         }
         else {
             # ── Skip VM — prompt for SSH directly ─────────────────────────
@@ -114,6 +117,7 @@ function Start-TAKDeployment {
         Install-TAKServer `
             -SshSession $session `
             -RpmPath $config.RpmPath `
+            -Credential $credential `
             -Confirm:$false
 
         # ── Phase 2b: Create Certificates ─────────────────────────────────
