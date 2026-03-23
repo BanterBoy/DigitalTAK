@@ -1,0 +1,5 @@
+# Certificate files are secrets — never commit
+*.p12
+*.pem
+*.jks
+*.key

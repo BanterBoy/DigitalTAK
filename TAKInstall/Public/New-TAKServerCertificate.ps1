@@ -96,19 +96,19 @@ function New-TAKServerCertificate {
         [SSH.SshSession] $SshSession,
 
         [Parameter(Mandatory)]
-        [ValidatePattern('^[A-Z0-9]+$')]
+        [ValidatePattern('^[A-Z0-9-]+$')]
         [string] $State,
 
         [Parameter(Mandatory)]
-        [ValidatePattern('^[A-Z0-9]+$')]
+        [ValidatePattern('^[A-Z0-9-]+$')]
         [string] $City,
 
         [Parameter(Mandatory)]
-        [ValidatePattern('^[A-Z0-9]+$')]
+        [ValidatePattern('^[A-Z0-9-]+$')]
         [string] $Organization,
 
         [Parameter(Mandatory)]
-        [ValidatePattern('^[A-Z0-9]+$')]
+        [ValidatePattern('^[A-Z0-9-]+$')]
         [string] $OrganizationalUnit,
 
         [Parameter()]

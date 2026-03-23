@@ -85,7 +85,10 @@ function Install-TAKServer {
         [string] $RemoteWorkDir = '/tmp/tak_install',
 
         [Parameter()]
-        [switch] $SkipGpgVerification
+        [switch] $SkipGpgVerification,
+
+        [Parameter()]
+        [PSCredential] $Credential
     )
 
     if (-not $PSCmdlet.ShouldProcess($SshSession.Host, 'Install TAK Server 5.7-RELEASE8')) {
@@ -96,11 +99,8 @@ function Install-TAKServer {
 
     # ── 1. Raise open-files ulimit ───────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Configuring system limits' -PercentComplete 5
-    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Raise nofile ulimit' -Command @'
-if ! sudo grep -qE '^\*\s+soft\s+nofile\s+32768$' /etc/security/limits.conf; then
-    printf '* soft nofile 32768\n* hard nofile 32768\n' | sudo tee --append /etc/security/limits.conf > /dev/null
-fi
-'@
+    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Raise nofile ulimit' -Command `
+        'if ! sudo grep -qE "^\*\s+soft\s+nofile\s+32768\$" /etc/security/limits.conf; then printf "* soft nofile 32768\n* hard nofile 32768\n" | sudo tee --append /etc/security/limits.conf > /dev/null; fi'
 
     # ── 2. EPEL and base packages ─────────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Installing EPEL and base packages' -PercentComplete 10
@@ -110,15 +110,18 @@ fi
     # ── 3. PostgreSQL PGDG repo ───────────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Adding PostgreSQL PGDG repository' -PercentComplete 20
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Install PostgreSQL PGDG repo' -Command `
-        "sudo dnf --disablerepo='*' -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+        "sudo dnf --disablerepo='*' -y --nogpgcheck install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
 
-    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Disable built-in postgresql module and update' -Command `
-        'sudo dnf -qy module disable postgresql && sudo dnf update -y'
+    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Disable built-in postgresql module' -Command `
+        'sudo dnf -qy module disable postgresql'
+
+    Invoke-TAKRemoteCommand -Session $SshSession -Description 'Update system packages' -Command `
+        'sudo dnf update -y' -TimeOut 600
 
     # ── 4. Java 17 + CRB ─────────────────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Installing OpenJDK 17' -PercentComplete 30
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Install OpenJDK 17' -Command `
-        'sudo dnf install -y java-17-openjdk-devel'
+        'sudo dnf install -y java-17-openjdk-devel' -TimeOut 600
 
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Enable CRB repo' -Command `
         'sudo dnf config-manager --set-enabled crb'
@@ -127,18 +130,32 @@ fi
     Write-Progress -Activity 'Installing TAK Server' -Status 'Uploading RPM to remote host' -PercentComplete 38
 
     Invoke-TAKRemoteCommand -Session $SshSession -Description "Create remote work dir $RemoteWorkDir" -Command `
-        "sudo mkdir -p $RemoteWorkDir && sudo chmod 700 $RemoteWorkDir"
+        "sudo mkdir -p $RemoteWorkDir && sudo chown `$(whoami) $RemoteWorkDir && chmod 700 $RemoteWorkDir"
 
-    Write-Verbose "  => SCP upload: $rpmFile → $RemoteWorkDir/"
-    Set-SCPItem -SessionId $SshSession.SessionId -Path $RpmPath -Destination "$RemoteWorkDir/" -ErrorAction Stop
+    # Upload via SCP (requires credential for Posh-SSH 3.x which does not support session reuse)
+    if (-not $Credential) {
+        $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+            [System.ArgumentException]::new(
+                'The -Credential parameter is required for file upload. Provide the same PSCredential used to create the SSH session.'),
+            'TAKCredentialRequired',
+            [System.Management.Automation.ErrorCategory]::InvalidArgument,
+            $null
+        )
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
+
+    Write-Verbose "  => SCP upload: $rpmFile -> $RemoteWorkDir/"
+    Set-SCPItem -ComputerName $SshSession.Host -Credential $Credential -Path $RpmPath `
+        -Destination "$RemoteWorkDir/" -AcceptKey -Force -OperationTimeout 600 -ErrorAction Stop
 
     $remoteRpm = "$RemoteWorkDir/$rpmFile"
     $remoteGpg = ''
 
     if ($GpgKeyPath -and -not $SkipGpgVerification) {
         $gpgFile = Split-Path $GpgKeyPath -Leaf
-        Write-Verbose "  => SCP upload: $gpgFile → $RemoteWorkDir/"
-        Set-SCPItem -SessionId $SshSession.SessionId -Path $GpgKeyPath -Destination "$RemoteWorkDir/" -ErrorAction Stop
+        Write-Verbose "  => SCP upload: $gpgFile -> $RemoteWorkDir/"
+        Set-SCPItem -ComputerName $SshSession.Host -Credential $Credential -Path $GpgKeyPath `
+            -Destination "$RemoteWorkDir/" -AcceptKey -Force -ErrorAction Stop
         $remoteGpg = "$RemoteWorkDir/$gpgFile"
     }
 
@@ -154,7 +171,7 @@ fi
     # ── 7. Install TAK RPM ────────────────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Installing TAK Server RPM' -PercentComplete 48
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Install takserver RPM' -Command `
-        "sudo dnf install -y $remoteRpm"
+        "sudo dnf install -y $remoteRpm" -TimeOut 600
 
     # ── 8. SELinux policy ─────────────────────────────────────────────────────
     Write-Progress -Activity 'Installing TAK Server' -Status 'Applying SELinux policy' -PercentComplete 60

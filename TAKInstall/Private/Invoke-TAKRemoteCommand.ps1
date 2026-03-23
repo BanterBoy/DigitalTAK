@@ -35,14 +35,26 @@ function Invoke-TAKRemoteCommand {
         [string] $Description,
 
         [Parameter()]
-        [switch] $AllowFailure
+        [switch] $AllowFailure,
+
+        [Parameter()]
+        [ValidateRange(0, 3600)]
+        [int] $TimeOut = 0
     )
 
     if ($Description) {
         Write-Verbose "  => $Description"
     }
 
-    $result = Invoke-SSHCommand -SSHSession $Session -Command $Command
+    $sshParams = @{
+        SSHSession = $Session
+        Command    = $Command
+    }
+    if ($TimeOut -gt 0) {
+        $sshParams['TimeOut'] = $TimeOut
+    }
+
+    $result = Invoke-SSHCommand @sshParams
 
     if ($result.ExitStatus -ne 0 -and -not $AllowFailure) {
         $msg = "Remote command failed (exit $($result.ExitStatus))"
