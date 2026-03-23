@@ -47,14 +47,12 @@ DigitalTAK/
 │   ├── takserver_renewLECerts.sh             # Optional: LetsEncrypt cert renewal
 │   └── utils.sh                              # Shared helper functions
 ├── TXTScripts/             # Mirror copies of all scripts with .txt extension
-├── Wiki/                   # In-repo wiki (Home, Deploy-TAKServer, TAKInstall, TAKServerPS)
 ├── Documentation/
 │   ├── TAK_Server_Configuration_Guide_5.7.pdf
 │   ├── TAK_Server_Configuration_Guide_5.7.md
 │   ├── Federation_Hub_Configuration_Guide.pdf
 │   ├── channels-README.md
-│   ├── Deploy-TAKServer.md
-│   └── Wiki/               # Legacy pointer to Wiki/ at repo root
+│   └── Deploy-TAKServer.md
 ├── reports/
 │   ├── TEST-REPORT.md       # Pester results
 │   ├── DEPLOYMENT-REPORT.md
@@ -127,6 +125,8 @@ RL9_tak5.7r8_install.sh             ← run first as root/sudo
 | 6 | **Openfire Cockpit port conflict** | Openfire uses port 9090; script explicitly disables Cockpit. |
 | 7 | **TAKInstall missing analyzer settings** | TAKInstall has no PSScriptAnalyzerSettings.psd1; BOM warnings fire on CI. |
 
+> **Wiki:** Moved to GitHub Wiki at https://github.com/BanterBoy/DigitalTAK/wiki (10 pages). In-repo `Wiki/` and `Documentation/Wiki/` folders removed.
+
 ---
 
 ## 7. CI Pipeline
@@ -174,7 +174,7 @@ When spawning subagents, use this as a guide:
 | Cert creation | `createTakCerts.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `promoteAdmin.sh` + mirrors | `RL9_tak5.7r8_install.sh`, Openfire/LE scripts |
 | Openfire | `openfire_takChat_install.sh` + its mirror | All TAK cert and install scripts |
 | LetsEncrypt | `takserver_createLECerts.sh`, `takserver_renewLECerts.sh` + mirrors | All non-LE scripts |
-| Documentation | `README.md`, `ORCHESTRATOR.md` | All scripts |
+| Documentation | `README.md`, `ORCHESTRATOR.md`, GitHub Wiki | All scripts |
 
 ---
 
@@ -189,6 +189,7 @@ When spawning subagents, use this as a guide:
 | 2026-03-22 | Scripts updated for 5.7 | pgdg repo method fixed (`--disablerepo=*`); CRB moved to correct position (post-Java); Java version guard added; GPG verification block added; `promoteAdmin.sh` given `sudo`; `createTakCerts.sh` password escaping hardened + CoreConfig validation added. |
 | 2026-03-22 | Main installer renamed | `RL9.5_tak5.4r14_install.sh` → `RL9_tak5.7r8_install.sh`. Old name referenced TAK 5.4-r14 despite installing 5.7. |
 | 2026-03-22 | Stale 5.6 PDF and API spec removed | `TAK_Server_Configuration_Guide.pdf` (5.6) superseded by `TAK_Server_Configuration_Guide_5.7.pdf`. `takVersion-5.6-RELEASE-14-openapispec.json` was not consumed by any script. |
+| 2025-07 | Wiki moved to GitHub Wiki | In-repo `Wiki/` and `Documentation/Wiki/` folders removed. 10 pages published to https://github.com/BanterBoy/DigitalTAK/wiki. README updated to link to GitHub Wiki. |
 
 ---
 

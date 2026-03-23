@@ -52,7 +52,6 @@ DigitalTAK/
 │   ├── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
 │   └── utils.sh                    ← Shared helper functions
 ├── TXTScripts/                     ← TXT mirrors (must stay byte-identical to .sh)
-├── Wiki/                           ← In-repo wiki (Home, Deploy, TAKInstall, TAKServerPS)
 ├── Documentation/                  ← Official TAK PDFs + channels README
 ├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, review reports
 ├── Deploy-TAKServer.ps1            ← End-to-end deployment orchestration script
@@ -63,6 +62,8 @@ DigitalTAK/
 ├── LICENSE
 └── README.md
 ```
+
+> **Wiki:** https://github.com/BanterBoy/DigitalTAK/wiki — 10 pages covering deployment, modules, shell scripts, networking, channels, and testing.
 
 ---
 
