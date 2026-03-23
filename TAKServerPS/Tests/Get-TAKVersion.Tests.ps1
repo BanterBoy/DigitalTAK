@@ -6,7 +6,7 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKServer.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKServer.psd1')) -Force -ErrorAction Stop
 }
 
 AfterAll {

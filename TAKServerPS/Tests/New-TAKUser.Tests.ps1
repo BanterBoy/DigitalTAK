@@ -6,7 +6,7 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKServer.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKServer.psd1')) -Force -ErrorAction Stop
 }
 
 AfterAll {
@@ -16,11 +16,11 @@ AfterAll {
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 function script:New-TestCredential {
-    param([string] $UserName = 'testuser', [string] $Password = 'P@ssw0rd!')
-    [System.Management.Automation.PSCredential]::new(
-        $UserName,
-        (ConvertTo-SecureString $Password -AsPlainText -Force)
+    param(
+        [string] $UserName = 'testuser',
+        [securestring] $SecurePassword = ('P@ssw0rd!' | ConvertTo-SecureString -AsPlainText -Force)
     )
+    [System.Management.Automation.PSCredential]::new($UserName, $SecurePassword)
 }
 
 # ── POST endpoint ─────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ Describe 'New-TAKUser — HTTP call' {
     }
 
     It 'body contains the plain-text password' {
-        New-TAKUser -Credential (New-TestCredential -Password 'P@ssw0rd!') -Confirm:$false
+        New-TAKUser -Credential (New-TestCredential -SecurePassword ('P@ssw0rd!' | ConvertTo-SecureString -AsPlainText -Force)) -Confirm:$false
         Should -Invoke Invoke-TAKRequest -ModuleName TAKServer -Times 1 -ParameterFilter {
             $Body -is [hashtable] -and $Body['password'] -eq 'P@ssw0rd!'
         }

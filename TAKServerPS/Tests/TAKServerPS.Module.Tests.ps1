@@ -6,7 +6,7 @@
 #>
 
 BeforeAll {
-    $script:ManifestPath = Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKServer.psd1')
+    $script:ManifestPath = Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKServer.psd1')
 
     $script:ExpectedFunctions = @(
         'Connect-TAKServer', 'Disconnect-TAKServer', 'Get-TAKCertificate',

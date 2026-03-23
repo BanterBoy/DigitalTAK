@@ -6,7 +6,7 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKInstall.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKInstall.psd1')) -Force -ErrorAction Stop
 
     $script:FakeSession = New-MockObject -Type ([SSH.SshSession])
 }

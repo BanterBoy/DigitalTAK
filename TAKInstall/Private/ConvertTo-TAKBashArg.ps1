@@ -25,6 +25,6 @@ function ConvertTo-TAKBashArg {
 
     process {
         # Escape embedded single-quotes, then wrap the whole value in single quotes.
-        "'" + $Value.Replace("'", "'\\''") + "'"
+        "'" + $Value.Replace("'", "'\''" ) + "'"
     }
 }

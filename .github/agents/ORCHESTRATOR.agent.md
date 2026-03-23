@@ -22,11 +22,26 @@ CivTAK / TAK Server installation and configuration automation for Rocky Linux 9.
 ```
 DigitalTAK/
 ├── .github/
-│   └── agents/                     ← VS Code agent definitions (this file + sub-agents)
-├── channels.zip                    ← ATAK client data package
-├── Documentation/
-│   ├── Federation_Hub_Configuration_Guide.pdf
-│   └── TAK_Server_Configuration_Guide_5.7.pdf
+│   ├── agents/                     ← VS Code agent definitions (this file + sub-agents)
+│   ├── copilot-instructions.md     ← Copilot repo-level instructions
+│   └── workflows/ci.yml            ← GitHub Actions CI (4 jobs)
+├── TAKServerPS/                    ← PS module — 44-cmdlet REST API wrapper
+│   ├── TAKServer.psd1 / .psm1
+│   ├── PSScriptAnalyzerSettings.psd1
+│   ├── Private/Invoke-TAKRequest.ps1
+│   ├── Public/  (44 cmdlets)
+│   └── Tests/   (7 test files)
+├── TAKInstall/                     ← PS module — remote provisioning over SSH (Posh-SSH)
+│   ├── TAKInstall.psd1 / .psm1
+│   ├── Private/ (4 helpers)
+│   ├── Public/  (6 cmdlets)
+│   └── Tests/   (5 test files)
+├── TAKDeploy/                      ← PS module — Hyper-V VM creation + deployment orchestration
+│   ├── TAKDeploy.psd1 / .psm1
+│   ├── PSScriptAnalyzerSettings.psd1
+│   ├── Private/ (3 helpers)
+│   ├── Public/  (3 cmdlets)
+│   └── Tests/   (2 test files)
 ├── InstallShellScripts/            ← Executable Bash scripts
 │   ├── RL9_tak5.7r8_install.sh     ← ENTRY POINT — main TAK installation
 │   ├── createTakCerts.sh           ← TAK CA + server cert generation
@@ -34,8 +49,17 @@ DigitalTAK/
 │   ├── openfire_takChat_install.sh ← Openfire XMPP chat integration
 │   ├── takserver_createLECerts.sh  ← Initial Let's Encrypt TLS cert issuance
 │   ├── takserver_renewLECerts.sh   ← Automated LE cert renewal
-│   └── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
+│   ├── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
+│   └── utils.sh                    ← Shared helper functions
 ├── TXTScripts/                     ← TXT mirrors (must stay byte-identical to .sh)
+├── Wiki/                           ← In-repo wiki (Home, Deploy, TAKInstall, TAKServerPS)
+├── Documentation/                  ← Official TAK PDFs + channels README
+├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, review reports
+├── Deploy-TAKServer.ps1            ← End-to-end deployment orchestration script
+├── Deploy-TAKTestServer.ps1        ← Test deployment script
+├── Sync-TXTMirrors.ps1             ← Syncs .sh → .txt mirrors
+├── CHANGELOG.md
+├── channels.zip                    ← ATAK client data package
 ├── LICENSE
 └── README.md
 ```
@@ -127,16 +151,32 @@ For cross-domain work (e.g., port conventions that affect multiple scripts, repo
 
 ---
 
-## Known Issues (as of 2025-07)
+## CI Pipeline (`.github/workflows/ci.yml`)
+
+Four jobs run on push to `prod`/`main` and on PRs:
+
+| Job | What it does |
+|-----|-------------|
+| **Pester Tests** | Runs `TAKServerPS/Tests/` and `TAKInstall/Tests/` on Ubuntu with pwsh |
+| **PSScriptAnalyzer** | Lints `TAKServerPS/` (with settings file) and `TAKInstall/` (default rules) |
+| **ShellCheck** | Lints `InstallShellScripts/*.sh` at warning severity |
+| **TXT Mirror Sync** | Verifies every `.sh` has a byte-identical `.txt` in `TXTScripts/` |
+
+TAKServerPS uses `PSScriptAnalyzerSettings.psd1` which excludes `PSUseBOMForUnicodeEncodedFile`.
+TAKInstall does NOT have a settings file — all default rules apply (including BOM warnings).
+
+---
+
+## Known Issues (as of 2026-03)
 
 1. **sed cert-metadata.sh patching** — `sed -i` is a silent no-op if the pattern doesn't match; no validation after patching.
 2. **Password escaping** — Fixed: passwords escaped via `printf '%s\n' | sed` before use in sed substitutions.
 3. **Hardcoded `/atakciv/` path** — `openfire_takChat_install.sh` assumes this path exists; no `mkdir -p` guard.
 4. **Openfire external download** — installer fetched at runtime with no hash verification.
 5. **`/etc/takserver_renew.conf`** — stores LE credentials in plaintext; permissions not hardened.
-6. **No CI / no shellcheck** — scripts are not lint-checked or automatically tested.
-7. **TXT/SH sync is manual** — no tooling enforces that TXT mirrors stay in sync with `.sh` files.
-8. **Openfire Cockpit port conflict** — Openfire uses port 9090; Cockpit (if installed) also uses 9090. The install script disables Cockpit.
+6. **TXT/SH sync is manual** — `Sync-TXTMirrors.ps1` exists but must be run manually; CI enforces it.
+7. **Openfire Cockpit port conflict** — Openfire uses port 9090; Cockpit (if installed) also uses 9090. The install script disables Cockpit.
+8. **TAKInstall missing PSScriptAnalyzerSettings.psd1** — BOM warnings fire on CI since TAKInstall has no exclusion file.
 
 ---
 

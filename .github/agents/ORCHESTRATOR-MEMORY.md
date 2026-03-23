@@ -16,22 +16,57 @@ Branch: `prod` (default).
 
 ```
 DigitalTAK/
-├── InstallShellScripts/   # Executable .sh scripts — source of truth
+├── .github/
+│   ├── agents/            # VS Code agent definitions (orchestrator + 4 sub-agents)
+│   ├── copilot-instructions.md
+│   └── workflows/ci.yml   # GitHub Actions CI (Pester, PSScriptAnalyzer, ShellCheck, TXT Sync)
+├── TAKServerPS/            # PS module — 44-cmdlet REST API wrapper (PowerShell → TAK Server)
+│   ├── TAKServer.psd1 / .psm1
+│   ├── PSScriptAnalyzerSettings.psd1  # Excludes PSUseBOMForUnicodeEncodedFile
+│   ├── Private/Invoke-TAKRequest.ps1
+│   ├── Public/  (44 cmdlets: Connect/Disconnect, Get/New/Remove/Set-TAK*)
+│   └── Tests/   (7 test files)
+├── TAKInstall/             # PS module — remote provisioning over SSH via Posh-SSH
+│   ├── TAKInstall.psd1 / .psm1
+│   ├── Private/ (ConvertTo-TAKBashArg, Invoke-TAKRemoteCommand, Wait-TAKAdminApiReady, Wait-TAKServiceReady)
+│   ├── Public/  (Install-TAKServer, New-TAKServerCertificate, Set-TAKAdminCertificate, Install-TAKOpenfire, New-TAKLetsEncryptCertificate, Update-TAKLetsEncryptCertificate)
+│   └── Tests/   (5 test files)
+├── TAKDeploy/              # PS module — Hyper-V VM creation + deployment orchestration
+│   ├── TAKDeploy.psd1 / .psm1
+│   ├── PSScriptAnalyzerSettings.psd1
+│   ├── Private/ (Assert-HyperVPrerequisites, Get-TAKDeploymentConfig, Set-TAKVMBootOrder)
+│   ├── Public/  (New-TAKVirtualMachine, Start-TAKDeployment, Wait-TAKLinuxInstall)
+│   └── Tests/   (2 test files)
+├── InstallShellScripts/    # Executable .sh scripts — source of truth
 │   ├── RL9_tak5.7r8_install.sh               # Main installer (entry point)
 │   ├── createTakCerts.sh                     # Interactive cert creation + CoreConfig patching
 │   ├── takUserCreateCerts_doNotRunAsRoot.sh  # Low-priv cert creation (run as 'tak' user)
 │   ├── promoteAdmin.sh                       # Promote admin.pem → TAK administrator
 │   ├── openfire_takChat_install.sh           # Optional: Openfire XMPP for TAK Chat
 │   ├── takserver_createLECerts.sh            # Optional: LetsEncrypt cert creation
-│   └── takserver_renewLECerts.sh             # Optional: LetsEncrypt cert renewal
-├── TXTScripts/            # Mirror copies of all scripts with .txt extension
-│   └── (one .txt per .sh — kept in sync manually)
+│   ├── takserver_renewLECerts.sh             # Optional: LetsEncrypt cert renewal
+│   └── utils.sh                              # Shared helper functions
+├── TXTScripts/             # Mirror copies of all scripts with .txt extension
+├── Wiki/                   # In-repo wiki (Home, Deploy-TAKServer, TAKInstall, TAKServerPS)
 ├── Documentation/
-│   ├── TAK_Server_Configuration_Guide_5.7.pdf      # Official TAK Server 5.7 guide (March 2026)
-│   └── Federation_Hub_Configuration_Guide.pdf      # Federation Hub guide
-├── channels.zip           # ATAK client data package (action bar layout + channel prefs)
+│   ├── TAK_Server_Configuration_Guide_5.7.pdf
+│   ├── TAK_Server_Configuration_Guide_5.7.md
+│   ├── Federation_Hub_Configuration_Guide.pdf
+│   ├── channels-README.md
+│   ├── Deploy-TAKServer.md
+│   └── Wiki/               # Legacy pointer to Wiki/ at repo root
+├── reports/
+│   ├── TEST-REPORT.md       # Pester results
+│   ├── DEPLOYMENT-REPORT.md
+│   ├── HYPERV-DEPLOY-PLAN.md
+│   └── REVIEW-REPORT-v1..v4.md
+├── Deploy-TAKServer.ps1     # End-to-end deployment orchestration
+├── Deploy-TAKTestServer.ps1 # Test deployment orchestration
+├── Sync-TXTMirrors.ps1      # Syncs .sh → .txt mirrors
+├── CHANGELOG.md
+├── channels.zip
 ├── README.md
-└── ORCHESTRATOR.md        # This file
+└── LICENSE
 ```
 
 ---
@@ -84,17 +119,32 @@ RL9_tak5.7r8_install.sh             ← run first as root/sudo
 
 | # | Area | Description |
 |---|------|-------------|
-| 1 | **sed patching of `cert-metadata.sh`** | `createTakCerts.sh` uses `sed -i` to replace literal placeholder strings (e.g., `STATE=${STATE}`) in `cert-metadata.sh`. If the file has already been patched, or TAK upgrades change the placeholder format, the sed will silently no-op. |
-| 2 | **Hardcoded `/atakciv/` path** | `openfire_takChat_install.sh` downloads Openfire to `/atakciv/openfire-5.0.3-1.noarch.rpm`. This directory must exist before the script runs; there is no mkdir guard. |
-| 3 | **External download at install time** | `openfire_takChat_install.sh` downloads Openfire directly from GitHub. If the release URL changes or connectivity is unavailable, the install fails. No hash/signature check on the downloaded RPM. |
-| 4 | **`/etc/takserver_renew.conf` stores credentials** | `takserver_renewLECerts.sh` reads `CERT_PASSWORD` from this file. File permissions are not set by the script — a world-readable file would expose the keystore password. |
-| 5 | **No CI / no tests** | No `.github/workflows`, no linting (shellcheck), no automated tests of any kind. |
-| 6 | **TXT/SH sync** | `TXTScripts/` are manual mirrors. If a `.sh` is updated but the `.txt` is not, they fall out of sync silently. |
-| 7 | **Openfire Cockpit port conflict** | `openfire_takChat_install.sh` explicitly disables Cockpit to free port 9090. If Cockpit is needed in the environment, this is a destructive step. |
+| 1 | **sed patching of `cert-metadata.sh`** | `createTakCerts.sh` uses `sed -i` to replace literal placeholder strings. Silent no-op if already patched or format changes. |
+| 2 | **Hardcoded `/atakciv/` path** | `openfire_takChat_install.sh` downloads Openfire to `/atakciv/`. No mkdir guard. |
+| 3 | **External download at install time** | `openfire_takChat_install.sh` downloads Openfire from GitHub. No hash/signature check. |
+| 4 | **`/etc/takserver_renew.conf` stores credentials** | File permissions not set by script — could be world-readable. |
+| 5 | **TXT/SH sync** | `Sync-TXTMirrors.ps1` exists but is manual. CI enforces sync via TXT Mirror Sync job. |
+| 6 | **Openfire Cockpit port conflict** | Openfire uses port 9090; script explicitly disables Cockpit. |
+| 7 | **TAKInstall missing analyzer settings** | TAKInstall has no PSScriptAnalyzerSettings.psd1; BOM warnings fire on CI. |
 
 ---
 
-## 7. Network Ports Reference
+## 7. CI Pipeline
+
+File: `.github/workflows/ci.yml` — triggers on push to `prod`/`main` and PRs.
+
+| Job | Target | Notes |
+|-----|--------|-------|
+| **Pester Tests** | `TAKServerPS/Tests/`, `TAKInstall/Tests/` | Ubuntu, pwsh, Pester 5 + Posh-SSH |
+| **PSScriptAnalyzer** | `TAKServerPS/` (with settings), `TAKInstall/` (default) | Fails on ANY violation |
+| **ShellCheck** | `InstallShellScripts/` | Warning severity |
+| **TXT Mirror Sync** | `.sh` vs `.txt` | `diff -q` byte comparison |
+
+TAKDeploy is NOT currently included in CI.
+
+---
+
+## 8. Network Ports Reference
 
 | Port | Proto | Service | Purpose |
 |------|-------|---------|---------|
@@ -114,7 +164,7 @@ RL9_tak5.7r8_install.sh             ← run first as root/sudo
 
 ---
 
-## 8. Files a Subagent Owns vs Must Not Touch
+## 9. Files a Subagent Owns vs Must Not Touch
 
 When spawning subagents, use this as a guide:
 
@@ -128,7 +178,7 @@ When spawning subagents, use this as a guide:
 
 ---
 
-## 9. Decision Log
+## 10. Decision Log
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
@@ -142,7 +192,7 @@ When spawning subagents, use this as a guide:
 
 ---
 
-## 10. CentOS / OS Warning
+## 11. CentOS / OS Warning
 
 TAK Server 5.7 supported OS list (from official guide, March 2026):
 - Rocky Linux 9 ✅ — **use this**
@@ -161,13 +211,13 @@ TAK Server 5.7 supported OS list (from official guide, March 2026):
 
 ---
 
-## 11. TAK 5.7 vs 5.6 — Differences for Rocky Linux 9
+## 12. TAK 5.7 vs 5.6
 
 The Rocky Linux 9 single-server installation commands are **identical** between 5.6 and 5.7 guides. Only the RPM filename changes. No new pre-requisites, no new steps.
 
 ---
 
-## 12. Script Changes Made (2026-03-22)
+## 13. Script Changes Made (2026-03-22)
 
 ### `RL9_tak5.7r8_install.sh` (was `RL9.5_tak5.4r14_install.sh`)
 

@@ -16,7 +16,7 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKInstall.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKInstall.psd1')) -Force -ErrorAction Stop
 }
 
 AfterAll {
@@ -50,23 +50,23 @@ Describe 'ConvertTo-TAKBashArg — Single-quote escaping' {
 
     It "escapes a single embedded apostrophe: it's -> 'it'\\''s'" {
         $result = InModuleScope TAKInstall { ConvertTo-TAKBashArg -Value "it's" }
-        $result | Should -Be "'it'\''" + "s'"
+        $result | Should -Be ("'it'\''" + "s'")
     }
 
     It "escapes multiple embedded apostrophes: don't can't" {
         $result = InModuleScope TAKInstall { ConvertTo-TAKBashArg -Value "don't can't" }
-        $result | Should -Be "'don'\''" + "t can'\''" + "t'"
+        $result | Should -Be ("'don'\''" + "t can'\''" + "t'")
     }
 
     It 'handles a value that is only a single quote' {
         $result = InModuleScope TAKInstall { ConvertTo-TAKBashArg -Value "'" }
-        $result | Should -Be "''\''" + "'"
+        $result | Should -Be ("''" + "\" + "'" + "''")
     }
 
     It 'handles consecutive single quotes' {
         $result = InModuleScope TAKInstall { ConvertTo-TAKBashArg -Value "''" }
         # Two single quotes: each becomes '\'' so output is ''\'''\'''
-        $result | Should -Be "''\''" + "'\''" + "'"
+        $result | Should -Be ("''" + "\" + "'" + "''" + "\" + "'" + "''")
     }
 }
 
@@ -80,7 +80,7 @@ Describe 'ConvertTo-TAKBashArg — Special bash characters pass through unchange
 
     It 'passes backtick through unchanged' {
         $result = InModuleScope TAKInstall { ConvertTo-TAKBashArg -Value '`date`' }
-        $result | Should -Be "'" + '`date`' + "'"
+        $result | Should -Be ("'" + '`date`' + "'")
     }
 
     It 'passes backslash through unchanged' {

@@ -6,14 +6,14 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKServer.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKServer.psd1')) -Force -ErrorAction Stop
 
     # Helper: build a minimal TAKServer.Session PSCustomObject
     function script:New-FakeSession {
         param(
             [string] $BaseUrl       = 'https://tak.test:8443',
             [object] $Certificate   = $null,
-            [object] $Credential    = $null,
+            [pscredential] $Credential = $null,
             [object] $Token         = $null,
             [bool]   $SkipCertCheck = $false
         )
@@ -182,7 +182,7 @@ Describe 'Invoke-TAKRequest — Authentication Priority' {
     Context 'Bearer Token (when no Certificate)' {
 
         BeforeEach {
-            $fakeToken = ConvertTo-SecureString 'mytoken' -AsPlainText -Force
+            $fakeToken = 'mytoken' | ConvertTo-SecureString -AsPlainText -Force
             InModuleScope TAKServer -Parameters @{ Tok = $fakeToken } {
                 $script:TAKSession = [PSCustomObject]@{
                     BaseUrl       = 'https://tak.test:8443'
@@ -214,7 +214,7 @@ Describe 'Invoke-TAKRequest — Authentication Priority' {
 
         BeforeEach {
             $fakeCred = [System.Management.Automation.PSCredential]::new(
-                'admin', (ConvertTo-SecureString 'pass' -AsPlainText -Force))
+                'admin', ('pass' | ConvertTo-SecureString -AsPlainText -Force))
             InModuleScope TAKServer -Parameters @{ Cred = $fakeCred } {
                 $script:TAKSession = [PSCustomObject]@{
                     BaseUrl       = 'https://tak.test:8443'

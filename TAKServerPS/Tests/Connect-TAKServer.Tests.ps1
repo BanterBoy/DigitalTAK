@@ -6,7 +6,7 @@
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKServer.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'TAKServer.psd1')) -Force -ErrorAction Stop
 }
 
 AfterAll {
@@ -64,14 +64,14 @@ Describe 'Connect-TAKServer — Successful Connection' {
 
     It 'stores Credential in session when Credential parameter set is used' {
         $cred = [System.Management.Automation.PSCredential]::new(
-            'admin', (ConvertTo-SecureString 'pass' -AsPlainText -Force))
+            'admin', ('pass' | ConvertTo-SecureString -AsPlainText -Force))
         $session = Connect-TAKServer -HostName 'tak.test' -Credential $cred
         $session.Credential | Should -Not -BeNullOrEmpty
         $session.Credential.UserName | Should -Be 'admin'
     }
 
     It 'stores Token in session when Token parameter set is used' {
-        $token   = ConvertTo-SecureString 'mytoken' -AsPlainText -Force
+        $token   = 'mytoken' | ConvertTo-SecureString -AsPlainText -Force
         $session = Connect-TAKServer -HostName 'tak.test' -Token $token
         $session.Token | Should -Not -BeNullOrEmpty
     }
@@ -106,7 +106,7 @@ Describe 'Connect-TAKServer — Connection Failure' {
         Mock Invoke-TAKRequest -ModuleName TAKServer {
             throw [System.Net.Http.HttpRequestException]::new('Connection refused')
         }
-        try { Connect-TAKServer -HostName 'unreachable.test' } catch { }
+        try { Connect-TAKServer -HostName 'unreachable.test' } catch { $null = $_ }
         $stored = InModuleScope TAKServer { $script:TAKSession }
         $stored | Should -BeNullOrEmpty
     }

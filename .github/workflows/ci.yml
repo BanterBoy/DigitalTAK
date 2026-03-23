@@ -78,7 +78,8 @@ jobs:
 
           $settings = './TAKServerPS/PSScriptAnalyzerSettings.psd1'
           $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings
-          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse
+          $settings2 = './TAKInstall/PSScriptAnalyzerSettings.psd1'
+          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2
 
           $all = @($r1) + @($r2)
           if ($all) {

@@ -69,11 +69,11 @@ function Set-TAKAdminCertificate {
     for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
         $percentComplete = [Math]::Min(20 + [int](($attempt / $maxAttempts) * 20), 40)
         Write-Progress -Activity 'Setting TAK admin certificate' -Status "Promoting admin.pem (attempt $attempt/$maxAttempts)" -PercentComplete $percentComplete
-        Write-Host "  Waiting for TAK admin backend... attempt $attempt/$maxAttempts" -ForegroundColor Yellow
+        Write-Information "  Waiting for TAK admin backend... attempt $attempt/$maxAttempts"
 
         $result = Invoke-TAKRemoteCommand -Session $SshSession -Description 'Promote admin.pem to administrator role' -Command $promotionCommand -AllowFailure
         if ($result.ExitStatus -eq 0) {
-            Write-Host '  [OK] Admin certificate promoted' -ForegroundColor Green
+            Write-Information '  [OK] Admin certificate promoted'
             break
         }
 
