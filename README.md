@@ -11,7 +11,6 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 
 ```
 DigitalTAK/
-├── Wiki/                       ← In-repo wiki section for operators and maintainers
 ├── InstallShellScripts/        ← Bash deployment scripts (run on the server)
 ├── TXTScripts/                 ← Byte-identical TXT mirrors of every .sh file
 ├── TAKServerPS/                ← PowerShell module — TAK Server REST API (44 cmdlets)
@@ -34,7 +33,7 @@ Use `Deploy-TAKServer.ps1` when you want to deploy a server from this repository
 
 Detailed operator guidance is in [Documentation/Deploy-TAKServer.md](Documentation/Deploy-TAKServer.md).
 
-The repository wiki section for the deployment script and both PowerShell modules is in [Wiki/Home.md](Wiki/Home.md).
+The project wiki is at [github.com/BanterBoy/DigitalTAK/wiki](https://github.com/BanterBoy/DigitalTAK/wiki).
 
 Quick start:
 
@@ -260,11 +259,7 @@ Full results: [reports/TEST-REPORT.md](reports/TEST-REPORT.md)
 
 | File | Description |
 |------|-------------|
-| `Wiki/Home.md` | Wiki index for deployment, `TAKInstall`, and `TAKServerPS` |
-| `Wiki/Deploy-TAKServer.md` | Wiki page for the general deployment entry point |
-| `Wiki/TAKInstall.md` | Wiki page for the SSH provisioning module and its exported functions |
-| `Wiki/TAKServerPS.md` | Wiki page for the REST API module and its exported functions |
-| `Wiki/_Sidebar.md` | Wiki navigation sidebar for the in-repo wiki section |
+| [Wiki](https://github.com/BanterBoy/DigitalTAK/wiki) | GitHub Wiki — deployment, TAKInstall, TAKServerPS, shell scripts, ports, testing |
 | `Documentation/TAK_Server_Configuration_Guide_5.7.pdf` | Official TAK Server 5.7 configuration guide |
 | `Documentation/Federation_Hub_Configuration_Guide.pdf` | Federation Hub configuration and setup guide |
 | `channels.zip` | ATAK client data package — distribute to devices via TAK Server data packages |
