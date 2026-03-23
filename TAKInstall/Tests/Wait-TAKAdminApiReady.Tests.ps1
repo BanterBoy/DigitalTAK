@@ -2,11 +2,11 @@
 <#
 .SYNOPSIS
     Unit tests for the private Wait-TAKAdminApiReady function in TAKInstall.
-    Invoke-TAKRemoteCommand and Start-Sleep are mocked — no SSH required.
+    Invoke-TAKRemoteCommand and Start-Sleep are mocked - no SSH required.
 #>
 
 BeforeAll {
-    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKInstall.psd1')) -Force -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..\TAKInstall.psd1')) -Force -ErrorAction Stop
 
     $script:FakeSession = New-MockObject -Type ([SSH.SshSession])
 }
@@ -15,7 +15,7 @@ AfterAll {
     Remove-Module 'TAKInstall' -Force -ErrorAction SilentlyContinue
 }
 
-Describe 'Wait-TAKAdminApiReady — API Reachable Immediately' {
+Describe 'Wait-TAKAdminApiReady - API Reachable Immediately' {
 
     BeforeEach {
         Mock Invoke-TAKRemoteCommand -ModuleName TAKInstall {
@@ -50,7 +50,7 @@ Describe 'Wait-TAKAdminApiReady — API Reachable Immediately' {
             Wait-TAKAdminApiReady -Session $S -TimeoutSeconds 60 -PollIntervalSeconds 5
         }
         Should -Invoke Invoke-TAKRemoteCommand -ModuleName TAKInstall -Times 1 -ParameterFilter {
-            $Command -notmatch "['\"]"
+            $Command -notmatch '[''"]'
         }
     }
 
@@ -63,7 +63,7 @@ Describe 'Wait-TAKAdminApiReady — API Reachable Immediately' {
     }
 }
 
-Describe 'Wait-TAKAdminApiReady — API Reachable After Retries' {
+Describe 'Wait-TAKAdminApiReady - API Reachable After Retries' {
 
     It 'returns successfully when the API becomes reachable on the third poll' {
         $script:callCount = 0
@@ -90,7 +90,7 @@ Describe 'Wait-TAKAdminApiReady — API Reachable After Retries' {
     }
 }
 
-Describe 'Wait-TAKAdminApiReady — Timeout' {
+Describe 'Wait-TAKAdminApiReady - Timeout' {
 
     BeforeEach {
         Mock Invoke-TAKRemoteCommand -ModuleName TAKInstall {

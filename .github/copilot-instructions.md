@@ -47,7 +47,7 @@ Invoke-ScriptAnalyzer -Path .\TAKInstall\  -Recurse
 ./Sync-TXTMirrors.ps1
 ```
 
-Full test results: [TEST-REPORT.md](../TEST-REPORT.md)
+Full test results: [TEST-REPORT.md](../reports/TEST-REPORT.md)
 
 ---
 
@@ -115,7 +115,7 @@ CI enforces this — a PR with a stale mirror will fail.
 ## Key References
 
 - [README.md](../README.md) — full cmdlet tables, network ports, usage examples
-- [TEST-REPORT.md](../TEST-REPORT.md) — Pester results (179/179)
+- [TEST-REPORT.md](../reports/TEST-REPORT.md) — Pester results (179/179)
 - TAK Server 5.7 docs: `Documentation/TAK_Server_Configuration_Guide_5.7.pdf`
 - [tak.gov](https://tak.gov) — RPM + GPG key download
 - [Posh-SSH](https://github.com/darkoperator/Posh-SSH) — SSH dependency for TAKInstall
