@@ -7,5 +7,6 @@
         'PSUseBOMForUnicodeEncodedFile'
         'PSAvoidUsingWriteHost'
         'PSUseSingularNouns'
+        'PSAvoidUsingPositionalParameters'  # Join-Path positional use is clear in context
     )
 }

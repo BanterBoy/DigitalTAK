@@ -96,9 +96,11 @@ jobs:
           $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2
           $settings3 = './TAKDeploy/PSScriptAnalyzerSettings.psd1'
           $r3 = Invoke-ScriptAnalyzer -Path ./TAKDeploy   -Recurse -Settings $settings3
-          $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1, ./Deploy-TAKTestServer.ps1
+          $settings4 = './PSScriptAnalyzerSettings.psd1'
+          $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1     -Settings $settings4
+          $r5 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKTestServer.ps1 -Settings $settings4
 
-          $all = @($r1) + @($r2) + @($r3) + @($r4)
+          $all = @($r1) + @($r2) + @($r3) + @($r4) + @($r5)
           if ($all) {
               $all | Format-Table RuleName, Severity, ScriptName, Line, Message -AutoSize
               Write-Error "PSScriptAnalyzer reported $($all.Count) violation(s)."
