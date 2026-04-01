@@ -9,10 +9,10 @@ You are the DigitalTAK Orchestrator — the top-level agent for the DigitalTAK r
 
 ## Repository Purpose
 
-CivTAK / TAK Server installation and configuration automation for Rocky Linux 9. Provides Bash shell scripts and TXT mirrors to install, configure, and maintain a production TAK Server deployment on a Hyper-V virtual machine.
+CivTAK / TAK Server installation and configuration automation for Rocky Linux 9. Provides a fully-automated Hyper-V provisioning pipeline (PowerShell) that spins up a Rocky Linux 9 guest via unattended kickstart and installs/configures TAK Server 5.7 with no manual steps. Also ships the underlying Bash shell scripts and TXT mirrors used by the provisioning pipeline, as well as rollback and uninstall tooling.
 
-**Author:** Ryan Schilder  
-**Target platform:** Rocky Linux 9.5, Hyper-V Gen 2, External vSwitch  
+**Author:** Ryan Schilder
+**Target platform:** Rocky Linux 9.5, Hyper-V Gen 2, External vSwitch
 **TAK Server:** `takserver-5.7-RELEASE8.noarch.rpm`
 
 ---
@@ -43,19 +43,32 @@ DigitalTAK/
 │   ├── Public/  (3 cmdlets)
 │   └── Tests/   (2 test files)
 ├── InstallShellScripts/            ← Executable Bash scripts
-│   ├── RL9_tak5.7r8_install.sh     ← ENTRY POINT — main TAK installation
+│   ├── RL9_tak5.7r8_install.sh     ← Main TAK installation (called by TAKInstall module)
+│   ├── rocky-9-tak.ks              ← Kickstart template for unattended Rocky Linux 9 install
 │   ├── createTakCerts.sh           ← TAK CA + server cert generation
 │   ├── promoteAdmin.sh             ← Promote user to TAK admin
 │   ├── openfire_takChat_install.sh ← Openfire XMPP chat integration
 │   ├── takserver_createLECerts.sh  ← Initial Let's Encrypt TLS cert issuance
 │   ├── takserver_renewLECerts.sh   ← Automated LE cert renewal
 │   ├── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
+│   ├── tak-uninstall.sh            ← Remove TAK Server + PostgreSQL + Openfire from guest
 │   └── utils.sh                    ← Shared helper functions
+├── IntegrationTests/               ← Pester end-to-end tests (requires TAK_INTEGRATION_HOST)
+│   ├── 01-VMProvisioning.Tests.ps1
+│   ├── 02-OSInstall.Tests.ps1
+│   ├── 03-TAKServerHealth.Tests.ps1
+│   ├── 04-Certificates.Tests.ps1
+│   ├── 05-UserManagement.Tests.ps1
+│   └── Helpers.ps1
 ├── TXTScripts/                     ← TXT mirrors (must stay byte-identical to .sh)
 ├── Documentation/                  ← Official TAK PDFs + channels README
 ├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, review reports
-├── Deploy-TAKServer.ps1            ← End-to-end deployment orchestration script
+├── Deploy-CivTAK.ps1               ← ENTRY POINT — zero-to-running CivTAK (Phases 0–9)
+├── Deploy-TAKServer.ps1            ← Legacy end-to-end deployment orchestration script
 ├── Deploy-TAKTestServer.ps1        ← Test deployment script
+├── Invoke-IntegrationTests.ps1     ← Runner for IntegrationTests/ suite
+├── Invoke-TAKRollback.ps1          ← Restore VM to a Phase snapshot created by Deploy-CivTAK.ps1
+├── Remove-CivTAK.ps1               ← Full teardown: VM, VHDX, certs, Windows store
 ├── Sync-TXTMirrors.ps1             ← Syncs .sh → .txt mirrors
 ├── CHANGELOG.md
 ├── channels.zip                    ← ATAK client data package
@@ -86,11 +99,34 @@ DigitalTAK/
 
 ## Script Execution Chain
 
+### PowerShell pipeline (automated — preferred)
+
+```
+Deploy-CivTAK.ps1                  ← ENTRY POINT (Windows host, requires Hyper-V)
+  Phase 0  Assert-HyperVPrerequisites
+  Phase 1  New-TAKVirtualMachine + rocky-9-tak.ks → unattended OS install
+  Phase 2  Wait-TAKLinuxInstall (snapshot: Phase0-RockyInstalled)
+  Phase 3  Install-TAKServer (invokes RL9_tak5.7r8_install.sh via SSH)
+  Phase 4  New-TAKServerCertificate (snapshot: Phase2-TAKInstalled)
+  Phase 5  Set-TAKAdminCertificate (snapshot: Phase4-CertsAndAdmin)
+  Phase 6  Connect-TAKServer + Get-TAKVersion (smoke test)
+  Phase 7  Download .p12 certs via SFTP
+  Phase 8  Import certs into Windows certificate store
+  Phase 9  Generate deployment report
+
+Invoke-TAKRollback.ps1             ← Restore VM to Phase0/Phase2/Phase4 snapshot
+Remove-CivTAK.ps1                  ← Full teardown (VM + VHDX + certs; optionally runs tak-uninstall.sh)
+```
+
+### Bash scripts (manual / called by pipeline over SSH)
+
 ```
 RL9_tak5.7r8_install.sh           ← main install (run as root or with sudo)
   ├── createTakCerts.sh            ← run after install to create CA + server cert
   │     └── takUserCreateCerts_doNotRunAsRoot.sh  ← per-user client certs (NOT root)
   └── promoteAdmin.sh              ← promote a user to TAK admin
+
+tak-uninstall.sh                   ← remove TAK + PostgreSQL + Openfire (idempotent)
 
 [Optional add-ons]
   openfire_takChat_install.sh      ← XMPP chat via Openfire
@@ -133,7 +169,7 @@ All shell scripts follow these standards:
 
 | Sub-Agent | Owns | Must NOT touch |
 |-----------|------|----------------|
-| `tak-install` | `RL9_tak5.7r8_install.sh` + its TXT mirror | All other scripts |
+| `tak-install` | `RL9_tak5.7r8_install.sh`, `tak-uninstall.sh` + their TXT mirrors | All other scripts |
 | `tak-certs` | `createTakCerts.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `promoteAdmin.sh` + mirrors | Install + Openfire + LE scripts |
 | `tak-openfire` | `openfire_takChat_install.sh` + mirror | All TAK core scripts |
 | `tak-letsencrypt` | `takserver_createLECerts.sh`, `takserver_renewLECerts.sh` + mirrors | All non-LE scripts |
@@ -152,23 +188,28 @@ For cross-domain work (e.g., port conventions that affect multiple scripts, repo
 
 ---
 
-## CI Pipeline (`.github/workflows/ci.yml`)
+## CI Pipeline
 
-Four jobs run on push to `prod`/`main` and on PRs:
+### `.github/workflows/ci.yml` — runs on push to `prod`/`main` and on PRs
 
 | Job | What it does |
 |-----|-------------|
-| **Pester Tests** | Runs `TAKServerPS/Tests/` and `TAKInstall/Tests/` on Ubuntu with pwsh |
+| **Pester Tests** | Runs `TAKServerPS/Tests/`, `TAKInstall/Tests/`, `TAKDeploy/Tests/` on Ubuntu with pwsh. `Run.Exit = $true` — failures fail the build. |
 | **PSScriptAnalyzer** | Lints `TAKServerPS/` (with settings file) and `TAKInstall/` (default rules) |
 | **ShellCheck** | Lints `InstallShellScripts/*.sh` at warning severity |
 | **TXT Mirror Sync** | Verifies every `.sh` has a byte-identical `.txt` in `TXTScripts/` |
+| **Integration Tests (skip)** | Runs `Invoke-IntegrationTests.ps1`; auto-skips all tests when `TAK_INTEGRATION_HOST` is unset — validates the skip mechanism on every CI push |
+
+### `.github/workflows/release.yml` — runs on `v*.*.*` tag push
+
+Creates a GitHub Release with CHANGELOG notes extracted for the tagged version.
 
 TAKServerPS uses `PSScriptAnalyzerSettings.psd1` which excludes `PSUseBOMForUnicodeEncodedFile`.
 TAKInstall does NOT have a settings file — all default rules apply (including BOM warnings).
 
 ---
 
-## Known Issues (as of 2026-03)
+## Known Issues (as of 2026-04)
 
 1. **sed cert-metadata.sh patching** — `sed -i` is a silent no-op if the pattern doesn't match; no validation after patching.
 2. **Password escaping** — Fixed: passwords escaped via `printf '%s\n' | sed` before use in sed substitutions.
@@ -178,6 +219,7 @@ TAKInstall does NOT have a settings file — all default rules apply (including 
 6. **TXT/SH sync is manual** — `Sync-TXTMirrors.ps1` exists but must be run manually; CI enforces it.
 7. **Openfire Cockpit port conflict** — Openfire uses port 9090; Cockpit (if installed) also uses 9090. The install script disables Cockpit.
 8. **TAKInstall missing PSScriptAnalyzerSettings.psd1** — BOM warnings fire on CI since TAKInstall has no exclusion file.
+9. **Deploy-CivTAK.ps1 snapshot resume** — Phase resume is detected by snapshot name; if a snapshot exists from a previous failed run but the VM state is inconsistent, the script may resume from a bad baseline. Use `Invoke-TAKRollback.ps1` to restore a clean snapshot before re-running.
 
 ---
 
@@ -191,6 +233,12 @@ TAKInstall does NOT have a settings file — all default rules apply (including 
 | 2025-03 | All 7 script fixes applied (pgdg repo, CRB ordering, Java guard, RPM+GPG, sudo for UserManager, password escaping, CoreConfig validation) |
 | 2025-03 | Install script renamed from `RL9.5_tak5.4r14_install.sh` → `RL9_tak5.7r8_install.sh` |
 | 2025-03 | Stale TAK 5.6 PDF and OpenAPI spec deleted; README rewritten |
+| 2026-04 | `Deploy-CivTAK.ps1` added as single-command entry point integrating TAKDeploy + TAKInstall + TAKServerPS |
+| 2026-04 | `rocky-9-tak.ks` kickstart added — delivers unattended Rocky Linux 9 OS install via OEMDRV VHDX |
+| 2026-04 | Snapshot-based resume added to `Deploy-CivTAK.ps1` (Phase0/Phase2/Phase4) for idempotent re-runs |
+| 2026-04 | `tak-uninstall.sh`, `Invoke-TAKRollback.ps1`, `Remove-CivTAK.ps1` added — rollback and teardown tooling |
+| 2026-04 | Integration test suite added (`IntegrationTests/`) with auto-skip when `TAK_INTEGRATION_HOST` unset |
+| 2026-04 | Release workflow added (`.github/workflows/release.yml`) — creates GitHub Release on `v*.*.*` tag |
 
 ---
 

@@ -5,11 +5,14 @@ tools: [read, edit, search, execute, todo]
 user-invocable: false
 ---
 
-You are the TAK Install specialist. Your sole responsibility is `InstallShellScripts/RL9_tak5.7r8_install.sh` and its mirror `TXTScripts/RL9_tak5.7r8_install.txt`. Read the file in full before touching anything.
+You are the TAK Install specialist. Your responsibility is the TAK Server install and uninstall scripts. Read every file in full before touching anything.
 
 ## Scope
 
-**Own:** `RL9_tak5.7r8_install.sh` and its TXT mirror  
+**Own:**
+- `InstallShellScripts/RL9_tak5.7r8_install.sh` + `TXTScripts/RL9_tak5.7r8_install.txt`
+- `InstallShellScripts/tak-uninstall.sh` + `TXTScripts/tak-uninstall.txt`
+
 **Never touch:** `createTakCerts.sh`, `promoteAdmin.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `openfire_takChat_install.sh`, `takserver_createLECerts.sh`, `takserver_renewLECerts.sh`
 
 ## Platform Context
@@ -47,11 +50,34 @@ You are the TAK Install specialist. Your sole responsibility is `InstallShellScr
 
 **There is no explicit PostgreSQL server install, initdb, or pg_hba.conf step** — PostgreSQL is installed as a dependency of the TAK RPM and configured by the TAK installer.
 
-## Known Issues in This Script
+## Known Issues in RL9_tak5.7r8_install.sh
 
 1. **Java version check is a warning, not a hard exit** — if the wrong Java version is active after install, the rest of the script will fail non-obviously later
 2. **GPG fallback is silent** — if the GPG key or RPM are not in `$SCRIPT_DIR`, the script falls back to downloading without any RPM signature verification
 3. **`createTakCerts.sh` is run inline** — if cert setup fails, the script halts at that point; `promoteAdmin.sh` will not run
+
+---
+
+## tak-uninstall.sh — What It Actually Does
+
+Removes TAK Server 5.7 and associated components from a Rocky Linux 9 guest. Runs as root (`sudo`). Supports `--yes` / `-y` for non-interactive mode; without it, prompts for confirmation before each destructive step. Idempotent — re-running after a clean uninstall is safe.
+
+Exact removal order:
+
+1. Stop and disable `takserver` systemd service (errors suppressed if not installed)
+2. `dnf remove -y takserver` (errors suppressed if not installed)
+3. Prompt/confirm removal of `/opt/tak/` — deletes entire TAK installation directory
+4. Stop and disable PostgreSQL service
+5. Prompt/confirm removal of `/var/lib/pgsql/` — deletes all PostgreSQL data
+6. Remove TAK firewall rules: 8089, 8443, 8446, 9091 (errors suppressed if not present)
+7. Remove SELinux policy module for takserver (`semodule -r takserver`, errors suppressed)
+8. Remove ulimit entries for `nofile 32768` from `/etc/security/limits.conf`
+9. If Openfire is detected (service `openfire-xmpp` or RPM `openfire`): stop service, `dnf remove -y openfire`, remove `/opt/openfire/`
+10. Print summary of what was removed
+
+**Does NOT remove:** Java (system-wide), Rocky Linux OS config, the SSH admin user account.
+
+**Called by:** `Remove-CivTAK.ps1` (Windows) via `-UninstallGuest` flag over SSH before VM teardown.
 
 ## Conventions
 
