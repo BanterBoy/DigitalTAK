@@ -929,7 +929,8 @@ if ($resumePhase -le 4) {
         }
     }
 
-    $reportPath = Join-Path $PSScriptRoot 'reports' 'DEPLOYMENT-REPORT.md'
+    $reportTimestamp = $endTime.ToString('yyyyMMddHHmmss')
+    $reportPath = Join-Path $PSScriptRoot 'reports' "DEPLOYMENT-REPORT-${reportTimestamp}.md"
     $reportLines -join "`n" | Set-Content -Path $reportPath -Encoding UTF8 -Force
     Write-Host "[OK] Report saved to: $reportPath" -ForegroundColor Green
 

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "GithubPages": {
+      "source": "julianobarbosa/claude-code-skills",
+      "sourceType": "github",
+      "computedHash": "c5bb04f3a29e47e6607ccd04c003c74fd48c1b62d39e6caa97bd2e6428fd88d0"
+    }
+  }
+}
