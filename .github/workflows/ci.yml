@@ -32,6 +32,7 @@ jobs:
         run: |
           $config = New-PesterConfiguration
           $config.Run.Path      = './TAKServerPS/Tests'
+          $config.Run.Exit      = $true
           $config.Output.Verbosity = 'Detailed'
           $config.TestResult.Enabled      = $true
           $config.TestResult.OutputPath   = 'TestResults-TAKServerPS.xml'
@@ -43,6 +44,7 @@ jobs:
         run: |
           $config = New-PesterConfiguration
           $config.Run.Path      = './TAKInstall/Tests'
+          $config.Run.Exit      = $true
           $config.Output.Verbosity = 'Detailed'
           $config.TestResult.Enabled      = $true
           $config.TestResult.OutputPath   = 'TestResults-TAKInstall.xml'
