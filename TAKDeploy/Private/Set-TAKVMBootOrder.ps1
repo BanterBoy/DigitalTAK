@@ -16,7 +16,7 @@ function Set-TAKVMBootOrder {
     )
 
     $dvd = Get-VMDvdDrive -VMName $VMName
-    if ($dvd) {
+    if ($dvd -and $PSCmdlet.ShouldProcess("VM '$VMName'", 'Set first boot device to DVD drive')) {
         Set-VMFirmware -VMName $VMName -FirstBootDevice $dvd
     }
 }
