@@ -43,6 +43,7 @@ sudo dnf install -y java-17-openjdk
 OPENFIRE_RPM_SHA256="${OPENFIRE_RPM_SHA256:-a08493cb19bef6dd2b51ebe88d4ffd121553e2e4473ddbecf94f5ff350e367aa}"
 
 echo "Downloading Openfire 5.0.3 RPM from GitHub releases..."
+mkdir -p /atakciv
 curl -fL -o /atakciv/openfire-5.0.3-1.noarch.rpm \
     "https://github.com/igniterealtime/Openfire/releases/download/v5.0.3/openfire-5.0.3-1.noarch.rpm"
 

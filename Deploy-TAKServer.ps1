@@ -601,6 +601,28 @@ if ($resumePhase -le 4) {
         return [PSCustomObject]@{ Name = $Name; Status = $status; Output = $output; ExitCode = $exitCode }
     }
 
+    # Wait for TAK Server ports to bind before running port tests.
+    # Java processes need up to 60s after 'active' state before 8089/8443/8446 listen.
+    Write-Host '  Waiting for TAK Server ports to bind...' -ForegroundColor Cyan
+    $portWaitSeconds = 90
+    $portWaitInterval = 10
+    $portWaitDeadline = (Get-Date).AddSeconds($portWaitSeconds)
+    $portReady = $false
+    while ((Get-Date) -lt $portWaitDeadline) {
+        $portCheck = Invoke-SSHCommand -SessionId $session.SessionId `
+            -Command 'sudo ss -tlnp | grep 8443' -ErrorAction SilentlyContinue
+        if ($portCheck -and $portCheck.ExitStatus -eq 0 -and $portCheck.Output -match '8443') {
+            $portReady = $true
+            break
+        }
+        Start-Sleep -Seconds $portWaitInterval
+    }
+    if ($portReady) {
+        Write-Host '  [OK] Port 8443 is listening — proceeding with tests.' -ForegroundColor Green
+    } else {
+        Write-Host '  [WARN] Port 8443 not detected after waiting; port tests may fail.' -ForegroundColor Yellow
+    }
+
     $tests = @()
 
     # Test 1: takserver service is active
@@ -695,7 +717,7 @@ if ($resumePhase -le 4) {
     $takVer = (Invoke-SSHCommand -SessionId $session.SessionId -Command 'rpm -q takserver').Output -join ''
     $uptime = (Invoke-SSHCommand -SessionId $session.SessionId -Command 'uptime -p').Output -join ''
     $diskUsage = (Invoke-SSHCommand -SessionId $session.SessionId -Command 'df -h / | tail -1').Output -join ''
-    $memInfo = (Invoke-SSHCommand -SessionId $session.SessionId -Command "free -h | grep Mem | awk '{print \$2}'").Output -join ''
+    $memInfo = (Invoke-SSHCommand -SessionId $session.SessionId -Command "free -h | awk '/Mem/{print `$2}'").Output -join ''
 
     $results.Tests = $tests
     $results.OSInfo = $osInfo
