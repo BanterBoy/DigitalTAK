@@ -51,6 +51,18 @@ jobs:
           $config.TestResult.OutputFormat = 'NUnit2.5'
           Invoke-Pester -Configuration $config
 
+      - name: Run TAKDeploy tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './TAKDeploy/Tests'
+          $config.Run.Exit      = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-TAKDeploy.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -72,7 +84,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y powershell
 
-      - name: Lint TAKServerPS and TAKInstall
+      - name: Lint TAKServerPS, TAKInstall, TAKDeploy and root scripts
         shell: pwsh
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -82,8 +94,11 @@ jobs:
           $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings
           $settings2 = './TAKInstall/PSScriptAnalyzerSettings.psd1'
           $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2
+          $settings3 = './TAKDeploy/PSScriptAnalyzerSettings.psd1'
+          $r3 = Invoke-ScriptAnalyzer -Path ./TAKDeploy   -Recurse -Settings $settings3
+          $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1, ./Deploy-TAKTestServer.ps1
 
-          $all = @($r1) + @($r2)
+          $all = @($r1) + @($r2) + @($r3) + @($r4)
           if ($all) {
               $all | Format-Table RuleName, Severity, ScriptName, Line, Message -AutoSize
               Write-Error "PSScriptAnalyzer reported $($all.Count) violation(s)."
