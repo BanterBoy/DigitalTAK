@@ -26,7 +26,7 @@ DigitalTAK provides three PowerShell modules that layer from infrastructure to a
 |--------|---------|-------|---------|
 | **TAKDeploy** | 3 | Hyper-V VM orchestration | PowerShell 7+, Hyper-V |
 | **TAKInstall** | 6 | Remote SSH provisioning | PowerShell 7+, Posh-SSH |
-| **TAKServerPS** | 44 | TAK Server REST API | PowerShell 7+, running TAK Server |
+| **TAKServerPS** | 42 | TAK Server REST API | PowerShell 7+, running TAK Server |
 
 ---
 
@@ -59,7 +59,7 @@ Wait-TAKLinuxInstall -VMName 'CivTAK' -IPAddress '10.0.0.10' -TimeoutSeconds 900
 ```
 
 #### `Start-TAKDeployment`
-Begins the deployment phase sequence. Used internally by `Deploy-CivTAK.ps1`.
+Reserved internal scaffolding. `Deploy-CivTAK.ps1` invokes `Assert-HyperVPrerequisites`, `New-TAKVirtualMachine`, and `Wait-TAKLinuxInstall` directly and does not call this cmdlet.
 
 ---
 
@@ -133,7 +133,7 @@ Update-TAKLetsEncryptCertificate -SSHSession $session -Domain 'tak.example.com'
 
 ## TAKServerPS
 
-REST API wrapper for TAK Server 5.7. Provides 44 cmdlets covering all major TAK Server API endpoints.
+REST API wrapper for TAK Server 5.7. Provides 42 cmdlets covering all major TAK Server API endpoints.
 
 **Import:** `Import-Module ./TAKServerPS`
 
@@ -144,13 +144,16 @@ Establishes an authenticated session to TAK Server. Stores the session in module
 
 ```powershell
 # Username/password auth
-Connect-TAKServer -Uri 'https://10.0.0.10:8443' -Credential (Get-Credential) -SkipCertificateCheck
+Connect-TAKServer -HostName '10.0.0.10' -Credential (Get-Credential) -SkipCertificateCheck
+
+# With a non-default port
+Connect-TAKServer -HostName '10.0.0.10' -Port 8443 -Credential (Get-Credential) -SkipCertificateCheck
 
 # Certificate auth
-Connect-TAKServer -Uri 'https://10.0.0.10:8443' -CertificatePath '.\admin.p12' -CertificatePassword $pw -SkipCertificateCheck
+Connect-TAKServer -HostName '10.0.0.10' -CertificatePath '.\admin.p12' -CertificatePassword $pw -SkipCertificateCheck
 
 # PFX auth
-Connect-TAKServer -Uri 'https://10.0.0.10:8443' -PfxPath '.\admin.pfx' -PfxPassword $pw -SkipCertificateCheck
+Connect-TAKServer -HostName '10.0.0.10' -PfxPath '.\admin.pfx' -PfxPassword $pw -SkipCertificateCheck
 ```
 
 {: .note }
@@ -179,8 +182,8 @@ Disconnect-TAKServer
 # List all users
 Get-TAKUser
 
-# Create a user
-New-TAKUser -Username 'operator1' -Password (Read-Host -AsSecureString 'Password') -Groups 'team-alpha'
+# Create a user (use -InboundGroups/-OutboundGroups for data-direction group assignment)
+New-TAKUser -Credential (Get-Credential) -InboundGroups 'team-alpha' -OutboundGroups 'team-alpha'
 
 # Remove a user
 Remove-TAKUser -Username 'operator1'
@@ -203,10 +206,11 @@ Remove-TAKUser -Username 'operator1'
 | `Get-TAKMission` | List missions |
 | `New-TAKMission` | Create a mission |
 | `Remove-TAKMission` | Delete a mission |
-| `Get-TAKMissionContent` | Get mission contents |
-| `Add-TAKMissionContent` | Add content to a mission |
-| `Remove-TAKMissionContent` | Remove content from a mission |
 | `Get-TAKMissionSubscription` | List mission subscriptions |
+| `Register-TAKMissionSubscription` | Subscribe to a mission |
+| `Unregister-TAKMissionSubscription` | Unsubscribe from a mission |
+| `Get-TAKMissionChange` | Get mission change log |
+| `Get-TAKMissionContact` | List contacts associated with a mission |
 
 ---
 
@@ -225,10 +229,9 @@ Remove-TAKUser -Username 'operator1'
 | Cmdlet | Description |
 |--------|-------------|
 | `Get-TAKVersion` | Get server version information |
-| `Get-TAKServerConfig` | Get server configuration |
-| `Set-TAKServerConfig` | Update server configuration |
 | `Get-TAKSecurityConfig` | Get security configuration |
 | `Set-TAKSecurityConfig` | Update security configuration |
+| `Remove-TAKToken` | Remove a token |
 
 ---
 
@@ -253,13 +256,13 @@ Remove-TAKUser -Username 'operator1'
 | Cmdlet | Description |
 |--------|-------------|
 | `Get-TAKDeviceProfile` | List device profiles |
-| `New-TAKDeviceProfile` | Create a device profile |
-| `Remove-TAKDeviceProfile` | Remove a device profile |
 | `Get-TAKCoT` | Get Cursor-on-Target events |
 | `Send-TAKCoT` | Send a CoT event |
 | `Get-TAKMapLayer` | List map layers |
-| `New-TAKMapLayer` | Add a map layer |
 | `Remove-TAKMapLayer` | Remove a map layer |
+| `Get-TAKContact` | List contacts |
+| `Get-TAKSubscription` | List subscriptions |
+| `Remove-TAKSubscription` | Remove a subscription |
 
 ---
 
@@ -267,9 +270,9 @@ Remove-TAKUser -Username 'operator1'
 
 | Cmdlet | Description |
 |--------|-------------|
-| `Get-TAKVideoFeed` | List video feeds |
-| `New-TAKVideoFeed` | Add a video feed |
-| `Remove-TAKVideoFeed` | Remove a video feed |
+| `Get-TAKVideo` | List video feeds |
+| `New-TAKVideo` | Add a video feed |
+| `Remove-TAKVideo` | Remove a video feed |
 | `Get-TAKPlugin` | List installed plugins |
 
 ---
@@ -278,9 +281,7 @@ Remove-TAKUser -Username 'operator1'
 
 | Cmdlet | Description |
 |--------|-------------|
-| `Get-TAKFederation` | List federation connections |
-| `New-TAKFederation` | Add a federation connection |
-| `Remove-TAKFederation` | Remove a federation connection |
+| `Get-TAKFederate` | List federation connections |
 
 ---
 

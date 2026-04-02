@@ -54,7 +54,7 @@ Install-Module -Name Pester -MinimumVersion 5.0 -Scope CurrentUser -Force
 ## Cloning the Repository
 
 ```powershell
-git clone https://github.com/ryschilder/DigitalTAK.git
+git clone https://github.com/BanterBoy/DigitalTAK.git
 cd DigitalTAK
 ```
 
@@ -93,14 +93,14 @@ Invoke-Pester ./TAKServerPS/Tests/ -Output Detailed
 Invoke-Pester ./TAKInstall/Tests/ -Output Detailed
 ```
 
-Expected output: **179 tests, all passing**.
+Expected output: **173 tests, all passing**.
 
 ### What the tests cover
 
 | Module | Tests | Coverage |
 |---|---|---|
-| TAKServerPS | 73 | Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets |
-| TAKInstall | 65 | Module manifest, 6-function inventory, bash escaping, SSH execution, service polling |
+| TAKServerPS | 103 | Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets |
+| TAKInstall | 70 | Module manifest, 6-function inventory, bash escaping, SSH execution, service polling |
 
 ---
 
@@ -110,7 +110,7 @@ Every push to `prod` and all pull requests run the full CI pipeline via GitHub A
 
 | Job | Tool | What it checks |
 |---|---|---|
-| **Pester** | PowerShell | 179 unit tests across TAKServerPS + TAKInstall |
+| **Pester** | PowerShell | 173 unit tests across TAKServerPS + TAKInstall |
 | **PSScriptAnalyzer** | PowerShell | Code quality and best practices |
 | **ShellCheck** | Bash | Shell script linting (severity: warning) |
 | **TXT Sync** | Bash | .txt mirrors byte-identical to .sh files |
@@ -127,13 +127,13 @@ Once you have a running TAK Server, use the REST API wrapper to manage it:
 Import-Module ./TAKServerPS
 
 # Connect (self-signed certs are the norm)
-Connect-TAKServer -Uri "https://10.0.0.10:8443" -Credential (Get-Credential) -SkipCertificateCheck
+Connect-TAKServer -HostName "10.0.0.10" -Credential (Get-Credential) -SkipCertificateCheck
 
 # List users
 Get-TAKUser
 
 # Create a user
-New-TAKUser -Username "operator1" -Password (Read-Host -AsSecureString "Password") -Groups "team-alpha"
+New-TAKUser -Credential (Get-Credential) -InboundGroups "team-alpha" -OutboundGroups "team-alpha"
 
 # List missions
 Get-TAKMission

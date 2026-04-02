@@ -113,7 +113,7 @@ The script executes in 10 phases. A Hyper-V snapshot is taken after key phases s
 | 9 | Report | Generates deployment report in `reports/` | No |
 
 {: .note }
-Phase numbers in snapshot names refer to the phase that **completed**, not the phase about to run. For example, `Phase0-RockyInstalled` means Phase 0 (wait for OS) finished successfully.
+Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase numbers in the table above.
 
 ---
 
