@@ -1,0 +1,31 @@
+# ── TAK onboarding: never commit key material ─────────────────────────────────
+
+# PKCS12 / JKS keystores (contain private keys)
+*.p12
+*.pfx
+*.jks
+
+# PEM-encoded keys and certs
+*.key
+*.pem
+*.crt
+*.cer
+
+# Per-team certificate output directories
+dist/
+files/
+
+# Manifest files that reference actual cert paths (safe to commit only if no paths)
+# Uncomment to also ignore manifests:
+# manifest.json
+
+# ATAK data packages ready for distribution (contain embedded credentials)
+*.zip
+
+# Temp files from keytool / openssl
+*.tmp
+*.bak
+
+# OS noise
+.DS_Store
+Thumbs.db
