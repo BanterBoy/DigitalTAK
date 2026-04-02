@@ -33,6 +33,9 @@ Describe 'New-TAKVirtualMachine' {
             VMId                = [guid]::NewGuid()
         }
 
+        # Bypass the elevation check so tests can run without an admin session
+        Mock -ModuleName 'TAKDeploy' -CommandName 'Get-IsAdminSession' -MockWith { $true }
+
         # Mock Hyper-V cmdlets
         Mock -ModuleName 'TAKDeploy' -CommandName 'Get-VMSwitch' -MockWith {
             [PSCustomObject]@{

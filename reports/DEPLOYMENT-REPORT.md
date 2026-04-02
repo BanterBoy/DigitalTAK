@@ -1,8 +1,8 @@
 # TAK Server Deployment Report
 
-**Generated:** 2026-03-24 00:19:08
-**Duration:** 00:14:15
-**Result:** 4 TEST(S) FAILED
+**Generated:** 2026-04-01 23:43:01
+**Duration:** 00:12:41
+**Result:** ALL TESTS PASSED
 
 ---
 
@@ -11,14 +11,14 @@
 | Item | Value |
 |------|-------|
 | VM Name | TAKServer |
-| VM IP | 10.10.0.135 |
+| VM IP | 10.10.0.138 |
 | SSH User | atak |
 | OS | Rocky Linux release 9.7 (Blue Onyx) |
 | Java | openjdk version "17.0.18" 2026-01-20 LTS |
 | TAK Server | takserver-5.7-RELEASE8.noarch |
-| Total Memory |  |
+| Total Memory | 7.5Gi |
 | Disk Usage (/) | /dev/mapper/rl_takserver-root   48G  4.0G   44G   9% / |
-| Uptime | up 9 minutes |
+| Uptime | up 7 minutes |
 | Hyper-V Generation | 2 |
 | vCPU | 4 |
 | RAM | 8 GB (fixed) |
@@ -69,13 +69,13 @@ Resume runs used the same credential material and called the same script after r
 
 | Phase | Result | Duration |
 |-------|--------|----------|
-| Install TAK Server | Success | 03:07 |
-| Create Certificates | Success | 03:16 |
-| Promote Admin Cert | Success | 02:03 |
+| Install TAK Server | Success | 03:28 |
+| Create Certificates | Success | 01:55 |
+| Promote Admin Cert | Success | 01:12 |
 
 ## Post-Deployment Test Results
 
-**18 / 22 tests passed**
+**22 / 22 tests passed**
 
 | # | Test | Result |
 |---|------|--------|
@@ -83,9 +83,9 @@ Resume runs used the same credential material and called the same script after r
 | 2 | takserver service is enabled | :white_check_mark: PASS |
 | 3 | Java 17 is installed | :white_check_mark: PASS |
 | 4 | PostgreSQL is running | :white_check_mark: PASS |
-| 5 | Port 8089 listening (CoT) | :x: FAIL |
-| 6 | Port 8443 listening (WebTAK) | :x: FAIL |
-| 7 | Port 8446 listening (Cert enrollment) | :x: FAIL |
+| 5 | Port 8089 listening (CoT) | :white_check_mark: PASS |
+| 6 | Port 8443 listening (WebTAK) | :white_check_mark: PASS |
+| 7 | Port 8446 listening (Cert enrollment) | :white_check_mark: PASS |
 | 8 | firewalld is active | :white_check_mark: PASS |
 | 9 | Firewall has 8089/tcp open | :white_check_mark: PASS |
 | 10 | Firewall has 8443/tcp open | :white_check_mark: PASS |
@@ -96,7 +96,7 @@ Resume runs used the same credential material and called the same script after r
 | 15 | Server certificate exists | :white_check_mark: PASS |
 | 16 | Admin .p12 cert exists | :white_check_mark: PASS |
 | 17 | Admin .p12 in /home/atak/ | :white_check_mark: PASS |
-| 18 | Certificate enrollment HTTPS responds on 8446 | :x: FAIL |
+| 18 | Certificate enrollment HTTPS responds on 8446 | :white_check_mark: PASS |
 | 19 | cert-metadata.sh has correct State | :white_check_mark: PASS |
 | 20 | TAK Server RPM installed | :white_check_mark: PASS |
 | 21 | nofile ulimit configured | :white_check_mark: PASS |
@@ -106,36 +106,17 @@ Resume runs used the same credential material and called the same script after r
 
 | Service | URL |
 |---------|-----|
-| WebTAK / Admin UI | https://10.10.0.135:8443 |
-| Cursor-on-Target (CoT) | 10.10.0.135:8089 (TLS) |
-| Certificate Enrollment | https://10.10.0.135:8446 |
+| WebTAK / Admin UI | https://10.10.0.138:8443 |
+| Cursor-on-Target (CoT) | 10.10.0.138:8089 (TLS) |
+| Certificate Enrollment | https://10.10.0.138:8446 |
 
 ## Next Steps
 
 1. Retrieve `/home/atak/admin.p12` from the server and import it into your browser.
-2. Navigate to `https://10.10.0.135:8443` to access the TAK Server admin UI.
+2. Navigate to `https://10.10.0.138:8443` to access the TAK Server admin UI.
 3. To create user certificates, SSH to the server and run:
    ```bash
    cd /opt/tak/certs
    sudo -u tak ./takUserCreateCerts_doNotRunAsRoot.sh <username>
    ```
 4. Distribute the generated `.p12` files to ATAK/WinTAK clients.
-
-## Failed Tests — Details
-
-### Port 8089 listening (CoT)
-- Exit code: 1
-- Output: ``
-
-### Port 8443 listening (WebTAK)
-- Exit code: 1
-- Output: ``
-
-### Port 8446 listening (Cert enrollment)
-- Exit code: 1
-- Output: ``
-
-### Certificate enrollment HTTPS responds on 8446
-- Exit code: 7
-- Output: `000`
-

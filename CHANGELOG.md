@@ -7,6 +7,33 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — 2026-04-01
+
+### Fixed
+- `Deploy-TAKServer.ps1` (Phase 5): Added port-readiness poll before post-deployment
+  port tests. Polls port 8443 for up to 90s after Phase 4 restart so TAK Server's
+  Java processes have time to bind — eliminates false-negative test failures on
+  every fresh deploy.
+- `Deploy-TAKServer.ps1` (Phase 5): Fixed `awk '{print \$2}'` memory-collection
+  command where `\$2` was mis-interpreted by PowerShell's string expander; replaced
+  with `` awk '/Mem/{print `$2}' `` so `$2` is passed correctly to awk.
+
+### Added
+- `.github/workflows/ci.yml`: TAKDeploy Pester tests now run in CI (`TAKDeploy/Tests/`).
+  Previously the 32-test TAKDeploy suite ran outside CI.
+- `.github/workflows/ci.yml`: PSScriptAnalyzer now lints `TAKDeploy/` and the two
+  root orchestration scripts (`Deploy-TAKServer.ps1`, `Deploy-TAKTestServer.ps1`).
+- `InstallShellScripts/openfire_takChat_install.sh`: Added `mkdir -p /atakciv`
+  before the Openfire RPM download so the script no longer fails if the directory
+  is absent. `TXTScripts/openfire_takChat_install.txt` mirror updated to match.
+
+### Changed
+- Repository wiki migrated from in-repo `Wiki/` and `Documentation/Wiki/` to the
+  GitHub Wiki (`https://github.com/BanterBoy/DigitalTAK/wiki`). In-repo wiki
+  directories removed; `README.md` updated to point to the GitHub Wiki.
+
+---
+
 ## [1.0.0] — 2026-03-22
 
 ### Added (Session 3)

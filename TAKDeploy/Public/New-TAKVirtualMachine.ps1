@@ -90,9 +90,7 @@ function New-TAKVirtualMachine {
     )
 
     # ── Elevation check ──────────────────────────────────────────────────
-    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-        ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if (-not $isAdmin) {
+    if (-not (Get-IsAdminSession)) {
         $errorRecord = [System.Management.Automation.ErrorRecord]::new(
             [System.UnauthorizedAccessException]::new('New-TAKVirtualMachine must run in an elevated (Administrator) PowerShell session.'),
             'TAKDeployNotElevated',
