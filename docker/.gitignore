@@ -1,0 +1,11 @@
+# ── Secrets — never commit ────────────────────────────────────────────────────
+.env
+
+# ── TAK Server RPM (binary, download from tak.gov) ───────────────────────────
+*.rpm
+
+# ── GPG key (download from tak.gov alongside the RPM) ────────────────────────
+*.key
+
+# ── Docker build cache and temp files ────────────────────────────────────────
+*.log

@@ -1,2 +1,7 @@
 # Deployment reports contain credentials and must never be committed
 reports/DEPLOYMENT-REPORT-*.md
+
+# Docker Compose secrets and binaries (see docker/.gitignore for details)
+docker/.env
+docker/*.rpm
+docker/*.key
