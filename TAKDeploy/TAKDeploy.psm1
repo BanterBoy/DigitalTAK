@@ -1,5 +1,8 @@
 #Requires -Version 7.0
-#Requires -Modules Posh-SSH, Hyper-V
+#Requires -Modules Posh-SSH
+# Note: Hyper-V is a Windows-only runtime dependency validated at call-time
+# by Assert-HyperVPrerequisites inside New-TAKVirtualMachine. It is intentionally
+# omitted here so the module loads on Linux CI runners and non-Hyper-V machines.
 <#
 .SYNOPSIS
     TAKDeploy PowerShell module — Hyper-V VM creation and TAK Server deployment.
