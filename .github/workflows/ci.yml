@@ -4,6 +4,20 @@ on:
   push:
     branches: [prod, main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      live_vm_host:
+        description: 'TAK Server VM IP or hostname (leave blank to skip live-VM tests)'
+        required: false
+        default: ''
+      live_vm_ssh_user:
+        description: 'SSH username on the TAK Server VM'
+        required: false
+        default: 'atak'
+      live_vm_tags:
+        description: 'Pester tags to run (blank = all integration tests)'
+        required: false
+        default: ''
 
 jobs:
   # ─── Pester unit tests ──────────────────────────────────────────────────────
@@ -159,3 +173,91 @@ jobs:
             exit 1
           fi
           echo "All TXT mirrors are in sync."
+
+  # ─── Live-VM integration tests (manual / release only) ─────────────────────
+  #
+  # This job runs the full integration + E2E test suite against a real deployed
+  # TAK Server VM.  It is intentionally NOT triggered on normal push/PR runs
+  # because it requires a self-hosted runner with network access to the VM.
+  #
+  # Trigger options:
+  #   1. Manual:  workflow_dispatch with live_vm_host set.
+  #   2. Release: push a tag matching 'v*' — uses self-hosted runner secrets.
+  #
+  # Required self-hosted runner secrets (set in repo Settings → Secrets):
+  #   TAK_SSH_PASS   - SSH password for the TAK Server VM
+  #   TAK_CERT_PASS  - PKCS#12 certificate password
+  #
+  live-vm-integration:
+    name: Live-VM Integration Tests
+    runs-on: [self-hosted, windows, tak-vm]
+    # Only run when triggered manually with a host, or on tagged releases
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.live_vm_host != '') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester and Posh-SSH
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module Pester   -MinimumVersion 5.0 -Force -Scope CurrentUser
+          Install-Module Posh-SSH -Force -Scope CurrentUser
+
+      - name: Set target host (workflow_dispatch vs tagged release)
+        id: target
+        shell: pwsh
+        run: |
+          $host_ = if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+              '${{ inputs.live_vm_host }}'
+          } else {
+              '${{ vars.TAK_VM_HOST }}'
+          }
+          $sshUser = if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+              '${{ inputs.live_vm_ssh_user }}'
+          } else {
+              '${{ vars.TAK_SSH_USER }}'
+          }
+          echo "TAK_INTEGRATION_HOST=$host_"  | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "TAK_SSH_USER=$sshUser"         | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Run integration tests against live VM
+        shell: pwsh
+        env:
+          TAK_INTEGRATION_HOST: ${{ env.TAK_INTEGRATION_HOST }}
+          TAK_SSH_USER:         ${{ env.TAK_SSH_USER }}
+          TAK_SSH_PASS:         ${{ secrets.TAK_SSH_PASS }}
+          TAK_CERT_PASS:        ${{ secrets.TAK_CERT_PASS }}
+        run: |
+          $params = @{
+              OutputPath = 'reports/TestResults-Integration-LiveVM.xml'
+              PassThru   = $true
+          }
+          $tags = '${{ inputs.live_vm_tags }}'
+          if ($tags -and $tags.Trim()) {
+              $params['Tags'] = $tags -split '\s*,\s*'
+          }
+          $result = .\Invoke-IntegrationTests.ps1 @params
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Run E2E tests against live VM
+        shell: pwsh
+        env:
+          TAK_INTEGRATION_HOST: ${{ env.TAK_INTEGRATION_HOST }}
+          TAK_SSH_USER:         ${{ env.TAK_SSH_USER }}
+          TAK_SSH_PASS:         ${{ secrets.TAK_SSH_PASS }}
+          TAK_CERT_PASS:        ${{ secrets.TAK_CERT_PASS }}
+        run: |
+          $result = .\Invoke-E2ETests.ps1 `
+              -XmlOutputPath      'reports/TestResults-E2E-LiveVM.xml' `
+              -MarkdownOutputPath 'reports/TestResults-E2E-LiveVM.md' `
+              -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Upload live-VM test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-vm-test-results
+          path: reports/TestResults-*-LiveVM.*
