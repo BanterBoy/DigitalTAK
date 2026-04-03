@@ -7,7 +7,7 @@ nav_order: 3
 # TAK Server Deployment
 {: .no_toc }
 
-Step-by-step guide for deploying a CivTAK server using `Deploy-CivTAK.ps1`.
+Step-by-step guide for deploying a CivTAK server using `Deploy-TAKServer.ps1`.
 {: .fs-6 .fw-300 }
 
 ## Table of Contents
@@ -20,13 +20,13 @@ Step-by-step guide for deploying a CivTAK server using `Deploy-CivTAK.ps1`.
 
 ## Overview
 
-`Deploy-CivTAK.ps1` is the canonical entry point for a complete, zero-touch CivTAK deployment. It:
+`Deploy-TAKServer.ps1` is the canonical entry point for a complete, zero-touch CivTAK deployment. It:
 
 - Creates a Hyper-V Gen 2 VM and installs Rocky Linux 9 via kickstart
 - Installs and configures TAK Server 5.7 over SSH
 - Creates a full certificate authority, server certs, and client certs
 - Promotes the admin certificate
-- Runs a post-deploy smoke test
+- Runs 20 post-deployment validation tests (service health, ports, SELinux, firewall, certs)
 - Downloads `.p12` client certificates to your local machine
 - Imports certificates into the Windows certificate store
 - Generates a deployment report
@@ -42,7 +42,8 @@ Before running the deployment:
 - [ ] Windows 10/11 Pro or Windows Server 2019+ with Hyper-V enabled
 - [ ] PowerShell 7.0+ running **as Administrator**
 - [ ] `Posh-SSH` module installed: `Install-Module Posh-SSH -Scope CurrentUser -Force`
-- [ ] Rocky Linux 9.5 DVD ISO downloaded (default expected path: `C:\Hyper-V\ISO\Rocky-9.5-x86_64-dvd.iso`)
+- [ ] Hyper-V virtual switch named `TAK-External` (External type) — or supply `-SwitchName`
+- [ ] Rocky Linux 9 DVD ISO downloaded (default expected path: `C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso`)
 - [ ] TAK Server 5.7 RPM downloaded from [tak.gov](https://tak.gov) (default: `C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm`)
 - [ ] At least 40 GB free disk space for the VM VHDX (default: 80 GB dynamic)
 - [ ] At least 8 GB RAM available for the VM
@@ -58,16 +59,17 @@ The simplest deployment uses all defaults and prompts interactively for certific
 $cred   = Get-Credential -UserName 'atak'
 $rootPw = Read-Host -AsSecureString 'Root password'
 $ksPw   = Read-Host -AsSecureString 'Keystore password'
+$certPw = Read-Host -AsSecureString 'Certificate (.p12) password'
 
-.\Deploy-CivTAK.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 ```
 
 You will be prompted for:
-- **State** — e.g., `TX`
-- **City** — e.g., `AUSTIN`
-- **Organization** — e.g., `ACME-OPS`
-- **Organizational Unit** — e.g., `TAK`
-- **CA Name** — e.g., `ACME-TAK-CA`
+- **State** — e.g., `ESSEX`
+- **City** — e.g., `SOUTHEND-ON-SEA`
+- **Organization** — e.g., `LEIGH-SERVICES`
+- **Organizational Unit** — e.g., `IT-DEPARTMENT`
+- **CA Name** — e.g., `TAK-CA`
 
 ---
 
@@ -79,14 +81,17 @@ For non-interactive / scripted deployments:
 $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString 'IamGroot.3742' -AsPlainText -Force))
 $rootPw = ConvertTo-SecureString 'R00t!Secure42' -AsPlainText -Force
 $ksPw   = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
+$certPw = ConvertTo-SecureString 'C3rtP@ss2025!' -AsPlainText -Force
 
-.\Deploy-CivTAK.ps1 `
-    -VMName           'CivTAK-Prod' `
-    -RockyIsoPath     'D:\ISO\Rocky-9.5-x86_64-dvd.iso' `
+.\Deploy-TAKServer.ps1 `
+    -VMName           'TAK-Prod-01' `
+    -SwitchName       'External LAN' `
+    -RockyIsoPath     'D:\ISO\Rocky-9.7-x86_64-dvd.iso' `
     -RpmPath          'D:\TAK\takserver-5.7-RELEASE8.noarch.rpm' `
     -Credential       $cred `
     -RootPassword     $rootPw `
     -KeystorePassword $ksPw `
+    -CertPassword     $certPw `
     -State            'TX' -City 'AUSTIN' `
     -Organization     'ACME-OPS' -OrganizationalUnit 'TAK' `
     -CAName           'ACME-TAK-CA' `
@@ -97,20 +102,19 @@ $ksPw   = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
 
 ## Deployment Phases
 
-The script executes in 10 phases. A Hyper-V snapshot is taken after key phases so the deployment can be resumed safely.
+The script executes in 9 phases. A Hyper-V snapshot is taken after key phases so the deployment can be resumed safely.
 
 | Phase | Name | What Happens | Snapshot Created? |
 |-------|------|-------------|:-----------------:|
-| 0 | Prerequisites | Checks Hyper-V, PowerShell version, required files | No |
-| 1 | Create VM | Hyper-V Gen 2 VM created, Rocky Linux kickstart delivered via OEMDRV VHDX | No |
-| 2 | OS Install | Waits for Rocky Linux unattended install and SSH availability | **Yes** — `Phase0-RockyInstalled` |
-| 3 | TAK Install | Installs TAK Server RPM, configures SELinux and firewalld | **Yes** — `Phase2-TAKInstalled` |
-| 4 | Create Certs | Creates CA, server certificates, client certificates, patches CoreConfig.xml | **Yes** — `Phase4-CertsAndAdmin` |
-| 5 | Promote Admin | Promotes admin.pem to TAK Server administrator | No |
-| 6 | Smoke Test | Connects to REST API, validates version endpoint | No |
-| 7 | Download Certs | Transfers .p12 client certificates via SFTP | No |
-| 8 | Import Certs | Imports .p12 into Windows certificate store | No |
-| 9 | Report | Generates deployment report in `reports/` | No |
+| 0 | Create VM | Hyper-V Gen 2 VM created, Rocky Linux kickstart delivered via OEMDRV VHDX | **Yes** — `Phase0-RockyInstalled` |
+| 1 | SSH | Establishes SSH session to the new VM | No |
+| 2 | TAK Install | Installs TAK Server RPM, configures SELinux and firewalld | **Yes** — `Phase2-TAKInstalled` |
+| 3 | Create Certs | Creates CA, server certificates, client certificates, patches CoreConfig.xml | No |
+| 4 | Promote Admin | Promotes admin.pem to TAK Server administrator | **Yes** — `Phase4-CertsAndAdmin` |
+| 5 | Validation | 20 post-deployment tests (service, ports, firewall, certs, SELinux, OS) | No |
+| 6 | Download Certs | Transfers `.p12` client certificates via SFTP | No |
+| 7 | Import Certs | Imports `.p12` into Windows certificate store | No |
+| 8 | Report | Generates deployment report in `reports/` | No |
 
 {: .note }
 Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase numbers in the table above.
@@ -121,28 +125,26 @@ Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase num
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `-VMName` | string | `CivTAK` | Hyper-V VM name |
-| `-SwitchName` | string | *(auto-detect)* | Hyper-V virtual switch. First External switch used if omitted |
-| `-RockyIsoPath` | string | `C:\Hyper-V\ISO\Rocky-9.5-x86_64-dvd.iso` | Path to Rocky Linux 9 DVD ISO |
-| `-VHDPath` | string | *(derived from VMName)* | Path for the dynamic VHDX |
+| `-VMName` | string | `TAKServer` | Hyper-V VM name |
+| `-SwitchName` | string | `TAK-External` | Hyper-V virtual switch. Must already exist |
+| `-RockyIsoPath` | string | `C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso` | Path to Rocky Linux 9 DVD ISO |
+| `-VHDPath` | string | `C:\Hyper-V\VMs\TAKServer\TAKServer.vhdx` | Path for the dynamic VHDX |
 | `-VHDSizeBytes` | int64 | `80 GB` | Maximum VHDX size |
 | `-MemoryBytes` | int64 | `8 GB` | Fixed RAM assigned to the VM |
 | `-ProcessorCount` | int | `4` | Number of virtual CPUs |
 | `-Credential` | PSCredential | **(mandatory)** | Linux admin account (username + password) |
 | `-RootPassword` | SecureString | **(mandatory)** | Root account password |
 | `-KeystorePassword` | SecureString | **(mandatory)** | TAK Server keystore password (min 6 chars) |
+| `-CertPassword` | SecureString | **(mandatory)** | PKCS#12 (.p12) certificate password |
 | `-RpmPath` | string | `C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm` | Path to TAK Server RPM |
-| `-SshPublicKey` | string | *(empty)* | Optional SSH public key for admin user |
-| `-State` | string | *(prompted)* | Certificate subject state |
-| `-City` | string | *(prompted)* | Certificate subject city |
-| `-Organization` | string | *(prompted)* | Certificate subject organisation |
-| `-OrganizationalUnit` | string | *(prompted)* | Certificate subject OU |
-| `-CAName` | string | *(prompted)* | Certificate authority name |
+| `-State` | string | *(prompted, default: ESSEX)* | Certificate subject state |
+| `-City` | string | *(prompted, default: SOUTHEND-ON-SEA)* | Certificate subject city |
+| `-Organization` | string | *(prompted, default: LEIGH-SERVICES)* | Certificate subject organisation |
+| `-OrganizationalUnit` | string | *(prompted, default: IT-DEPARTMENT)* | Certificate subject OU |
+| `-CAName` | string | *(prompted, default: TAK-CA)* | Certificate authority name |
 | `-Timezone` | string | `Europe/London` | Guest OS IANA timezone |
 | `-Hostname` | string | `takserver` | Guest OS hostname |
-| `-Keyboard` | string | `gb` | X keyboard variant |
-| `-Lang` | string | `en_GB.UTF-8` | Guest OS locale |
-| `-SSHTimeoutSeconds` | int | `900` | Max wait (seconds) for SSH after OS install |
+| `-SSHTimeoutSeconds` | int | `600` | Max wait (seconds) for SSH after OS install |
 | `-DisableSnapshotResume` | switch | *(off)* | Force clean rebuild, ignore existing snapshots |
 
 ---
@@ -153,13 +155,13 @@ If a deployment fails mid-way, simply re-run the same command. The script automa
 
 ```powershell
 # Re-run with the same credentials — resumes from last checkpoint automatically
-.\Deploy-CivTAK.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 ```
 
 To force a complete rebuild from scratch:
 
 ```powershell
-.\Deploy-CivTAK.ps1 -DisableSnapshotResume -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+.\Deploy-TAKServer.ps1 -DisableSnapshotResume -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 ```
 
 ---
@@ -179,7 +181,7 @@ Use `Invoke-TAKRollback.ps1` to restore the VM to a known-good phase snapshot:
 .\Invoke-TAKRollback.ps1 -SnapshotName 'Phase0-RockyInstalled'
 
 # Roll back a named VM to a specific phase
-.\Invoke-TAKRollback.ps1 -VMName 'CivTAK-Prod' -SnapshotName 'Phase2-TAKInstalled'
+.\Invoke-TAKRollback.ps1 -VMName 'TAK-Prod-01' -SnapshotName 'Phase2-TAKInstalled'
 ```
 
 Available snapshot names:
@@ -254,4 +256,4 @@ Once the deployment completes:
 | **CoT (ATAK clients)** | `<VM-IP>:8089` |
 | **Client cert enrollment** | `https://<VM-IP>:8446` |
 
-Default admin credentials are set during the Promote Admin phase. Import the downloaded `.p12` certificate from `reports/certs/` into your ATAK client.
+Default admin credentials are set during the Promote Admin phase. Import the downloaded `.p12` certificate from `certs/` into your ATAK client.

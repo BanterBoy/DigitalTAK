@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] — 2026-04-03
 
+### Removed
+- `Deploy-CivTAK.ps1` — removed as a broken duplicate of `Deploy-TAKServer.ps1`.
+  `Deploy-CivTAK.ps1` was identified as failing (called unexported private function
+  `Assert-HyperVPrerequisites` from the TAKDeploy module) and its scope fully overlapped
+  with `Deploy-TAKServer.ps1`. `Deploy-TAKServer.ps1` remains the single supported
+  end-to-end deployment entry point. All documentation updated to reflect this.
+
 ### Fixed
 - `Remove-CivTAK.ps1` (Step 5): Certificate store cleanup now removes the full
   TAK cert chain (root CA, intermediate CA, and admin cert).  Previously only the
