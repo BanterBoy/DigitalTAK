@@ -124,17 +124,21 @@ jobs:
           Set-PSRepository PSGallery -InstallationPolicy Trusted
           Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
 
+          # Helper: lint a module's source files, excluding its Tests/ subdirectory.
+          # Test files use global: scoped stub functions and Pester patterns that are
+          # intentionally non-production style.
+          function Invoke-ModuleLint([string]$ModulePath, [string]$Settings) {
+              Get-ChildItem -Path $ModulePath -Recurse -Include '*.ps1','*.psm1','*.psd1' |
+                  Where-Object { $_.FullName -notmatch '[/\\]Tests[/\\]' -and $_.FullName -notmatch '[/\\]Tests$' } |
+                  ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Settings $Settings }
+          }
+
           $settings = './TAKServerPS/PSScriptAnalyzerSettings.psd1'
-          $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings `
-                    -ExcludePath ./TAKServerPS/Tests
+          $r1 = Invoke-ModuleLint -ModulePath ./TAKServerPS -Settings $settings
           $settings2 = './TAKInstall/PSScriptAnalyzerSettings.psd1'
-          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2 `
-                    -ExcludePath ./TAKInstall/Tests
+          $r2 = Invoke-ModuleLint -ModulePath ./TAKInstall  -Settings $settings2
           $settings3 = './TAKDeploy/PSScriptAnalyzerSettings.psd1'
-          # Exclude Tests/ — test files use global: scoped stub functions and other
-          # cross-platform Pester patterns that are intentionally non-production style.
-          $r3 = Invoke-ScriptAnalyzer -Path ./TAKDeploy   -Recurse -Settings $settings3 `
-                    -ExcludePath ./TAKDeploy/Tests
+          $r3 = Invoke-ModuleLint -ModulePath ./TAKDeploy   -Settings $settings3
           $settings4 = './PSScriptAnalyzerSettings.psd1'
           $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1     -Settings $settings4
           $r5 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKTestServer.ps1 -Settings $settings4
