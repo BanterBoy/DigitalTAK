@@ -1,3 +1,9 @@
+---
+layout: page
+title: Client Validation
+nav_title: Client Validation
+---
+
 # TAK Client Validation Checklist
 
 > **Status:** M4 deliverable — April 2026

@@ -1,3 +1,9 @@
+---
+layout: page
+title: Baseline Configuration
+nav_title: Baseline Config
+---
+
 # DigitalTAK Baseline Configuration Reference
 
 > **Status:** Baseline snapshot — April 2026

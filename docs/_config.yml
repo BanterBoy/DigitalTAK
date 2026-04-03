@@ -1,37 +1,36 @@
-title: DigitalTAK Documentation
-description: Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V
-baseurl: "/DigitalTAK"
-url: "https://ryschilder.github.io"
+title: DigitalTAK
+tagline: "TAK Server 5.7 automation for Rocky Linux 9 on Hyper-V"
+description: "Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V Gen 2"
+lang: en-GB
+baseurl: ""
+url: "https://digitaltak.lukeleigh.com"
 
-remote_theme: just-the-docs/just-the-docs
+author:
+  name: "Ryan Schilder"
+  url: https://github.com/BanterBoy
 
-# Theme settings
-color_scheme: dark
+version: 1.0
 
-# Navigation
-nav_sort: order
+# Markdown
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  toc_levels: 1..6
 
-# Search
-search_enabled: true
-
-# Aux links (top-right)
-aux_links:
-  "GitHub":
-    - "https://github.com/ryschilder/DigitalTAK"
-
-aux_links_new_tab: true
-
-# Footer content
-footer_content: "DigitalTAK &mdash; TAK Server 5.7 automation for Rocky Linux 9 on Hyper-V"
+permalink: /:title/
 
 # Plugins
 plugins:
-  - jekyll-remote-theme
+  - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Exclude from processing
 exclude:
   - Gemfile
   - Gemfile.lock
   - node_modules
-  - vendor
+  - vendor/

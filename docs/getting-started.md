@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: Getting Started
-nav_order: 2
+nav_title: Getting Started
 ---
 
 # Getting Started

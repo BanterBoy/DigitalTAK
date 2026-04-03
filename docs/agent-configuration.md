@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: Agent Configuration
-nav_order: 4
+nav_title: Agent Configuration
 ---
 
 # Agent Configuration

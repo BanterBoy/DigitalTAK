@@ -1,0 +1,40 @@
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="{{ '/' | absolute_url }}">
+          {{ site.title }}
+        </a>
+      </h1>
+      <p class="lead">{{ site.description }}</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item{% if page.url == '/' or page.url == '/index.html' %} active{% endif %}"
+         href="{{ '/' | absolute_url }}">Home</a>
+      <a class="sidebar-nav-item{% if page.url contains 'getting-started' %} active{% endif %}"
+         href="{{ '/getting-started/' | absolute_url }}">Getting Started</a>
+      <a class="sidebar-nav-item{% if page.url contains 'deployment' %} active{% endif %}"
+         href="{{ '/deployment/' | absolute_url }}">Deployment</a>
+      <a class="sidebar-nav-item{% if page.url contains 'agent-configuration' %} active{% endif %}"
+         href="{{ '/agent-configuration/' | absolute_url }}">Agent Configuration</a>
+      <a class="sidebar-nav-item{% if page.url contains 'api-reference' %} active{% endif %}"
+         href="{{ '/api-reference/' | absolute_url }}">API Reference</a>
+      <a class="sidebar-nav-item{% if page.url contains 'agents-skills' %} active{% endif %}"
+         href="{{ '/agents-skills-reference/' | absolute_url }}">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item{% if page.url contains 'troubleshooting' %} active{% endif %}"
+         href="{{ '/troubleshooting/' | absolute_url }}">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://tak.gov/">
+        <img src="https://img.shields.io/badge/TAK-tak.gov-2A6496.svg" alt="TAK Gov">
+      </a>
+    </nav>
+    <p>&copy; {{ site.time | date: '%Y' }}. All rights reserved.</p>
+  </div>
+</div>

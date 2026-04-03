@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: TAK Server Deployment
-nav_order: 3
+nav_title: Deployment
 ---
 
 # TAK Server Deployment

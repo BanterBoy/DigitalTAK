@@ -1,18 +1,16 @@
 ---
-layout: home
+layout: page
 title: Home
-nav_order: 1
+nav_title: Home
 ---
 
 # DigitalTAK Documentation
-{: .fs-9 }
 
 Fully automated CivTAK deployment and management for Rocky Linux 9.7 on Hyper-V Gen 2.
-{: .fs-6 .fw-300 }
 
-[Get Started](getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[Deployment Guide](deployment){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[API Reference](api-reference){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get Started](getting-started/) &middot;
+[Deployment Guide](deployment/) &middot;
+[API Reference](api-reference/)
 
 ---
 

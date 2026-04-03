@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: Agents & Skills Reference
-nav_order: 5
+nav_title: Agents & Skills
 ---
 
 # Agents & Skills Reference
