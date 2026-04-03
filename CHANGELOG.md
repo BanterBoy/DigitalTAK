@@ -7,6 +7,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — 2026-04-03
+
+### Fixed
+- `Remove-CivTAK.ps1` (Step 5): Certificate store cleanup now removes the full
+  TAK cert chain (root CA, intermediate CA, and admin cert).  Previously only the
+  root CA cert was matched because the filter relied solely on `Subject -match
+  'TAK-CA'`; intermediate CA (`CN=intermediate-ca`) and admin (`CN=admin`) certs
+  were silently skipped.  The updated filter also checks the `Issuer` field for
+  the CA name and matches the known TAK intermediate-ca CN so all three installed
+  certs are removed regardless of the organisation name used at deployment time.
+  A new `-CAName` parameter (default `'TAK-CA'`) allows the root CA identifier to
+  be specified when a non-default CA name was used.
+
 ## [Unreleased] — 2026-04-01
 
 ### Fixed
