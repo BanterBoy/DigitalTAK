@@ -125,11 +125,16 @@ jobs:
           Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
 
           $settings = './TAKServerPS/PSScriptAnalyzerSettings.psd1'
-          $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings
+          $r1 = Invoke-ScriptAnalyzer -Path ./TAKServerPS -Recurse -Settings $settings `
+                    -ExcludePath ./TAKServerPS/Tests
           $settings2 = './TAKInstall/PSScriptAnalyzerSettings.psd1'
-          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2
+          $r2 = Invoke-ScriptAnalyzer -Path ./TAKInstall  -Recurse -Settings $settings2 `
+                    -ExcludePath ./TAKInstall/Tests
           $settings3 = './TAKDeploy/PSScriptAnalyzerSettings.psd1'
-          $r3 = Invoke-ScriptAnalyzer -Path ./TAKDeploy   -Recurse -Settings $settings3
+          # Exclude Tests/ — test files use global: scoped stub functions and other
+          # cross-platform Pester patterns that are intentionally non-production style.
+          $r3 = Invoke-ScriptAnalyzer -Path ./TAKDeploy   -Recurse -Settings $settings3 `
+                    -ExcludePath ./TAKDeploy/Tests
           $settings4 = './PSScriptAnalyzerSettings.psd1'
           $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1     -Settings $settings4
           $r5 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKTestServer.ps1 -Settings $settings4
