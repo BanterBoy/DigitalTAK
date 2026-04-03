@@ -30,6 +30,19 @@
     and is always deleted in AfterAll, even on failure.
 #>
 
+# BeforeDiscovery runs before Pester evaluates -Skip:() on each It block.
+# This is the correct Pester 5 mechanism for runtime skip conditions.
+BeforeDiscovery {
+    $script:SkipAll = if ([string]::IsNullOrWhiteSpace($env:TAK_INTEGRATION_HOST)) {
+        'TAK_INTEGRATION_HOST is not set — skipping user management tests'
+    } elseif (-not (Test-Path (Join-Path $PSScriptRoot '..', '..', 'certs', 'admin.p12')) -and
+              [string]::IsNullOrWhiteSpace($env:TAK_API_USER)) {
+        'No auth available: admin.p12 not found and TAK_API_USER not set'
+    } else {
+        $null
+    }
+}
+
 BeforeAll {
     . (Join-Path $PSScriptRoot 'Helpers.ps1')
 
@@ -98,28 +111,19 @@ AfterAll {
     Remove-Module 'TAKServer' -Force -ErrorAction SilentlyContinue
 }
 
-# File-level BeforeEach: skip every It when $script:Skip is set.
-# Required because -Skip:($null -ne $script:Skip) on individual Its evaluates at Pester 5
-# discovery time (before BeforeAll runs), so the variable is always $null at that point.
-BeforeEach {
-    if ($null -ne $script:Skip) {
-        Set-ItResult -Skipped -Because $script:Skip
-    }
-}
-
 # ── Connection ────────────────────────────────────────────────────────────────
 
 Describe 'TAK Server API Connection' -Tag 'Integration', 'API' {
 
-    It 'Connect-TAKServer returns a session object' -Skip:($null -ne $script:Skip) {
+    It 'Connect-TAKServer returns a session object' -Skip:($null -ne $script:SkipAll) {
         $script:Session | Should -Not -BeNullOrEmpty
     }
 
-    It 'Session has the correct HostName' -Skip:($null -ne $script:Skip) {
+    It 'Session has the correct HostName' -Skip:($null -ne $script:SkipAll) {
         $script:Session.HostName | Should -Be $script:Config.Host
     }
 
-    It 'Session BaseUrl uses the expected API port' -Skip:($null -ne $script:Skip) {
+    It 'Session BaseUrl uses the expected API port' -Skip:($null -ne $script:SkipAll) {
         $script:Session.BaseUrl | Should -Match ":$($script:Config.ApiPort)"
     }
 }
@@ -128,12 +132,12 @@ Describe 'TAK Server API Connection' -Tag 'Integration', 'API' {
 
 Describe 'TAK Server Version via API' -Tag 'Integration', 'API' {
 
-    It 'Get-TAKVersion returns a version object' -Skip:($null -ne $script:Skip) {
+    It 'Get-TAKVersion returns a version object' -Skip:($null -ne $script:SkipAll) {
         $ver = Get-TAKVersion
         $ver | Should -Not -BeNullOrEmpty
     }
 
-    It 'Server reports version 5.7.x' -Skip:($null -ne $script:Skip) {
+    It 'Server reports version 5.7.x' -Skip:($null -ne $script:SkipAll) {
         $ver = Get-TAKVersion
         $ver.version | Should -Match '5\.7'
     }
@@ -143,19 +147,19 @@ Describe 'TAK Server Version via API' -Tag 'Integration', 'API' {
 
 Describe 'TAK Server User Creation' -Tag 'Integration', 'API', 'UserManagement' {
 
-    It 'New-TAKUser creates a user without error' -Skip:($null -ne $script:Skip) {
+    It 'New-TAKUser creates a user without error' -Skip:($null -ne $script:SkipAll) {
         { New-TAKUser -Username $script:TestUser -Password $script:TestPass -Confirm:$false } |
             Should -Not -Throw
     }
 
-    It 'Created user appears in user list' -Skip:($null -ne $script:Skip) {
+    It 'Created user appears in user list' -Skip:($null -ne $script:SkipAll) {
         # Allow a short settle time for the API to index the new user
         Start-Sleep -Milliseconds 500
         $users = Get-TAKUser
         $users.username | Should -Contain $script:TestUser
     }
 
-    It 'Get-TAKUser returns the specific user by name' -Skip:($null -ne $script:Skip) {
+    It 'Get-TAKUser returns the specific user by name' -Skip:($null -ne $script:SkipAll) {
         $user = Get-TAKUser -Username $script:TestUser
         $user | Should -Not -BeNullOrEmpty
         $user.username | Should -Be $script:TestUser
@@ -166,11 +170,11 @@ Describe 'TAK Server User Creation' -Tag 'Integration', 'API', 'UserManagement' 
 
 Describe 'TAK Server User Deletion' -Tag 'Integration', 'API', 'UserManagement' {
 
-    It 'Remove-TAKUser deletes the user without error' -Skip:($null -ne $script:Skip) {
+    It 'Remove-TAKUser deletes the user without error' -Skip:($null -ne $script:SkipAll) {
         { Remove-TAKUser -Username $script:TestUser -Confirm:$false } | Should -Not -Throw
     }
 
-    It 'Deleted user no longer appears in user list' -Skip:($null -ne $script:Skip) {
+    It 'Deleted user no longer appears in user list' -Skip:($null -ne $script:SkipAll) {
         # Allow a short settle time
         Start-Sleep -Milliseconds 500
         $users = Get-TAKUser
@@ -182,7 +186,7 @@ Describe 'TAK Server User Deletion' -Tag 'Integration', 'API', 'UserManagement' 
 
 Describe 'TAK Server User API Idempotency' -Tag 'Integration', 'API', 'UserManagement' {
 
-    It 'Creating a user that already exists throws a descriptive error' -Skip:($null -ne $script:Skip) {
+    It 'Creating a user that already exists throws a descriptive error' -Skip:($null -ne $script:SkipAll) {
         # Create the user first
         New-TAKUser -Username $script:TestUser -Password $script:TestPass -Confirm:$false -ErrorAction SilentlyContinue
 

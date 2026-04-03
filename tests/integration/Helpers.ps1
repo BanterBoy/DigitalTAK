@@ -47,7 +47,7 @@ function Get-TAKIntegrationConfig {
         SshUser     = if ($env:TAK_SSH_USER)   { $env:TAK_SSH_USER }   else { 'atak' }
         SshPass     = $env:TAK_SSH_PASS
         VMName      = if ($env:TAK_VM_NAME)    { $env:TAK_VM_NAME }    else { 'TAKServer' }
-        CertPass    = if ($env:TAK_CERT_PASS)  { $env:TAK_CERT_PASS }  else { throw 'TAK_CERT_PASS is not set. Set this env var to the PKCS#12 certificate password before running integration tests.' }
+        CertPass    = $env:TAK_CERT_PASS   # $null when not set; callers that need it must validate before use
         ApiPort     = if ($env:TAK_API_PORT)   { [int]$env:TAK_API_PORT }   else { 8443 }
         EnrollPort  = if ($env:TAK_ENROLL_PORT){ [int]$env:TAK_ENROLL_PORT } else { 8446 }
         CotPort     = if ($env:TAK_COT_PORT)   { [int]$env:TAK_COT_PORT }   else { 8089 }

@@ -34,6 +34,19 @@
     and is always deleted in AfterAll, even on test failure.
 #>
 
+# BeforeDiscovery runs before Pester evaluates -Skip:() on each It block.
+# This is the correct Pester 5 mechanism for runtime skip conditions.
+BeforeDiscovery {
+    $script:SkipAll = if ([string]::IsNullOrWhiteSpace($env:TAK_INTEGRATION_HOST)) {
+        'TAK_INTEGRATION_HOST is not set — skipping group management tests'
+    } elseif (-not (Test-Path (Join-Path $PSScriptRoot '..', '..', 'certs', 'admin.p12')) -and
+              [string]::IsNullOrWhiteSpace($env:TAK_API_USER)) {
+        'No auth available: admin.p12 not found and TAK_API_USER not set'
+    } else {
+        $null
+    }
+}
+
 BeforeAll {
     . (Join-Path $PSScriptRoot 'Helpers.ps1')
 
@@ -104,20 +117,11 @@ AfterAll {
     Remove-Module 'TAKServer' -Force -ErrorAction SilentlyContinue
 }
 
-# File-level BeforeEach: skip every It when $script:Skip is set.
-# Required because -Skip:($null -ne $script:Skip) evaluates at Pester 5 discovery time
-# (before BeforeAll has run), so the variable is always $null at that point.
-BeforeEach {
-    if ($null -ne $script:Skip) {
-        Set-ItResult -Skipped -Because $script:Skip
-    }
-}
-
 # ── Connection guard ──────────────────────────────────────────────────────────
 
 Describe 'Group Management — Connection' -Tag 'Integration', 'API', 'GroupManagement' {
 
-    It 'active TAKServer session is available for group tests' -Skip:($null -ne $script:Skip) {
+    It 'active TAKServer session is available for group tests' -Skip:($null -ne $script:SkipAll) {
         $script:Session | Should -Not -BeNullOrEmpty
     }
 }
@@ -126,19 +130,19 @@ Describe 'Group Management — Connection' -Tag 'Integration', 'API', 'GroupMana
 
 Describe 'Get-TAKGroup — List Available Groups' -Tag 'Integration', 'API', 'GroupManagement' {
 
-    It 'Get-TAKGroup returns a non-empty list' -Skip:($null -ne $script:Skip) {
+    It 'Get-TAKGroup returns a non-empty list' -Skip:($null -ne $script:SkipAll) {
         $groups = Get-TAKGroup
         $groups | Should -Not -BeNullOrEmpty `
             -Because 'TAK Server must have at least the default groups configured'
     }
 
-    It 'group list contains at least one entry with a Name property' -Skip:($null -ne $script:Skip) {
+    It 'group list contains at least one entry with a Name property' -Skip:($null -ne $script:SkipAll) {
         $groups = Get-TAKGroup
         ($groups | Select-Object -First 1).PSObject.Properties.Name | Should -Contain 'name' `
             -Because 'group objects must have a name field'
     }
 
-    It "group list includes the test group '$($script:TestGroup)'" -Skip:($null -ne $script:Skip) {
+    It "group list includes the test group '$($script:TestGroup)'" -Skip:($null -ne $script:SkipAll) {
         $groups = Get-TAKGroup
         $groups.name | Should -Contain $script:TestGroup `
             -Because "the '$($script:TestGroup)' group must exist on the server before assignment"
@@ -150,7 +154,7 @@ Describe 'Get-TAKGroup — List Available Groups' -Tag 'Integration', 'API', 'Gr
 Describe 'Set-TAKUserGroup — Bidirectional Assignment' -Tag 'Integration', 'API', 'GroupManagement' {
 
     It "assigns '$($script:TestGroup)' as a bidirectional group to the test user without error" `
-        -Skip:($null -ne $script:Skip) {
+        -Skip:($null -ne $script:SkipAll) {
 
         {
             Set-TAKUserGroup `
@@ -161,7 +165,7 @@ Describe 'Set-TAKUserGroup — Bidirectional Assignment' -Tag 'Integration', 'AP
     }
 
     It 'test user appears in the group member list after bidirectional assignment' `
-        -Skip:($null -ne $script:Skip) {
+        -Skip:($null -ne $script:SkipAll) {
 
         # Allow a short settle time for the server to index the group change
         Start-Sleep -Milliseconds 500
@@ -177,7 +181,7 @@ Describe 'Set-TAKUserGroup — Bidirectional Assignment' -Tag 'Integration', 'AP
 
 Describe 'Set-TAKUserGroup — Inbound and Outbound Split Assignment' -Tag 'Integration', 'API', 'GroupManagement' {
 
-    It 'assigns inbound-only group membership without error' -Skip:($null -ne $script:Skip) {
+    It 'assigns inbound-only group membership without error' -Skip:($null -ne $script:SkipAll) {
         {
             Set-TAKUserGroup `
                 -UserName $script:TestUser `
@@ -186,7 +190,7 @@ Describe 'Set-TAKUserGroup — Inbound and Outbound Split Assignment' -Tag 'Inte
         } | Should -Not -Throw
     }
 
-    It 'assigns outbound-only group membership without error' -Skip:($null -ne $script:Skip) {
+    It 'assigns outbound-only group membership without error' -Skip:($null -ne $script:SkipAll) {
         {
             Set-TAKUserGroup `
                 -UserName $script:TestUser `
@@ -195,7 +199,7 @@ Describe 'Set-TAKUserGroup — Inbound and Outbound Split Assignment' -Tag 'Inte
         } | Should -Not -Throw
     }
 
-    It 'assigns combined inbound+outbound group membership without error' -Skip:($null -ne $script:Skip) {
+    It 'assigns combined inbound+outbound group membership without error' -Skip:($null -ne $script:SkipAll) {
         {
             Set-TAKUserGroup `
                 -UserName $script:TestUser `
@@ -210,7 +214,7 @@ Describe 'Set-TAKUserGroup — Inbound and Outbound Split Assignment' -Tag 'Inte
 
 Describe 'Set-TAKUserGroup — Idempotency' -Tag 'Integration', 'API', 'GroupManagement' {
 
-    It 'setting the same group twice does not throw an error' -Skip:($null -ne $script:Skip) {
+    It 'setting the same group twice does not throw an error' -Skip:($null -ne $script:SkipAll) {
         {
             Set-TAKUserGroup -UserName $script:TestUser -GroupList $script:TestGroup -Confirm:$false
             Set-TAKUserGroup -UserName $script:TestUser -GroupList $script:TestGroup -Confirm:$false
