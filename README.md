@@ -5,7 +5,7 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 
 **Target platform:** Rocky Linux 9.5 · Hyper-V Gen 2 · TAK Server `5.7-RELEASE8`
 
-**[Full documentation →](https://ryschilder.github.io/DigitalTAK/)** — Getting Started · Deployment Guide · API Reference · Troubleshooting
+**[Full documentation →](https://digitaltak.lukeleigh.com/)** — Getting Started · Deployment Guide · API Reference · Troubleshooting
 
 ---
 
@@ -259,15 +259,15 @@ Full results: [reports/TEST-REPORT.md](reports/TEST-REPORT.md)
 
 ## Documentation
 
-Primary reference: **[https://ryschilder.github.io/DigitalTAK/](https://ryschilder.github.io/DigitalTAK/)**
+Primary reference: **[https://digitaltak.lukeleigh.com/](https://digitaltak.lukeleigh.com/)**
 
 | Page | Description |
-|------|-------------|
-| [Getting Started](https://ryschilder.github.io/DigitalTAK/getting-started) | Prerequisites, repo layout, module installation, CI pipeline |
-| [Deployment Guide](https://ryschilder.github.io/DigitalTAK/deployment) | Step-by-step `Deploy-CivTAK.ps1` guide |
-| [API Reference](https://ryschilder.github.io/DigitalTAK/api-reference) | Complete cmdlet reference — TAKDeploy, TAKInstall, TAKServerPS (53 cmdlets) |
-| [Troubleshooting](https://ryschilder.github.io/DigitalTAK/troubleshooting) | Common failures and fixes |
-| [Configuration Reference](https://ryschilder.github.io/DigitalTAK/config/baseline) | CoreConfig.xml, certificate layout, port inventory, security gaps |
+|------|-----------|
+| [Getting Started](https://digitaltak.lukeleigh.com/getting-started/) | Prerequisites, repo layout, module installation, CI pipeline |
+| [Deployment Guide](https://digitaltak.lukeleigh.com/deployment/) | Step-by-step `Deploy-TAKServer.ps1` guide |
+| [API Reference](https://digitaltak.lukeleigh.com/api-reference/) | Complete cmdlet reference — TAKDeploy, TAKInstall, TAKServerPS (53 cmdlets) |
+| [Troubleshooting](https://digitaltak.lukeleigh.com/troubleshooting/) | Common failures and fixes |
+| [Configuration Reference](https://digitaltak.lukeleigh.com/config/baseline/) | CoreConfig.xml, certificate layout, port inventory, security gaps |
 
 Bundled references (in-repo):
 

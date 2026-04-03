@@ -18,7 +18,7 @@ Fully automated CivTAK deployment and management for Rocky Linux 9.7 on Hyper-V 
 
 DigitalTAK is a complete automation framework for deploying, configuring, and managing a [TAK Server 5.7](https://tak.gov) instance on **Rocky Linux 9.7** running inside a **Hyper-V Gen 2** virtual machine.
 
-A single PowerShell script — `Deploy-CivTAK.ps1` — takes you from zero to a fully running CivTAK instance with certificates, user management, and optional XMPP chat.
+A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to a fully running CivTAK instance with certificates, user management, and optional XMPP chat.
 
 ## Key Capabilities
 
@@ -38,7 +38,7 @@ A single PowerShell script — `Deploy-CivTAK.ps1` — takes you from zero to a 
 | Page | Description |
 |------|-------------|
 | [Getting Started](getting-started) | Prerequisites, repo layout, module installation, CI pipeline |
-| [Deployment Guide](deployment) | Step-by-step `Deploy-CivTAK.ps1` walkthrough with all parameters |
+| [Deployment Guide](deployment) | Step-by-step `Deploy-TAKServer.ps1` walkthrough with all parameters |
 | [API Reference](api-reference) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
 | [Troubleshooting](troubleshooting) | Diagnosis and fixes for common failures |
 | [Configuration Reference](config/baseline) | CoreConfig.xml settings, certificate layout, port inventory |
@@ -47,7 +47,7 @@ A single PowerShell script — `Deploy-CivTAK.ps1` — takes you from zero to a 
 ## Architecture Overview
 
 ```
-Deploy-CivTAK.ps1 (entry point)
+Deploy-TAKServer.ps1 (entry point)
 ├── TAKDeploy/          Hyper-V VM orchestration (3 cmdlets)
 ├── TAKInstall/         Remote SSH provisioning (6 cmdlets)
 │   └── InstallShellScripts/   Bash scripts that run on Rocky Linux

@@ -71,7 +71,7 @@ Agents only work on tasks assigned to them. They do not pick up unassigned work.
 If you want the Founding Engineer to modify default deployment parameters (e.g., change the default VM name, adjust resource sizes, or update the default ISO path), create a task and assign it to the Founding Engineer:
 
 1. Open [Paperclip](https://paperclip.ing) and navigate to the DigitalTAK project
-2. Create a new task with a clear description of the change (e.g., *"Change default VHDSizeBytes to 120GB in Deploy-CivTAK.ps1"*)
+2. Create a new task with a clear description of the change (e.g., *"Change default VHDSizeBytes to 120GB in Deploy-TAKServer.ps1"*)
 3. Assign it to the **Founding Engineer** agent
 4. The agent will pick it up, make the change, commit to `prod`, and mark the task done
 

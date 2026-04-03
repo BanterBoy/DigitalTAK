@@ -26,7 +26,7 @@ DigitalTAK provides three PowerShell modules that layer from infrastructure to a
 |--------|---------|-------|---------|
 | **TAKDeploy** | 3 | Hyper-V VM orchestration | PowerShell 7+, Hyper-V |
 | **TAKInstall** | 6 | Remote SSH provisioning | PowerShell 7+, Posh-SSH |
-| **TAKServerPS** | 42 | TAK Server REST API | PowerShell 7+, running TAK Server |
+| **TAKServerPS** | 44 | TAK Server REST API | PowerShell 7+, running TAK Server |
 
 ---
 
@@ -45,17 +45,17 @@ Creates a Hyper-V Gen 2 VM and delivers a Rocky Linux kickstart via an OEMDRV VH
 New-TAKVirtualMachine `
     -VMName      'CivTAK' `
     -SwitchName  'ExternalSwitch' `
-    -IsoPath     'C:\ISO\Rocky-9.5-x86_64-dvd.iso' `
-    -VHDPath     'C:\Hyper-V\CivTAK\CivTAK.vhdx' `
-    -VHDSizeBytes 80GB `
-    -MemoryBytes  8GB
+    -IsoPath     'C:\ISO\Rocky-9.7-x86_64-dvd.iso' `
+    -VMPath      'C:\Hyper-V\VMs\CivTAK' `
+    -VHDSizeGB    80 `
+    -MemoryStartupBytes 8GB
 ```
 
 #### `Wait-TAKLinuxInstall`
 Polls the VM until the Rocky Linux unattended installation completes and SSH becomes available.
 
 ```powershell
-Wait-TAKLinuxInstall -VMName 'CivTAK' -IPAddress '10.0.0.10' -TimeoutSeconds 900
+Wait-TAKLinuxInstall -VMName 'CivTAK' -TimeoutSeconds 900
 ```
 
 #### `Start-TAKDeployment`
@@ -79,9 +79,9 @@ Copies the TAK Server RPM to the remote host and installs it via the `RL9_tak5.7
 $session = New-SSHSession -ComputerName '10.0.0.10' -Credential $cred -AcceptKey
 
 Install-TAKServer `
-    -SSHSession  $session `
+    -SshSession  $session `
     -RpmPath     'C:\TAK\takserver-5.7-RELEASE8.noarch.rpm' `
-    -RootPassword $rootPw
+    -Credential  $cred
 ```
 
 #### `New-TAKServerCertificate`
@@ -89,7 +89,7 @@ Creates a certificate authority, server certificate, and client certificates. Pa
 
 ```powershell
 New-TAKServerCertificate `
-    -SSHSession        $session `
+    -SshSession        $session `
     -KeystorePassword  $ksPw `
     -State             'TX' `
     -City              'AUSTIN' `
@@ -102,38 +102,40 @@ New-TAKServerCertificate `
 Promotes the generated `admin.pem` to TAK Server administrator role.
 
 ```powershell
-Set-TAKAdminCertificate -SSHSession $session -KeystorePassword $ksPw
+Set-TAKAdminCertificate -SshSession $session
 ```
 
 #### `Install-TAKOpenfire`
 Installs and configures Openfire XMPP server with TAK Chat integration.
 
 ```powershell
-Install-TAKOpenfire -SSHSession $session
+Install-TAKOpenfire -SshSession $session
 ```
 
 #### `New-TAKLetsEncryptCertificate`
 Issues a Let's Encrypt certificate via Certbot. Requires a public DNS record and port 80 open.
 
 ```powershell
+$pass = Read-Host -AsSecureString 'Keystore password'
 New-TAKLetsEncryptCertificate `
-    -SSHSession $session `
-    -Domain     'tak.example.com' `
-    -Email      'admin@example.com'
+    -SshSession         $session `
+    -DomainName         'tak.example.com' `
+    -KeystorePassword   $pass `
+    -RenewalScriptPath  '.\InstallShellScripts\takserver_renewLECerts.sh'
 ```
 
 #### `Update-TAKLetsEncryptCertificate`
 Renews an existing Let's Encrypt certificate. Suitable for use in a scheduled task.
 
 ```powershell
-Update-TAKLetsEncryptCertificate -SSHSession $session -Domain 'tak.example.com'
+Update-TAKLetsEncryptCertificate -SshSession $session
 ```
 
 ---
 
 ## TAKServerPS
 
-REST API wrapper for TAK Server 5.7. Provides 42 cmdlets covering all major TAK Server API endpoints.
+REST API wrapper for TAK Server 5.7. Provides 44 cmdlets covering all major TAK Server API endpoints.
 
 **Import:** `Import-Module ./TAKServerPS`
 
@@ -143,17 +145,15 @@ REST API wrapper for TAK Server 5.7. Provides 42 cmdlets covering all major TAK 
 Establishes an authenticated session to TAK Server. Stores the session in module state.
 
 ```powershell
-# Username/password auth
-Connect-TAKServer -HostName '10.0.0.10' -Credential (Get-Credential) -SkipCertificateCheck
+# PFX file (recommended)
+Connect-TAKServer -HostName '10.0.0.10' -PfxPath '.\admin.p12' -PfxPassword $pw -SkipCertificateCheck $true
 
-# With a non-default port
-Connect-TAKServer -HostName '10.0.0.10' -Port 8443 -Credential (Get-Credential) -SkipCertificateCheck
+# Credential auth
+Connect-TAKServer -HostName '10.0.0.10' -Port 8443 -Credential (Get-Credential) -SkipCertificateCheck $true
 
-# Certificate auth
-Connect-TAKServer -HostName '10.0.0.10' -CertificatePath '.\admin.p12' -CertificatePassword $pw -SkipCertificateCheck
-
-# PFX auth
-Connect-TAKServer -HostName '10.0.0.10' -PfxPath '.\admin.pfx' -PfxPassword $pw -SkipCertificateCheck
+# Certificate object
+$cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new('admin.p12', $pw)
+Connect-TAKServer -HostName '10.0.0.10' -Certificate $cert -SkipCertificateCheck $true
 ```
 
 {: .note }
@@ -321,7 +321,7 @@ Every `.sh` file has a byte-identical `.txt` mirror in `TXTScripts/`. This is en
 
 ## Integration Tests
 
-End-to-end Pester tests in `IntegrationTests/`. Require a live TAK Server at `$env:TAK_INTEGRATION_HOST`.
+End-to-end Pester tests run via `Invoke-IntegrationTests.ps1`. Require a live TAK Server at `$env:TAK_INTEGRATION_HOST`.
 
 | Test File | What It Tests |
 |-----------|--------------|

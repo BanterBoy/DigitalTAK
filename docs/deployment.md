@@ -202,8 +202,8 @@ After deployment, you can add XMPP chat support via Openfire using the TAKInstal
 Import-Module ./TAKInstall
 
 $session = New-SSHSession -ComputerName <VM-IP> -Credential $cred -AcceptKey
-Install-TAKOpenfire -SSHSession $session
-Remove-SSHSession -SSHSession $session
+Install-TAKOpenfire -SshSession $session
+Remove-SSHSession -SessionId $session.SessionId
 ```
 
 ---
@@ -216,8 +216,13 @@ To replace the self-signed certificate with a publicly trusted cert:
 Import-Module ./TAKInstall
 
 $session = New-SSHSession -ComputerName <VM-IP> -Credential $cred -AcceptKey
-New-TAKLetsEncryptCertificate -SSHSession $session -Domain 'tak.example.com' -Email 'admin@example.com'
-Remove-SSHSession -SSHSession $session
+$ksPw = Read-Host -AsSecureString 'Keystore password'
+New-TAKLetsEncryptCertificate `
+    -SshSession        $session `
+    -DomainName        'tak.example.com' `
+    -KeystorePassword  $ksPw `
+    -RenewalScriptPath '.\InstallShellScripts\takserver_renewLECerts.sh'
+Remove-SSHSession -SessionId $session.SessionId
 ```
 
 {: .warning }

@@ -62,7 +62,7 @@ cd DigitalTAK
 
 ```
 DigitalTAK/
-├── Deploy-CivTAK.ps1           # Main entry point — full automated deployment
+├── Deploy-TAKServer.ps1        # Main entry point — full automated deployment
 ├── Invoke-TAKRollback.ps1      # Roll back to a deployment phase snapshot
 ├── Remove-CivTAK.ps1           # Tear down and clean up everything
 ├── Invoke-IntegrationTests.ps1 # Run end-to-end integration tests
@@ -75,7 +75,6 @@ DigitalTAK/
 ├── InstallShellScripts/        # Bash scripts executed on the Rocky Linux guest
 ├── TXTScripts/                 # Byte-identical .txt mirrors of all .sh files
 │
-├── IntegrationTests/           # End-to-end Pester tests (requires live host)
 ├── Documentation/              # TAK Server PDF and Markdown guides
 ├── docs/                       # This documentation site
 └── .github/workflows/          # GitHub Actions CI/CD pipelines
@@ -93,13 +92,13 @@ Invoke-Pester ./TAKServerPS/Tests/ -Output Detailed
 Invoke-Pester ./TAKInstall/Tests/ -Output Detailed
 ```
 
-Expected output: **173 tests, all passing**.
+Expected output: **179 tests, all passing**.
 
 ### What the tests cover
 
 | Module | Tests | Coverage |
 |---|---|---|
-| TAKServerPS | 103 | Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets |
+| TAKServerPS | 109 | Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets |
 | TAKInstall | 70 | Module manifest, 6-function inventory, bash escaping, SSH execution, service polling |
 
 ---
@@ -110,7 +109,7 @@ Every push to `prod` and all pull requests run the full CI pipeline via GitHub A
 
 | Job | Tool | What it checks |
 |---|---|---|
-| **Pester** | PowerShell | 173 unit tests across TAKServerPS + TAKInstall |
+| **Pester** | PowerShell | 179 unit tests across TAKServerPS + TAKInstall |
 | **PSScriptAnalyzer** | PowerShell | Code quality and best practices |
 | **ShellCheck** | Bash | Shell script linting (severity: warning) |
 | **TXT Sync** | Bash | .txt mirrors byte-identical to .sh files |

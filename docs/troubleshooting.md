@@ -65,7 +65,7 @@ In Hyper-V Manager → Settings → SCSI Controller, remove the DVD drive or mov
 
 ---
 
-### Symptom: `Deploy-CivTAK.ps1` fails at Phase 1 with "No External virtual switch found"
+### Symptom: `Deploy-TAKServer.ps1` fails at Phase 1 with "No External virtual switch found"
 
 **Cause:** No External Hyper-V switch exists, and auto-creation failed (no active physical NIC).
 
@@ -78,7 +78,8 @@ Get-NetAdapter | Where-Object Status -eq 'Up'
 New-VMSwitch -Name 'ExternalSwitch' -NetAdapterName 'Ethernet' -AllowManagementOS $true
 
 # Re-run the deployment
-.\Deploy-CivTAK.ps1 -SwitchName 'ExternalSwitch' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+$certPw = Read-Host -AsSecureString 'Certificate password'
+.\Deploy-TAKServer.ps1 -SwitchName 'ExternalSwitch' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 ```
 
 ---
@@ -106,7 +107,8 @@ New-VMSwitch -Name 'ExternalSwitch' -NetAdapterName 'Ethernet' -AllowManagementO
 - If port 22 is unreachable, verify the guest firewall: `sudo firewall-cmd --list-all`.
 - Extend the SSH timeout when re-running:
   ```powershell
-  .\Deploy-CivTAK.ps1 -SSHTimeoutSeconds 1800 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+  $certPw = Read-Host -AsSecureString 'Certificate password'
+  .\Deploy-TAKServer.ps1 -SSHTimeoutSeconds 1800 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
   ```
 
 ---
@@ -508,21 +510,22 @@ Get-TAKVersion   # Should return the server version string
 
 ## Deployment Resume / Snapshot Issues
 
-### Symptom: Re-running `Deploy-CivTAK.ps1` does not resume from the last checkpoint
+### Symptom: Re-running `Deploy-TAKServer.ps1` does not resume from the last checkpoint
 
 **Cause:** The expected snapshot names (`Phase0-RockyInstalled`, `Phase2-TAKInstalled`, `Phase4-CertsAndAdmin`) are missing, renamed, or the wrong VM name is being used.
 
 **Diagnosis:**
 ```powershell
 # List all snapshots for the VM
-Get-VMSnapshot -VMName 'CivTAK' | Select-Object Name, CreationTime
+Get-VMSnapshot -VMName 'TAKServer' | Select-Object Name, CreationTime
 ```
 
 **Resolution:**
 - If the snapshot names differ from the expected values, you can rename them in Hyper-V Manager, or use `-DisableSnapshotResume` to force a fresh run from Phase 0.
 - If the VM was renamed, pass the `-VMName` parameter explicitly:
   ```powershell
-  .\Deploy-CivTAK.ps1 -VMName 'CivTAK-Prod' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+  $certPw = Read-Host -AsSecureString 'Certificate password'
+  .\Deploy-TAKServer.ps1 -VMName 'TAKServer-Prod' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
   ```
 
 ---
@@ -533,9 +536,9 @@ Get-VMSnapshot -VMName 'CivTAK' | Select-Object Name, CreationTime
 
 **Resolution:** Always shut down the VM cleanly before rolling back:
 ```powershell
-Stop-VM -Name 'CivTAK' -Force
-.\Invoke-TAKRollback.ps1 -VMName 'CivTAK' -SnapshotName 'Phase2-TAKInstalled'
-Start-VM -Name 'CivTAK'
+Stop-VM -Name 'TAKServer' -Force
+.\Invoke-TAKRollback.ps1 -VMName 'TAKServer' -SnapshotName 'Phase2-TAKInstalled'
+Start-VM -Name 'TAKServer'
 ```
 
 ---
@@ -552,8 +555,8 @@ $PSVersionTable
 (Get-Module TAKServerPS).Version
 
 # Hyper-V VM state
-Get-VM -Name 'CivTAK' | Select-Object Name, State, MemoryAssigned, ProcessorCount
-Get-VMSnapshot -VMName 'CivTAK' | Select-Object Name, CreationTime
+Get-VM -Name 'TAKServer' | Select-Object Name, State, MemoryAssigned, ProcessorCount
+Get-VMSnapshot -VMName 'TAKServer' | Select-Object Name, CreationTime
 ```
 
 On the guest (via SSH):
