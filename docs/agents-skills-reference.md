@@ -59,7 +59,7 @@ Wait-TAKLinuxInstall -VMName 'CivTAK' -IPAddress '10.0.0.10' -TimeoutSeconds 900
 ```
 
 #### `Start-TAKDeployment`
-Reserved internal scaffolding. `Deploy-CivTAK.ps1` invokes `Assert-HyperVPrerequisites`, `New-TAKVirtualMachine`, and `Wait-TAKLinuxInstall` directly and does not call this cmdlet.
+Reserved internal scaffolding. `Deploy-TAKServer.ps1` calls `New-TAKVirtualMachine` and `Wait-TAKLinuxInstall` directly and does not use this cmdlet.
 
 ---
 
@@ -310,11 +310,10 @@ Every `.sh` file has a byte-identical `.txt` mirror in `TXTScripts/`. This is en
 
 | Script | Description |
 |--------|-------------|
-| `Deploy-CivTAK.ps1` | Main entry point — full zero-to-running CivTAK deployment |
+| `Deploy-TAKServer.ps1` | Main entry point — full zero-to-running CivTAK deployment |
 | `Invoke-TAKRollback.ps1` | Roll back VM to a phase snapshot |
 | `Remove-CivTAK.ps1` | Tear down VM, VHDX, certs, and Windows certificate store entries |
 | `Invoke-IntegrationTests.ps1` | Run end-to-end integration tests (requires live `TAK_INTEGRATION_HOST`) |
-| `Deploy-TAKServer.ps1` | Legacy general-purpose deployment (maintained but not the primary path) |
 | `Deploy-TAKTestServer.ps1` | Test deployment wrapper |
 | `Sync-TXTMirrors.ps1` | Sync `.txt` mirrors of all `.sh` files |
 

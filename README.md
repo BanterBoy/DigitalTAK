@@ -5,7 +5,7 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 
 **Target platform:** Rocky Linux 9.5 · Hyper-V Gen 2 · TAK Server `5.7-RELEASE8`
 
-**[Full documentation →](https://ryschilder.github.io/DigitalTAK/)**
+**[Full documentation →](https://ryschilder.github.io/DigitalTAK/)** — Getting Started · Deployment Guide · API Reference · Troubleshooting
 
 ---
 
@@ -259,9 +259,20 @@ Full results: [reports/TEST-REPORT.md](reports/TEST-REPORT.md)
 
 ## Documentation
 
+Primary reference: **[https://ryschilder.github.io/DigitalTAK/](https://ryschilder.github.io/DigitalTAK/)**
+
+| Page | Description |
+|------|-------------|
+| [Getting Started](https://ryschilder.github.io/DigitalTAK/getting-started) | Prerequisites, repo layout, module installation, CI pipeline |
+| [Deployment Guide](https://ryschilder.github.io/DigitalTAK/deployment) | Step-by-step `Deploy-CivTAK.ps1` guide |
+| [API Reference](https://ryschilder.github.io/DigitalTAK/api-reference) | Complete cmdlet reference — TAKDeploy, TAKInstall, TAKServerPS (53 cmdlets) |
+| [Troubleshooting](https://ryschilder.github.io/DigitalTAK/troubleshooting) | Common failures and fixes |
+| [Configuration Reference](https://ryschilder.github.io/DigitalTAK/config/baseline) | CoreConfig.xml, certificate layout, port inventory, security gaps |
+
+Bundled references (in-repo):
+
 | File | Description |
 |------|-------------|
-| [Wiki](https://github.com/BanterBoy/DigitalTAK/wiki) | GitHub Wiki — deployment, TAKInstall, TAKServerPS, shell scripts, ports, testing |
 | `Documentation/TAK_Server_Configuration_Guide_5.7.pdf` | Official TAK Server 5.7 configuration guide |
 | `Documentation/Federation_Hub_Configuration_Guide.pdf` | Federation Hub configuration and setup guide |
 | `channels.zip` | ATAK client data package — distribute to devices via TAK Server data packages |

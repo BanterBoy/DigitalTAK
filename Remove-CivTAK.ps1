@@ -36,12 +36,26 @@
     PSCredential for the Linux admin user.  Required when -UninstallGuest is set.
 
 .PARAMETER Organization
-    Organization string used to identify TAK certificates in the Windows store.
-    Used to scope which certs are removed. Defaults to 'TAK'.
+    Organization string used to scope TAK certificate removal from the Windows
+    certificate store.  Must match the value supplied to -Organization when the
+    certificates were created (e.g. 'LEIGH-SERVICES').  Defaults to 'TAK'.
+    Used as a fallback; the primary match is done by -CAName and the known TAK
+    intermediate-ca CN so that all three installed certs (root CA, intermediate
+    CA, and admin) are removed correctly.
+
+.PARAMETER CAName
+    Name of the Root Certificate Authority used during deployment.  Must match
+    the -CAName value supplied to Deploy-TAKServer.ps1 / New-TAKServerCertificate.
+    Defaults to 'TAK-CA'.  Used to identify the root CA cert in the Windows store
+    and to find intermediate/admin certs via their Issuer field.
 
 .EXAMPLE
     # Destroy the VM and remove all local artefacts:
     .\Remove-CivTAK.ps1
+
+.EXAMPLE
+    # Remove with a custom org/CA name matching deployment parameters:
+    .\Remove-CivTAK.ps1 -Organization 'LEIGH-SERVICES' -CAName 'TAK-CA'
 
 .EXAMPLE
     # Clean uninstall from guest before VM destruction:
@@ -59,7 +73,8 @@ param (
     [string]       $VHDPath      = '',
     [switch]       $UninstallGuest,
     [PSCredential] $Credential,
-    [string]       $Organization = 'TAK'
+    [string]       $Organization = 'TAK',
+    [string]       $CAName       = 'TAK-CA'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -211,11 +226,25 @@ else {
 Write-Host ''
 Write-Host '── Step 5: Removing TAK certificates from Windows store ──' -ForegroundColor Magenta
 
+# Matches the three certs that Deploy-TAKServer.ps1 imports:
+#   - Root CA       (CN=<CAName>, …)                     → Subject matches $CAName
+#   - Intermediate CA (CN=intermediate-ca, Issuer=<CAName>) → Issuer matches $CAName  or Subject matches 'CN=intermediate-ca'
+#   - Admin cert    (CN=admin, Issuer=intermediate-ca)   → Issuer matches 'CN=intermediate-ca'
+# The $Organization fallback catches any remaining TAK-org certs when the above patterns do not.
+$caNameEsc  = [regex]::Escape($CAName)
+$orgEsc     = [regex]::Escape($Organization)
+
 $removedCount = 0
 foreach ($storeName in @('Root', 'My')) {
     $storePath = "Cert:\CurrentUser\$storeName"
     $takCerts  = Get-ChildItem -Path $storePath -ErrorAction SilentlyContinue |
-        Where-Object { $_.Subject -match 'O=' -and ($_.Subject -match [regex]::Escape($Organization) -or $_.Subject -match 'TAK-CA') }
+        Where-Object {
+            $_.Subject -match $caNameEsc -or
+            $_.Issuer  -match $caNameEsc -or
+            $_.Subject -match 'CN=intermediate-ca' -or
+            $_.Issuer  -match 'CN=intermediate-ca' -or
+            ($_.Subject -match 'O=' -and $_.Subject -match $orgEsc)
+        }
 
     foreach ($cert in $takCerts) {
         Remove-Item -Path $cert.PSPath -Force

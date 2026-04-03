@@ -5,7 +5,7 @@
     Runs the DigitalTAK integration test suite against a live TAK Server deployment.
 
 .DESCRIPTION
-    Executes all integration tests in the IntegrationTests/ directory.
+    Executes all integration tests in the tests/integration/ directory.
     Tests are skipped automatically if the required environment variables are
     not set, so this script is safe to run in any environment.
 
@@ -21,7 +21,7 @@
         TAK_SSH_USER          - SSH username (default: atak)
         TAK_SSH_PASS          - SSH password (plain text — use only in secure environments)
         TAK_VM_NAME           - Hyper-V VM name for VM-level tests (default: TAKServer)
-        TAK_CERT_PASS         - PKCS#12 certificate password (default: atakatak)
+        TAK_CERT_PASS         - PKCS#12 certificate password (required — no default)
         TAK_API_PORT          - TAK Server HTTPS port (default: 8443)
         TAK_ENROLL_PORT       - Certificate enrollment port (default: 8446)
         TAK_COT_PORT          - CoT TCP port (default: 8089)
@@ -65,11 +65,16 @@
 param (
     [string[]] $Tags,
     [string[]] $ExcludeTags,
-    [string]   $OutputPath = (Join-Path $PSScriptRoot 'reports' 'TestResults-Integration.xml'),
+    [string]   $OutputPath,
     [switch]   $PassThru
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Resolve default output path here rather than in the param default so that
+# Join-Path works correctly when $PSScriptRoot is empty (e.g. pwsh -Command).
+$_root = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
+if (-not $OutputPath) { $OutputPath = Join-Path $_root 'reports' 'TestResults-Integration.xml' }
 
 # ── Prerequisites check ───────────────────────────────────────────────────────
 
@@ -96,7 +101,7 @@ if ([string]::IsNullOrWhiteSpace($host_)) {
 }
 
 # Ensure reports directory exists
-$reportsDir = Join-Path $PSScriptRoot 'reports'
+$reportsDir = Join-Path $_root 'reports'
 if (-not (Test-Path $reportsDir)) {
     New-Item -Path $reportsDir -ItemType Directory -Force | Out-Null
 }
@@ -105,8 +110,9 @@ if (-not (Test-Path $reportsDir)) {
 
 $config = New-PesterConfiguration
 
-$config.Run.Path            = Join-Path $PSScriptRoot 'IntegrationTests'
+$config.Run.Path            = Join-Path $_root 'tests' 'integration'
 $config.Run.Exit            = $false   # Do not exit process — caller handles this
+$config.Run.PassThru        = $true    # PassThru must be set in config, not on Invoke-Pester -Configuration
 $config.Output.Verbosity    = 'Detailed'
 $config.TestResult.Enabled      = $true
 $config.TestResult.OutputPath   = $OutputPath
@@ -122,7 +128,7 @@ if ($ExcludeTags) {
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 
-$result = Invoke-Pester -Configuration $config -Passthru
+$result = Invoke-Pester -Configuration $config
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 

@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="52" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-04-02" time="15:04:59">
+  <environment platform="Microsoft Windows 11 Pro|C:\Windows|\Device\Harddisk0\Partition3" clr-version="10.0.5" nunit-version="2.5.8.0" user="LukeLeigh" machine-name="LUKE" user-domain="AzureAD" cwd="C:\Users\LukeLeigh\DigitalTAK" os-version="10.0.26200" />
+  <culture-info current-culture="en-GB" current-uiculture="en-GB" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="8.0111" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\New-TAKVirtualMachine.Tests.ps1" executed="True" result="Success" success="True" time="1.9067" asserts="0" description="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\New-TAKVirtualMachine.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-TAKVirtualMachine" executed="True" result="Success" success="True" time="1.3557" asserts="0" description="New-TAKVirtualMachine">
+            <results>
+              <test-suite type="TestFixture" name="New-TAKVirtualMachine.when prerequisites are met" executed="True" result="Success" success="True" time="0.7728" asserts="0" description="New-TAKVirtualMachine.when prerequisites are met">
+                <results>
+                  <test-case description="calls New-VM with the correct VM name" name="New-TAKVirtualMachine.when prerequisites are met.calls New-VM with the correct VM name" time="0.3576" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="sets processor count" name="New-TAKVirtualMachine.when prerequisites are met.sets processor count" time="0.0635" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="disables dynamic memory" name="New-TAKVirtualMachine.when prerequisites are met.disables dynamic memory" time="0.0594" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="sets Secure Boot to MicrosoftUEFICertificateAuthority" name="New-TAKVirtualMachine.when prerequisites are met.sets Secure Boot to MicrosoftUEFICertificateAuthority" time="0.0644" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="attaches the ISO as a DVD drive" name="New-TAKVirtualMachine.when prerequisites are met.attaches the ISO as a DVD drive" time="0.0437" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="enables Guest Service Interface" name="New-TAKVirtualMachine.when prerequisites are met.enables Guest Service Interface" time="0.0427" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="starts the VM" name="New-TAKVirtualMachine.when prerequisites are met.starts the VM" time="0.0576" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="returns the VM object" name="New-TAKVirtualMachine.when prerequisites are met.returns the VM object" time="0.065" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="New-TAKVirtualMachine.when -WhatIf is used" executed="True" result="Success" success="True" time="0.8178" asserts="0" description="New-TAKVirtualMachine.when -WhatIf is used">
+                <results>
+                  <test-case description="does not call New-VM" name="New-TAKVirtualMachine.when -WhatIf is used.does not call New-VM" time="0.0399" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="New-TAKVirtualMachine.when no External vSwitch exists" executed="True" result="Success" success="True" time="1.2475" asserts="0" description="New-TAKVirtualMachine.when no External vSwitch exists">
+                <results>
+                  <test-case description="creates a new External vSwitch and proceeds" name="New-TAKVirtualMachine.when no External vSwitch exists.creates a new External vSwitch and proceeds" time="0.4256" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="New-TAKVirtualMachine.parameter validation" executed="True" result="Success" success="True" time="1.3463" asserts="0" description="New-TAKVirtualMachine.parameter validation">
+                <results>
+                  <test-case description="rejects VHDSizeGB below 20" name="New-TAKVirtualMachine.parameter validation.rejects VHDSizeGB below 20" time="0.0564" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects ProcessorCount of 0" name="New-TAKVirtualMachine.parameter validation.rejects ProcessorCount of 0" time="0.0364" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\Start-TAKDeployment.Tests.ps1" executed="True" result="Success" success="True" time="1.4805" asserts="0" description="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\Start-TAKDeployment.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Start-TAKDeployment" executed="True" result="Success" success="True" time="1.4321" asserts="0" description="Start-TAKDeployment">
+            <results>
+              <test-suite type="TestFixture" name="Start-TAKDeployment.when -WhatIf is specified" executed="True" result="Success" success="True" time="0.0853" asserts="0" description="Start-TAKDeployment.when -WhatIf is specified">
+                <results>
+                  <test-case description="does not call Get-TAKDeploymentConfig" name="Start-TAKDeployment.when -WhatIf is specified.does not call Get-TAKDeploymentConfig" time="0.0496" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="does not call Assert-HyperVPrerequisites" name="Start-TAKDeployment.when -WhatIf is specified.does not call Assert-HyperVPrerequisites" time="0.0321" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used" executed="True" result="Success" success="True" time="1.0967" asserts="0" description="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used">
+                <results>
+                  <test-case description="does not call New-TAKVirtualMachine" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.does not call New-TAKVirtualMachine" time="0.1358" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="calls Assert-HyperVPrerequisites exactly once" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.calls Assert-HyperVPrerequisites exactly once" time="0.0781" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="calls Install-TAKServer during Phase 2a" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.calls Install-TAKServer during Phase 2a" time="0.1622" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="calls New-TAKServerCertificate during Phase 2b" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.calls New-TAKServerCertificate during Phase 2b" time="0.2113" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="calls Set-TAKAdminCertificate during Phase 2c" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.calls Set-TAKAdminCertificate during Phase 2c" time="0.203" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="closes the SSH session in the finally block" name="Start-TAKDeployment.when prerequisites pass and -SkipVMCreation is used.closes the SSH session in the finally block" time="0.2141" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Start-TAKDeployment.when prerequisites fail" executed="True" result="Success" success="True" time="1.2008" asserts="0" description="Start-TAKDeployment.when prerequisites fail">
+                <results>
+                  <test-case description="throws when -ThrowOnFailure causes Assert-HyperVPrerequisites to throw" name="Start-TAKDeployment.when prerequisites fail.throws when -ThrowOnFailure causes Assert-HyperVPrerequisites to throw" time="0.0947" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Start-TAKDeployment.when Openfire is enabled" executed="True" result="Success" success="True" time="1.4262" asserts="0" description="Start-TAKDeployment.when Openfire is enabled">
+                <results>
+                  <test-case description="calls Install-TAKOpenfire when InstallOpenfire is true" name="Start-TAKDeployment.when Openfire is enabled.calls Install-TAKOpenfire when InstallOpenfire is true" time="0.2168" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\TAKDeploy.Module.Tests.ps1" executed="True" result="Success" success="True" time="3.7574" asserts="0" description="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\TAKDeploy.Module.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="TAKDeploy — Module Manifest" executed="True" result="Success" success="True" time="3.4428" asserts="0" description="TAKDeploy — Module Manifest">
+            <results>
+              <test-case description="passes Test-ModuleManifest without error" name="TAKDeploy — Module Manifest.passes Test-ModuleManifest without error" time="0.4718" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="has PowerShellVersion 7.0" name="TAKDeploy — Module Manifest.has PowerShellVersion 7.0" time="0.5141" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares RootModule as TAKDeploy.psm1" name="TAKDeploy — Module Manifest.declares RootModule as TAKDeploy.psm1" time="0.4682" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="exports exactly 3 functions in the manifest" name="TAKDeploy — Module Manifest.exports exactly 3 functions in the manifest" time="0.5238" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the Posh-SSH module" name="TAKDeploy — Module Manifest.requires the Posh-SSH module" time="0.4788" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the Hyper-V module" name="TAKDeploy — Module Manifest.requires the Hyper-V module" time="0.4729" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="declares a non-empty Author" name="TAKDeploy — Module Manifest.declares a non-empty Author" time="0.5044" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKDeploy — Module Import and Exports" executed="True" result="Success" success="True" time="3.5942" asserts="0" description="TAKDeploy — Module Import and Exports">
+            <results>
+              <test-case description="module is discoverable after import" name="TAKDeploy — Module Import and Exports.module is discoverable after import" time="0.0145" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="exports exactly 3 commands at runtime" name="TAKDeploy — Module Import and Exports.exports exactly 3 commands at runtime" time="0.0106" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="TAKDeploy — Module Import and Exports.exports &lt;_&gt;" executed="True" result="Success" success="True" time="0.0453" asserts="0" description="exports &lt;_&gt;">
+                <results>
+                  <test-case description="exports New-TAKVirtualMachine" name="TAKDeploy — Module Import and Exports.exports New-TAKVirtualMachine" time="0.024" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Wait-TAKLinuxInstall" name="TAKDeploy — Module Import and Exports.exports Wait-TAKLinuxInstall" time="0.0111" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="exports Start-TAKDeployment" name="TAKDeploy — Module Import and Exports.exports Start-TAKDeployment" time="0.0102" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="ParameterizedTest" name="TAKDeploy — Module Import and Exports.does NOT export private helpers" executed="True" result="Success" success="True" time="0.0347" asserts="0" description="does NOT export private helpers">
+                <results>
+                  <test-case description="does NOT export private helpers" name="TAKDeploy — Module Import and Exports.does NOT export private helpers()" time="0.0177" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="does NOT export private helpers" name="TAKDeploy — Module Import and Exports.does NOT export private helpers()" time="0.0169" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="TAKDeploy — Function Metadata" executed="True" result="Success" success="True" time="3.704" asserts="0" description="TAKDeploy — Function Metadata">
+            <results>
+              <test-case description="all exported functions use [CmdletBinding()]" name="TAKDeploy — Function Metadata.all exported functions use [CmdletBinding()]" time="0.0096" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="New-TAKVirtualMachine has a VMName parameter with default TAKServer" name="TAKDeploy — Function Metadata.New-TAKVirtualMachine has a VMName parameter with default TAKServer" time="0.014" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Wait-TAKLinuxInstall has a TimeoutSeconds parameter" name="TAKDeploy — Function Metadata.Wait-TAKLinuxInstall has a TimeoutSeconds parameter" time="0.0108" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Start-TAKDeployment has a SkipVMCreation switch" name="TAKDeploy — Function Metadata.Start-TAKDeployment has a SkipVMCreation switch" time="0.0155" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="TAKDeploy — Function Metadata.&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)" executed="True" result="Success" success="True" time="0.0338" asserts="0" description="&lt;_&gt; supports -WhatIf and -Confirm (ShouldProcess)">
+                <results>
+                  <test-case description="New-TAKVirtualMachine supports -WhatIf and -Confirm (ShouldProcess)" name="TAKDeploy — Function Metadata.New-TAKVirtualMachine supports -WhatIf and -Confirm (ShouldProcess)" time="0.0186" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Start-TAKDeployment supports -WhatIf and -Confirm (ShouldProcess)" name="TAKDeploy — Function Metadata.Start-TAKDeployment supports -WhatIf and -Confirm (ShouldProcess)" time="0.0152" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\Wait-TAKLinuxInstall.Tests.ps1" executed="True" result="Success" success="True" time="0.8665" asserts="0" description="C:\Users\LukeLeigh\DigitalTAK\TAKDeploy\Tests\Wait-TAKLinuxInstall.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Wait-TAKLinuxInstall" executed="True" result="Success" success="True" time="0.8022" asserts="0" description="Wait-TAKLinuxInstall">
+            <results>
+              <test-suite type="TestFixture" name="Wait-TAKLinuxInstall.when SSH connects on the first attempt" executed="True" result="Success" success="True" time="0.3915" asserts="0" description="Wait-TAKLinuxInstall.when SSH connects on the first attempt">
+                <results>
+                  <test-case description="returns an SSH session object" name="Wait-TAKLinuxInstall.when SSH connects on the first attempt.returns an SSH session object" time="0.1162" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="calls New-SSHSession exactly once on first success" name="Wait-TAKLinuxInstall.when SSH connects on the first attempt.calls New-SSHSession exactly once on first success" time="0.0886" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="uses the Credential parameter to skip Get-Credential prompt" name="Wait-TAKLinuxInstall.when SSH connects on the first attempt.uses the Credential parameter to skip Get-Credential prompt" time="0.0818" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="passes -AcceptKey to New-SSHSession" name="Wait-TAKLinuxInstall.when SSH connects on the first attempt.passes -AcceptKey to New-SSHSession" time="0.0962" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Wait-TAKLinuxInstall.when the VM IP is not auto-detected" executed="True" result="Success" success="True" time="0.4917" asserts="0" description="Wait-TAKLinuxInstall.when the VM IP is not auto-detected">
+                <results>
+                  <test-case description="prompts for IP and still establishes a session" name="Wait-TAKLinuxInstall.when the VM IP is not auto-detected.prompts for IP and still establishes a session" time="0.0933" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Wait-TAKLinuxInstall.when SSH connection fails then succeeds" executed="True" result="Success" success="True" time="0.6416" asserts="0" description="Wait-TAKLinuxInstall.when SSH connection fails then succeeds">
+                <results>
+                  <test-case description="retries and eventually returns a session" name="Wait-TAKLinuxInstall.when SSH connection fails then succeeds.retries and eventually returns a session" time="0.1388" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Wait-TAKLinuxInstall.when the SSH timeout expires with no successful connection" executed="True" result="Success" success="True" time="0.6791" asserts="0" description="Wait-TAKLinuxInstall.when the SSH timeout expires with no successful connection">
+                <results>
+                  <test-case description="throws a terminating error" name="Wait-TAKLinuxInstall.when the SSH timeout expires with no successful connection.throws a terminating error" time="0.0304" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Wait-TAKLinuxInstall.parameter validation" executed="True" result="Success" success="True" time="0.7931" asserts="0" description="Wait-TAKLinuxInstall.parameter validation">
+                <results>
+                  <test-case description="rejects TimeoutSeconds below 30" name="Wait-TAKLinuxInstall.parameter validation.rejects TimeoutSeconds below 30" time="0.032" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects RetryIntervalSeconds below 5" name="Wait-TAKLinuxInstall.parameter validation.rejects RetryIntervalSeconds below 5" time="0.0342" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects a blank VMName" name="Wait-TAKLinuxInstall.parameter validation.rejects a blank VMName" time="0.0378" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
