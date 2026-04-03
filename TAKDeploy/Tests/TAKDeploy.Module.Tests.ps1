@@ -47,12 +47,15 @@ Describe 'TAKDeploy — Module Manifest' {
         $requiredNames | Should -Contain 'Posh-SSH'
     }
 
-    It 'requires the Hyper-V module' {
+    It 'does NOT list Hyper-V as a RequiredModule (Windows-only soft dependency)' {
         $m = Test-ModuleManifest -Path $script:ManifestPath -ErrorAction Stop
         $requiredNames = $m.RequiredModules | ForEach-Object {
             if ($_ -is [string]) { $_ } else { $_.Name }
         }
-        $requiredNames | Should -Contain 'Hyper-V'
+        # Hyper-V is validated at call-time by Assert-HyperVPrerequisites inside
+        # New-TAKVirtualMachine, not as a manifest dependency, so the module loads
+        # on Linux CI runners and non-Hyper-V machines.
+        $requiredNames | Should -Not -Contain 'Hyper-V'
     }
 
     It 'declares a non-empty Author' {

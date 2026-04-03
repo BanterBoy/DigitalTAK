@@ -9,8 +9,12 @@
     Description       = 'Hyper-V deployment and TAK Server provisioning for Rocky Linux 9 VMs.'
     PowerShellVersion = '7.0'
 
-    # Required modules
-    RequiredModules   = @('Posh-SSH', 'Hyper-V')
+    # Posh-SSH is required for SSH session support.
+    # Hyper-V is a Windows-only runtime dependency used by New-TAKVirtualMachine;
+    # it is intentionally omitted from RequiredModules so the module loads on
+    # non-Windows/CI environments. New-TAKVirtualMachine validates availability
+    # at call time via Assert-HyperVPrerequisites.
+    RequiredModules   = @('Posh-SSH')
 
     # Functions to export
     FunctionsToExport = @(
