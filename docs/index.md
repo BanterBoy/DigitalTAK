@@ -11,7 +11,8 @@ Fully automated CivTAK deployment and management for Rocky Linux 9.5 on Hyper-V 
 {: .fs-6 .fw-300 }
 
 [Get Started](getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[Deployment Guide](deployment){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Deployment Guide](deployment){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[API Reference](api-reference){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -33,6 +34,17 @@ A single PowerShell script — `Deploy-CivTAK.ps1` — takes you from zero to a 
 | **Let's Encrypt** | Optional public TLS via Certbot |
 | **Rollback** | Snapshot-based phase rollback |
 | **Teardown** | Full VM + cert cleanup with `Remove-CivTAK.ps1` |
+
+## Documentation
+
+| Page | Description |
+|------|-------------|
+| [Getting Started](getting-started) | Prerequisites, repo layout, module installation, CI pipeline |
+| [Deployment Guide](deployment) | Step-by-step `Deploy-CivTAK.ps1` walkthrough with all parameters |
+| [API Reference](api-reference) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
+| [Troubleshooting](troubleshooting) | Diagnosis and fixes for common failures |
+| [Configuration Reference](config/baseline) | CoreConfig.xml settings, certificate layout, port inventory |
+| [Agent Configuration](agent-configuration) | Managing deployments with AI agents |
 
 ## Architecture Overview
 
