@@ -4,16 +4,15 @@
 
 .DESCRIPTION
     Defines no-op stubs for all Hyper-V PowerShell cmdlets that TAKDeploy calls
-    at runtime. These stubs exist only to allow Pester to create mocks for these
-    commands on platforms where the Hyper-V module is not available (Linux CI
-    runners, non-Windows machines). Each stub's parameters mirror the signature
-    expected by the calling code and tests.
+    at runtime. These stubs are placed in the GLOBAL scope so that Pester's Mock
+    system can discover them via Get-Command, which is required for
+    Mock -ModuleName 'TAKDeploy' -CommandName '<HyperVCmdlet>' to work on Linux
+    CI runners and non-Windows machines where the Hyper-V module is not installed.
 
-    Dot-source this file in BeforeAll *before* importing the TAKDeploy module so
-    that the commands are resolvable when Pester sets up mocks.
+    Dot-source this file in BeforeAll *before* importing the TAKDeploy module.
 #>
 
-function Get-VMSwitch {
+function global:Get-VMSwitch {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $Name,
@@ -21,7 +20,7 @@ function Get-VMSwitch {
     )
 }
 
-function New-VMSwitch {
+function global:New-VMSwitch {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)] [string] $Name,
@@ -30,7 +29,7 @@ function New-VMSwitch {
     )
 }
 
-function New-VM {
+function global:New-VM {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)] [string] $Name,
@@ -44,7 +43,7 @@ function New-VM {
     )
 }
 
-function Set-VM {
+function global:Set-VM {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -55,7 +54,7 @@ function Set-VM {
     )
 }
 
-function Set-VMMemory {
+function global:Set-VMMemory {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -64,7 +63,7 @@ function Set-VMMemory {
     )
 }
 
-function Set-VMFirmware {
+function global:Set-VMFirmware {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -74,7 +73,7 @@ function Set-VMFirmware {
     )
 }
 
-function Add-VMDvdDrive {
+function global:Add-VMDvdDrive {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -83,14 +82,14 @@ function Add-VMDvdDrive {
     )
 }
 
-function Get-VMDvdDrive {
+function global:Get-VMDvdDrive {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName
     )
 }
 
-function Enable-VMIntegrationService {
+function global:Enable-VMIntegrationService {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -99,7 +98,7 @@ function Enable-VMIntegrationService {
     )
 }
 
-function Start-VM {
+function global:Start-VM {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName,
@@ -107,7 +106,7 @@ function Start-VM {
     )
 }
 
-function Get-VMNetworkAdapter {
+function global:Get-VMNetworkAdapter {
     [CmdletBinding()]
     param(
         [Parameter()] [string] $VMName
