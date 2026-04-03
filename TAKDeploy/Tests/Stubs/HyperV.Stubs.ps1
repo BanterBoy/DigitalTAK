@@ -112,3 +112,11 @@ function global:Get-VMNetworkAdapter {
         [Parameter()] [string] $VMName
     )
 }
+
+function global:Get-NetAdapter {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $Name,
+        [Parameter()] [string] $InterfaceDescription
+    )
+}
