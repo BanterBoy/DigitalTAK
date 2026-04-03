@@ -6,6 +6,9 @@
 #>
 
 BeforeAll {
+    # Stub Hyper-V cmdlets so Pester can mock them on Linux / non-Hyper-V machines.
+    . (Join-Path $PSScriptRoot 'Stubs' 'HyperV.Stubs.ps1')
+
     $script:ManifestPath = Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKDeploy.psd1')
 
     $script:ExpectedFunctions = @(

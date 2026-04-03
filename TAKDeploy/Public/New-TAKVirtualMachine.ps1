@@ -59,7 +59,7 @@
 #>
 function New-TAKVirtualMachine {
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
-    [OutputType([Microsoft.HyperV.PowerShell.VirtualMachine])]
+    [OutputType('Microsoft.HyperV.PowerShell.VirtualMachine')]
     param (
         [Parameter()]
         [ValidateNotNullOrEmpty()]
