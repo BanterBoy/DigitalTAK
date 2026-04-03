@@ -106,7 +106,7 @@ function Test-TAKTCPPort {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [string] $Host,
+        [string] $HostName,   # Named HostName (not Host) — $Host is a read-only PowerShell automatic variable
 
         [Parameter(Mandatory)]
         [int] $Port,
@@ -116,7 +116,7 @@ function Test-TAKTCPPort {
 
     try {
         $tcp = [System.Net.Sockets.TcpClient]::new()
-        $ar  = $tcp.BeginConnect($Host, $Port, $null, $null)
+        $ar  = $tcp.BeginConnect($HostName, $Port, $null, $null)
         $ok  = $ar.AsyncWaitHandle.WaitOne($TimeoutMs, $false)
         $tcp.Close()
         return $ok
