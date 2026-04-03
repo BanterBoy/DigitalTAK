@@ -257,3 +257,60 @@ Once the deployment completes:
 | **Client cert enrollment** | `https://<VM-IP>:8446` |
 
 Default admin credentials are set during the Promote Admin phase. Import the downloaded `.p12` certificate from `certs/` into your ATAK client.
+
+---
+
+## Live Deployment Validation (DIG-53, 2026-04-03)
+
+The full end-to-end deployment was validated against a live Rocky Linux 9.7 Hyper-V VM (10.10.0.144).
+**22 / 22 core health checks passed.** Zero failures.
+
+### Validated Hardware Specs
+
+These are the minimum-recommended specs confirmed to run a production deployment without issue:
+
+| Resource | Value |
+|----------|-------|
+| vCPU | 4 |
+| RAM | 8 GB (fixed) |
+| VHD | 80 GB dynamic VHDX |
+| Disk used at idle | ~4 GB / 48 GB provisioned (9%) |
+| OS | Rocky Linux 9.7 (Blue Onyx) |
+| Java | OpenJDK 17.0.18 LTS |
+| TAK Server | takserver-5.7-RELEASE8.noarch |
+
+### Deployment Timing
+
+| Phase | Approx Duration |
+|-------|----------------|
+| Total (all phases) | ~14 minutes |
+| Install TAK Server | ~3m 28s |
+| Create Certificates | ~1m 55s |
+| Promote Admin Cert | ~1m 12s |
+
+### Known Gotchas
+
+**Port 8443 returns connection failure during automated tests.** TAK Server enforces mutual TLS (mTLS). A bare HTTPS request without a client certificate gets an SSL handshake rejection (HTTP 000). This is *correct behaviour*, not a service failure. To verify manually, import `admin.p12` into your browser and navigate to `https://<VM-IP>:8443`.
+
+**Port 8446 returns HTTP 403 for unauthenticated requests.** This is also correct — the certificate enrollment endpoint requires a valid client identity. The 403 confirms the service is up and correctly gating access.
+
+**API management tests are skipped without `admin.p12` on the host.** The `05-UserManagement` and `08-GroupManagement` integration test suites require `certs/admin.p12` to be present locally. These are skipped automatically when the file is absent. To run them, retrieve the file first:
+
+```powershell
+scp atak@<VM-IP>:/home/atak/admin.p12 .\certs\admin.p12
+```
+
+**OpenSSL 3.x (Rocky Linux 9) and RC2-40-CBC PKCS#12 files.** The upstream TAK Server cert tooling produces PKCS#12 files encrypted with the legacy RC2-40-CBC cipher. OpenSSL 3.x (included in Rocky Linux 9) requires the `-legacy` flag to read these directly on the guest. This is a server-side inspection issue only — the `.p12` files are valid and import correctly into Windows without any workaround.
+
+**PKCS#12 password.** The generated `.p12` files (`admin.p12`, `user.p12`, `truststore-intermediate-ca.p12`) use the upstream default password `atakatak`, regardless of the `-KeystorePassword` supplied to the deployment script. The keystore password governs the server-side JKS stores; the PKCS#12 password is set separately by the TAK cert generation tools.
+
+### Test Infrastructure Fixes Applied
+
+Several test infrastructure issues were identified and fixed during DIG-53 validation. If you maintain a fork, ensure these changes are present:
+
+| Issue | Fix |
+|-------|-----|
+| `Test-TAKTCPPort -Host` shadows the PowerShell `$Host` automatic variable | Parameter renamed to `-HostName` |
+| `Invoke-IntegrationTests.ps1` / `Invoke-E2ETests.ps1` fail when run outside the repo root (`$PSScriptRoot` empty) | Default path resolution moved into script body |
+| `Invoke-Pester -Configuration ... -Passthru` incompatible with Pester 5.7 | Use `$config.Run.PassThru = $true` instead |
+| `05-UserManagement` / `08-GroupManagement`: Pester 5 evaluates `-Skip:` at discovery time, causing `CommandNotFoundException` when `admin.p12` is absent | Tests now use `Set-ItResult -Skipped` inside test bodies (runtime check) |

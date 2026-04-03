@@ -7,7 +7,7 @@ nav_order: 1
 # DigitalTAK Documentation
 {: .fs-9 }
 
-Fully automated CivTAK deployment and management for Rocky Linux 9.5 on Hyper-V Gen 2.
+Fully automated CivTAK deployment and management for Rocky Linux 9.7 on Hyper-V Gen 2.
 {: .fs-6 .fw-300 }
 
 [Get Started](getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
@@ -18,7 +18,7 @@ Fully automated CivTAK deployment and management for Rocky Linux 9.5 on Hyper-V 
 
 ## What is DigitalTAK?
 
-DigitalTAK is a complete automation framework for deploying, configuring, and managing a [TAK Server 5.7](https://tak.gov) instance on **Rocky Linux 9.5** running inside a **Hyper-V Gen 2** virtual machine.
+DigitalTAK is a complete automation framework for deploying, configuring, and managing a [TAK Server 5.7](https://tak.gov) instance on **Rocky Linux 9.7** running inside a **Hyper-V Gen 2** virtual machine.
 
 A single PowerShell script — `Deploy-CivTAK.ps1` — takes you from zero to a fully running CivTAK instance with certificates, user management, and optional XMPP chat.
 
@@ -59,7 +59,7 @@ Deploy-CivTAK.ps1 (entry point)
 ## Target Environment
 
 - **Host OS:** Windows 10/11 or Windows Server with Hyper-V enabled
-- **Guest OS:** Rocky Linux 9.5
+- **Guest OS:** Rocky Linux 9.7
 - **TAK Server:** 5.7-RELEASE8
 - **PowerShell:** 7.0+
 - **Required modules:** `Posh-SSH`, `Pester` (for tests)
