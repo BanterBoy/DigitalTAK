@@ -12,8 +12,10 @@ BeforeAll {
     $script:ManifestPath = Resolve-Path (Join-Path $PSScriptRoot '..' 'TAKDeploy.psd1')
     Import-Module $script:ManifestPath -Force -ErrorAction Stop
 
-    # Test ISO — create a temporary file so ValidateScript passes
-    $script:TestIso = Join-Path $TestDrive 'Rocky-9.7-x86_64-dvd.iso'
+    # Test paths — use Pester's cross-platform TestDrive so C:\ paths don't cause
+    # DriveNotFoundException on Linux CI runners.
+    $script:TestVMPath = $TestDrive
+    $script:TestIso    = Join-Path $TestDrive 'Rocky-9.7-x86_64-dvd.iso'
     New-Item -Path $script:TestIso -ItemType File -Force | Out-Null
 }
 
@@ -64,6 +66,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'calls New-VM with the correct VM name' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -74,8 +77,9 @@ Describe 'New-TAKVirtualMachine' {
 
         It 'sets processor count' {
             New-TAKVirtualMachine -VMName 'TestVM' `
-                -IsoPath $script:TestIso `
-                -SwitchName 'TAK-External' `
+                -IsoPath        $script:TestIso `
+                -VMPath         $script:TestVMPath `
+                -SwitchName     'TAK-External' `
                 -ProcessorCount 8 `
                 -Confirm:$false
 
@@ -87,6 +91,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'disables dynamic memory' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -98,6 +103,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'sets Secure Boot to MicrosoftUEFICertificateAuthority' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -109,6 +115,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'attaches the ISO as a DVD drive' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -118,6 +125,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'enables Guest Service Interface' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -127,6 +135,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'starts the VM' {
             New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -136,6 +145,7 @@ Describe 'New-TAKVirtualMachine' {
         It 'returns the VM object' {
             $result = New-TAKVirtualMachine -VMName 'TestVM' `
                 -IsoPath $script:TestIso `
+                -VMPath     $script:TestVMPath `
                 -SwitchName 'TAK-External' `
                 -Confirm:$false
 
@@ -180,7 +190,8 @@ Describe 'New-TAKVirtualMachine' {
 
         It 'creates a new External vSwitch and proceeds' {
             New-TAKVirtualMachine -VMName 'TestVM' `
-                -IsoPath $script:TestIso `
+                -IsoPath   $script:TestIso `
+                -VMPath    $script:TestVMPath `
                 -Confirm:$false
 
             Should -Invoke -CommandName 'New-VMSwitch' -ModuleName 'TAKDeploy' -Times 1 -Exactly -ParameterFilter {
