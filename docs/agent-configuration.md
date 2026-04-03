@@ -4,7 +4,6 @@ title: Agent Configuration
 nav_title: Agent Configuration
 ---
 
-# Agent Configuration
 {: .no_toc }
 
 How to use the Paperclip AI agents to manage and extend the DigitalTAK project.

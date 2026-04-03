@@ -4,7 +4,6 @@ title: Getting Started
 nav_title: Getting Started
 ---
 
-# Getting Started
 {: .no_toc }
 
 ## Table of Contents

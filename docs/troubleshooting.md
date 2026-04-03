@@ -4,7 +4,6 @@ title: Troubleshooting
 nav_title: Troubleshooting
 ---
 
-# Troubleshooting
 {: .no_toc }
 
 Diagnosis and resolution steps for common DigitalTAK deployment failures.
