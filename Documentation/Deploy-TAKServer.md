@@ -66,7 +66,10 @@ There are three broad groups:
 
 - `Credential` — Linux admin user created by kickstart
 - `RootPassword` — Linux root password
-- `KeystorePassword` — password passed into the TAK server certificate workflow
+- `KeystorePassword` — password for the TAK Server Java keystore
+- `CertPassword` — password used when exporting PKCS#12 (`.p12`) certificate files
+
+> **Security requirement:** `-CertPassword` has no default value. The script fails immediately if this parameter is not supplied. Choose a strong, unique password that is not shared with any other system. Do not reuse the `KeystorePassword` value.
 
 ### 3. Certificate metadata
 
@@ -87,14 +90,16 @@ Use this when you want the script to prompt for certificate subject values while
 ```powershell
 Set-Location 'C:\GitRepos\DigitalTAK'
 
-$cred = Get-Credential -UserName 'atak'
-$rootPw = Read-Host -AsSecureString -Prompt 'Root password'
-$ksPw = Read-Host -AsSecureString -Prompt 'TAK keystore password'
+$cred    = Get-Credential -UserName 'atak'
+$rootPw  = Read-Host -AsSecureString -Prompt 'Root password'
+$ksPw    = Read-Host -AsSecureString -Prompt 'TAK keystore password'
+$certPw  = Read-Host -AsSecureString -Prompt 'Certificate (.p12) password'
 
 .\Deploy-TAKServer.ps1 `
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
+    -CertPassword $certPw `
     -Confirm:$false
 ```
 
@@ -113,9 +118,10 @@ Use this when you want a reproducible deployment with no metadata prompts.
 ```powershell
 Set-Location 'C:\GitRepos\DigitalTAK'
 
-$cred   = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
-$rootPw = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
-$ksPw   = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
+$cred    = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
+$rootPw  = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
+$ksPw    = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
+$certPw  = ConvertTo-SecureString 'CertExample!23' -AsPlainText -Force
 
 .\Deploy-TAKServer.ps1 `
     -VMName 'TAK-Prod-01' `
@@ -131,6 +137,7 @@ $ksPw   = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
+    -CertPassword $certPw `
     -State 'TX' `
     -City 'AUSTIN' `
     -Organization 'ACME-OPS' `
@@ -160,6 +167,7 @@ Use `-DisableSnapshotResume` when you want the script to ignore prior checkpoint
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
+    -CertPassword $certPw `
     -DisableSnapshotResume `
     -Confirm:$false
 ```
@@ -183,7 +191,15 @@ Use `-DisableSnapshotResume` when you want the script to ignore prior checkpoint
 
 - `Credential`: the Linux admin account created by kickstart and used for SSH
 - `RootPassword`: root account password written into kickstart
-- `KeystorePassword`: value passed into the TAK certificate workflow and recorded in the deployment report
+- `KeystorePassword`: password for the TAK Server Java keystore; recorded in the deployment report
+- `CertPassword`: password used when creating and exporting PKCS#12 (`.p12`) certificate files — `admin.p12`, `user.p12`, and `truststore-intermediate-ca.p12`; also used when importing those certificates into the Windows certificate store
+
+**`CertPassword` requirements:**
+
+- **Mandatory** — the script fails immediately with an error if this parameter is not supplied. There is no default.
+- Use a strong, unique password (minimum 8 characters; mix of upper/lower case, digits, and symbols recommended).
+- Do not reuse the `KeystorePassword` value for this parameter.
+- Record this password securely; it is required any time a client imports the `.p12` files.
 
 ### Certificate metadata
 
@@ -255,3 +271,14 @@ For routine use:
 - The wrapper `Deploy-TAKTestServer.ps1` remains only for backward compatibility.
 - New operational documentation should reference `Deploy-TAKServer.ps1`.
 - If you want the cert subject metadata to be fully reproducible, pass it explicitly instead of relying on the prompts.
+
+## Migration note for existing deployments
+
+Previous versions of this script generated `.p12` files using a hardcoded community password. That default has been removed.
+
+**If you have existing `.p12` files generated before this change:**
+
+- Those files were protected with the old community password, which is publicly known. They should be treated as compromised.
+- After upgrading to this version of the script, re-run the certificate generation step by running a new deployment (or using snapshot resume from before the cert phase). Supply a fresh, strong `-CertPassword` value.
+- Redistribute the new `.p12` files to all ATAK/WinTAK clients and update any automated import scripts that previously used the old default.
+- Remove or revoke the old `.p12` files from client devices where possible.

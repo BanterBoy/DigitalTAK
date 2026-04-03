@@ -55,6 +55,11 @@
 .PARAMETER KeystorePassword
     SecureString containing the TAK Server keystore password (min 6 chars).
 
+.PARAMETER CertPassword
+    SecureString for the PKCS#12 (.p12) certificate password used when exporting
+    admin, user, and intermediate-CA certificates.  Mandatory — no default.
+    This password is required for the Windows certificate import step.
+
 .PARAMETER RpmPath
     Path to the TAK Server RPM.
 
@@ -97,12 +102,14 @@
     $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString 'IamGroot.3742' -AsPlainText -Force))
     $rootPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
     $ksPw   = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
-    .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
+    $certPw = Read-Host -AsSecureString 'Certificate (.p12) password'
+    .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 
 .EXAMPLE
     $cred   = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
     $rootPw = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
     $ksPw   = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
+    $certPw = ConvertTo-SecureString 'CertExample!23' -AsPlainText -Force
     .\Deploy-TAKServer.ps1 `
         -VMName 'TAK-Prod-01' `
         -SwitchName 'External LAN' `
@@ -111,6 +118,7 @@
         -Credential $cred `
         -RootPassword $rootPw `
         -KeystorePassword $ksPw `
+        -CertPassword $certPw `
         -State 'TX' `
         -City 'AUSTIN' `
         -Organization 'ACME-OPS' `
@@ -147,6 +155,9 @@ param (
 
     [Parameter(Mandatory)]
     [SecureString] $KeystorePassword,
+
+    [Parameter(Mandatory)]
+    [SecureString] $CertPassword,
 
     # ── TAK Server configuration ──
     [string] $RpmPath             = 'C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm',
@@ -786,8 +797,7 @@ if ($resumePhase -le 4) {
         Write-Host '  No old TAK certificates found in Windows stores' -ForegroundColor DarkGray
     }
 
-    # Generated TAK PKCS#12 files retain the upstream default password.
-    $pfxPassword = ConvertTo-SecureString 'atakatak' -AsPlainText -Force
+    $pfxPassword = $CertPassword
 
     # Import Intermediate CA into Trusted Root Certification Authorities
     $intermediateP12Path = Join-Path $localCertDir 'truststore-intermediate-ca.p12'
@@ -856,13 +866,12 @@ if ($resumePhase -le 4) {
     $reportLines += "| SSH user password | $([System.Net.NetworkCredential]::new('', $Credential.Password).Password) |"
     $reportLines += "| Root password | $([System.Net.NetworkCredential]::new('', $RootPassword).Password) |"
     $reportLines += "| Deployment keystore password parameter | $([System.Net.NetworkCredential]::new('', $KeystorePassword).Password) |"
-    $reportLines += '| Generated PKCS#12 / PFX password | atakatak |'
+    $reportLines += "| PKCS#12 / PFX certificate password | $([System.Net.NetworkCredential]::new('', $CertPassword).Password) |"
     $reportLines += ''
     $reportLines += 'Notes:'
     $reportLines += ''
-    $reportLines += '- The Windows-imported certificate files use the generated PKCS#12 password `atakatak`.'
+    $reportLines += '- The Windows-imported certificate files use the `-CertPassword` value supplied at deployment time.'
     $reportLines += '- This applies to `admin.p12`, `user.p12`, and `truststore-intermediate-ca.p12`.'
-    $reportLines += '- The deployment script may use a different `-KeystorePassword` value for server-side configuration, but the generated PKCS#12 files retain the upstream default password unless the certificate generation workflow is changed.'
     $reportLines += ''
     $reportLines += '## Deployment Commands'
     $reportLines += ''

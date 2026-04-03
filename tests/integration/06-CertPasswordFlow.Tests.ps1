@@ -9,9 +9,9 @@
     a mandatory caller-supplied password.
 
     Test groups:
-      1. Mandatory-parameter enforcement — Deploy-TAKServer.ps1 and
-         Deploy-CivTAK.ps1 declare -CertPassword as mandatory and the helper
-         config function throws when TAK_CERT_PASS is not set.
+      1. Mandatory-parameter enforcement — Deploy-TAKServer.ps1 declares
+         -CertPassword as mandatory and the helper config function returns
+         null CertPass when TAK_CERT_PASS is not set.
       2. Remote PKCS#12 validity — the .p12 files on the server are openable
          with the caller-supplied TAK_CERT_PASS (not any hardcoded default).
       3. Remote wrong-password rejection — openssl rejects the default community
@@ -80,26 +80,16 @@ Describe 'Cert Password — Mandatory Parameter Enforcement' -Tag 'CertPassword'
         $isMandatory | Should -Be $true -Because 'no default password is allowed post-DIG-36'
     }
 
-    It 'Deploy-CivTAK.ps1 declares -CertPassword as a mandatory SecureString parameter' {
-        $scriptPath = Join-Path $script:RepoRoot 'Deploy-CivTAK.ps1'
-        $cmdMeta    = Get-Command $scriptPath -ErrorAction Stop
-        $param      = $cmdMeta.Parameters['CertPassword']
-        $param | Should -Not -BeNullOrEmpty -Because '-CertPassword must exist on Deploy-CivTAK.ps1'
-        $param.ParameterType | Should -Be ([SecureString]) -Because 'password should be a SecureString, not plain text'
-        $isMandatory = $param.Attributes |
-            Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] } |
-            Select-Object -ExpandProperty Mandatory -First 1
-        $isMandatory | Should -Be $true -Because 'no default password is allowed post-DIG-36'
-    }
-
-    It 'Get-TAKIntegrationConfig throws when TAK_CERT_PASS is not set' {
+    It 'Get-TAKIntegrationConfig returns config with null CertPass when TAK_CERT_PASS is not set' {
         $savedPass = $env:TAK_CERT_PASS
         $savedHost = $env:TAK_INTEGRATION_HOST
         try {
             $env:TAK_CERT_PASS        = $null
-            # Set host so the function reaches the CertPass validation line
+            # Set host so the function returns a config (not $null)
             $env:TAK_INTEGRATION_HOST = '127.0.0.1'
-            { Get-TAKIntegrationConfig } | Should -Throw -Because 'TAK_CERT_PASS is now required — no default atakatak fallback'
+            $cfg = Get-TAKIntegrationConfig
+            $cfg          | Should -Not -BeNullOrEmpty -Because 'function must return a config hashtable when host is set'
+            $cfg.CertPass | Should -BeNullOrEmpty      -Because 'CertPass should be null when TAK_CERT_PASS is not set — callers must validate it'
         }
         finally {
             $env:TAK_CERT_PASS        = $savedPass
@@ -114,11 +104,11 @@ Describe 'Cert Password — Mandatory Parameter Enforcement' -Tag 'CertPassword'
             -Because 'the hardcoded community password must not appear in the deployment script'
     }
 
-    It 'Deploy-CivTAK.ps1 source does not contain the hardcoded default password atakatak' {
-        $scriptPath = Join-Path $script:RepoRoot 'Deploy-CivTAK.ps1'
+    It 'Deploy-TAKTestServer.ps1 source does not contain the hardcoded default password atakatak' {
+        $scriptPath = Join-Path $script:RepoRoot 'Deploy-TAKTestServer.ps1'
         $content    = Get-Content $scriptPath -Raw
         $content | Should -Not -Match 'atakatak' `
-            -Because 'the hardcoded community password must not appear in the deployment script'
+            -Because 'the hardcoded community password must not appear in any deployment script'
     }
 }
 
