@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [prod, main]
+    branches: [prod, main, dev]
   pull_request:
+    branches: [prod, main, dev]
   workflow_dispatch:
     inputs:
       live_vm_host:
@@ -19,11 +20,22 @@ on:
         required: false
         default: ''
 
+# Cancel in-flight runs for the same branch/PR to avoid resource waste.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal required permissions — jobs that need more declare their own block.
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   # ─── Pester unit tests ──────────────────────────────────────────────────────
   pester:
     name: Pester Tests
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
