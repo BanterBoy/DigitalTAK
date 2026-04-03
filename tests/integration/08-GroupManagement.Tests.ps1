@@ -68,10 +68,12 @@ BeforeAll {
 
     $script:TestGroup = if ($env:TAK_TEST_GROUP) { $env:TAK_TEST_GROUP } else { 'Cyan' }
 
+    # Always import TAKServerPS so structural tests (Parameter Contract) can run
+    # regardless of whether a live TAK Server host is configured.
+    $manifest = Join-Path $script:RepoRoot 'TAKServerPS' 'TAKServer.psd1'
+    Import-Module (Resolve-Path $manifest) -Force -ErrorAction Stop
+
     if (-not $script:Skip) {
-        # Import TAKServerPS
-        $manifest = Join-Path $script:RepoRoot 'TAKServerPS' 'TAKServer.psd1'
-        Import-Module (Resolve-Path $manifest) -Force -ErrorAction Stop
 
         if ($script:HasCert) {
             $secPw = ConvertTo-SecureString $script:Config.CertPass -AsPlainText -Force
