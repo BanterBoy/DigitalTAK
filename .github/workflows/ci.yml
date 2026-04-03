@@ -63,6 +63,13 @@ jobs:
           $config.TestResult.OutputFormat = 'NUnit2.5'
           Invoke-Pester -Configuration $config
 
+      - name: Run integration tests (skip without live host)
+        shell: pwsh
+        run: |
+          # TAK_INTEGRATION_HOST is not set in CI, so all tests will be skipped.
+          # This step validates that the test infrastructure loads without errors.
+          .\Invoke-IntegrationTests.ps1 -OutputPath 'TestResults-Integration.xml' -PassThru | Out-Null
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,9 +1,11 @@
 # DigitalTAK
 
-CivTAK / TAK Server automation for Rocky Linux 9.  
+CivTAK / TAK Server automation for Rocky Linux 9.
 Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInstall`) to install, configure, and manage a production TAK Server 5.7 deployment — including certificate management, XMPP chat integration, Let's Encrypt TLS, and a full REST API wrapper.
 
 **Target platform:** Rocky Linux 9.5 · Hyper-V Gen 2 · TAK Server `5.7-RELEASE8`
+
+**[Full documentation →](https://ryschilder.github.io/DigitalTAK/)**
 
 ---
 
