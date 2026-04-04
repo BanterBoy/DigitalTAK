@@ -4,7 +4,18 @@ reports/DEPLOYMENT-REPORT-*.md
 # Integration test XML results
 reports/TestResults-Integration.xml
 
-# Docker Compose secrets and binaries (see docker/.gitignore for details)
+# Docker Compose secrets (see docker/.gitignore for details)
 docker/.env
-docker/*.rpm
-docker/*.key
+
+# ── TAK Server RPM and GPG key (binary content, NOT included in repo) ──────
+# These files MUST be downloaded manually from https://tak.gov
+# A TAK.gov account with MFA is required to access the downloads portal.
+# Never commit these files — they are too large for GitHub (>100 MB) and
+# are subject to TAK Server distribution restrictions.
+takserver-*.noarch.rpm
+takserver-*.rpm
+takserver-public-gpg.key
+
+# Official TAK Server Docker release package (binary content, download from tak.gov)
+# Extract takserver-docker-5.7-RELEASE-8.zip here before building.
+takserver-docker-5.7-RELEASE-8/

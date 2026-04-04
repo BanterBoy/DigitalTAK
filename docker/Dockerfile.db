@@ -1,0 +1,25 @@
+# DigitalTAK – TAK Server PostgreSQL 15 Database Image
+# Based on the official tak.gov Docker release (Dockerfile.takserver-db).
+#
+# Build context: repo root (..)
+#   docker compose sets context: .. so COPY paths below resolve from the repo root.
+
+FROM postgres:15.1
+
+RUN apt-get update && \
+    apt-get install -y postgresql-15-postgis-3 openjdk-17-jdk procps && \
+    rm -rf /var/lib/apt/lists/*
+
+# DB utilities and the CoreConfig.example.xml that SchemaManager needs to find
+# the DB connection details (hostname tak-database, user martiuser).
+COPY takserver-docker-5.7-RELEASE-8/tak/db-utils/ /opt/tak/db-utils/
+COPY takserver-docker-5.7-RELEASE-8/tak/CoreConfig.example.xml /opt/tak/CoreConfig.example.xml
+
+RUN chmod +x /opt/tak/db-utils/*.sh
+
+# Wrapper entrypoint: fixes Docker-volume ownership then calls configureInDocker.sh
+COPY docker/scripts/db-entrypoint.sh /db-entrypoint.sh
+RUN sed -i 's/\r//' /db-entrypoint.sh && chmod +x /db-entrypoint.sh
+
+ENTRYPOINT ["/db-entrypoint.sh"]
+

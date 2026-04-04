@@ -137,7 +137,10 @@ Update-TAKLetsEncryptCertificate -SshSession $session
 
 REST API wrapper for TAK Server 5.7. Provides 44 cmdlets covering all major TAK Server API endpoints.
 
-**Import:** `Import-Module .\TAKServerPS\TAKServer.psm1`
+**Import:** `Import-Module .\TAKServerPS\TAKServer.psd1`
+
+{: .note }
+39/46 end-to-end tests pass (April 2026). `New-TAKUser` REST and `Set-TAKUserGroup` have a server-side ESAPI bug in TAK Server 5.7-RELEASE8 — see the [Validation Report](../validation-report/).
 
 ### Session Management
 
@@ -179,10 +182,12 @@ Disconnect-TAKServer
 | `Set-TAKUserGroup` | Assign a user to a group |
 
 ```powershell
-# List all users
+# List all users (by connection)
 Get-TAKUser
 
 # Create a user (use -InboundGroups/-OutboundGroups for data-direction group assignment)
+# Note: REST endpoint has a server-side ESAPI bug in 5.7-RELEASE8 RPM.
+# Use UserManager.jar over SSH as the workaround.
 New-TAKUser -Credential (Get-Credential) -InboundGroups 'team-alpha' -OutboundGroups 'team-alpha'
 
 # Remove a user

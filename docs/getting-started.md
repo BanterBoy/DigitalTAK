@@ -31,10 +31,17 @@ Before cloning and running the project, ensure your host machine meets these req
 
 ### Required Files (Not Included in Repo)
 
-You must download these separately before running a deployment:
+You must download these separately before running a deployment. **They are not included in this repository and must not be committed.**
 
 1. **Rocky Linux 9.5 ISO** — from [rockylinux.org](https://rockylinux.org/download)
-2. **TAK Server 5.7 RPM** — from [tak.gov](https://tak.gov) (requires a TAK.gov account)
+2. **TAK Server 5.7 RPM** (`takserver-5.7-RELEASE8.noarch.rpm`) — from [tak.gov](https://tak.gov)
+   - A free TAK.gov account is required
+   - **MFA is enforced** on the downloads portal — enrol a second factor before attempting to download
+   - Navigate to **Downloads → TAK Server** after logging in
+   - The RPM is over 500 MB and is `.gitignore`d — never commit it to this repository
+
+{: .warning }
+If VS Code shows a **"Files too large"** warning when committing, click **Cancel**. The TAK Server RPM must not be committed to this repository.
 
 ### PowerShell Modules
 
@@ -124,16 +131,17 @@ See `.github/workflows/ci.yml` for the full pipeline definition.
 Once you have a running TAK Server, use the REST API wrapper to manage it:
 
 ```powershell
-Import-Module .\TAKServerPS\TAKServer.psm1
+Import-Module .\TAKServerPS\TAKServer.psd1
 
-# Connect (self-signed certs are the norm)
-Connect-TAKServer -HostName "10.0.0.10" -Credential (Get-Credential) -SkipCertificateCheck $true
+# Connect using an admin PFX certificate (recommended)
+$pass = Read-Host -AsSecureString 'Admin PFX password'
+Connect-TAKServer -HostName "10.0.0.10" -PfxPath ".\admin.p12" -PfxPassword $pass -SkipCertificateCheck $true
 
-# List users
-Get-TAKUser
+# List all provisioned user accounts
+Get-TAKUser -AccountList
 
-# Create a user
-New-TAKUser -Credential (Get-Credential) -InboundGroups "team-alpha" -OutboundGroups "team-alpha"
+# Get version info
+Get-TAKVersion
 
 # List missions
 Get-TAKMission
@@ -141,6 +149,9 @@ Get-TAKMission
 # Disconnect
 Disconnect-TAKServer
 ```
+
+{: .note }
+39 of 46 end-to-end tests pass against a live TAK Server 5.7-RELEASE8 instance (April 2026). `New-TAKUser` REST and `Set-TAKUserGroup` have a known server-side ESAPI bug — use `UserManager.jar` over SSH as the workaround. See the [Validation Report](../validation-report/) and [Troubleshooting](../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception) for details.
 
 For the full cmdlet reference, see the [Agents & Skills Reference](../agents-skills-reference/) page or run `Get-Help <CmdletName> -Full` in PowerShell.
 

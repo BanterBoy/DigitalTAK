@@ -69,7 +69,7 @@ function Get-TAKGroup {
             Invoke-TAKRequest -Path '/Marti/api/groups/all'
         }
         default {
-            Invoke-TAKRequest -Path '/Marti/api/groups'
+            Invoke-TAKRequest -Path '/Marti/api/groups/all'
         }
     }
 }

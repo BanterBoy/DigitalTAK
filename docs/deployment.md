@@ -43,7 +43,7 @@ Before running the deployment:
 - [ ] `Posh-SSH` module installed: `Install-Module Posh-SSH -Scope CurrentUser -Force`
 - [ ] Hyper-V virtual switch named `TAK-External` (External type) — or supply `-SwitchName`
 - [ ] Rocky Linux 9 DVD ISO downloaded (default expected path: `C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso`)
-- [ ] TAK Server 5.7 RPM downloaded from [tak.gov](https://tak.gov) (default: `C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm`)
+- [ ] TAK Server 5.7 RPM downloaded from [tak.gov](https://tak.gov) (requires a **TAK.gov account with MFA**; navigate to Downloads → TAK Server) — default path: `C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm`
 - [ ] At least 40 GB free disk space for the VM VHDX (default: 80 GB dynamic)
 - [ ] At least 8 GB RAM available for the VM
 

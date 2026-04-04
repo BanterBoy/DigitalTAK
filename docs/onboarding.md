@@ -18,8 +18,8 @@ How to generate client certificates, create user accounts, and distribute ATAK d
 
 ---
 
-{: .warning }
-**TAKServerPS is currently under development.** Steps 3 and 4 of this guide use `TAKServerPS` PowerShell cmdlets that have not been fully validated against a live TAK Server. The cmdlets are known to have issues. Do not follow the PowerShell account-creation or data-package steps in a production environment until this notice is removed. Use the WebTAK admin UI at `https://<server>:8443` to manage users manually in the meantime.
+{: .note }
+**TAKServerPS validated — April 2026.** `Connect-TAKServer`, user creation (`New-TAKUser` via SSH workaround), password management, mission lifecycle, and `Remove-TAKUser` all pass. `Set-TAKUserGroup` fails with HTTP 500 due to a server-side ESAPI bug — the WebTAK admin console remains the workaround for group assignment. See the [Validation Report](../validation-report/) for full test results.
 
 ## Overview
 
@@ -42,8 +42,8 @@ tak-team-certs.sh                 New-TAKTeamRoster.ps1
 - An active connection to TAK Server: `Connect-TAKServer -HostName <host> -Credential (Get-Credential)`
 - JDK 11+ with `keytool` on PATH (for truststore conversion)
 
-{: .warning }
-**TAKServerPS (Connect-TAKServer and related cmdlets) is not currently reliable.** The `Connect-TAKServer` step and all subsequent PowerShell-based user and certificate operations in this guide depend on TAKServerPS, which is under active development. Proceed with caution.
+{: .note }
+`Connect-TAKServer` is validated and operational. PFX file authentication is the recommended approach for admin operations.
 
 ---
 
@@ -121,11 +121,11 @@ The `.p12` files are sensitive. Treat them like passwords. Delete them from the 
 ## Step 3 — Create User Accounts (on Windows)
 
 {: .warning }
-**TAKServerPS — under development.** The PowerShell commands below use `TAKServerPS` cmdlets that are known to have issues. This step is included for completeness only. Use the WebTAK admin console at `https://<server>:8443 → User Management` to create accounts until this notice is removed. Further updates will be published once TAKServerPS validation is complete.
+**Server-side ESAPI bug — `New-TAKUser` REST returns HTTP 500.** `POST /Marti/api/users/` throws NullPointerException on TAK Server 5.7-RELEASE8 due to a missing `ESAPI.properties` file. The cmdlet is correct. Use `New-TAKTeamRoster.ps1` with the `-SshCredential` parameter (which falls back to `UserManager.jar` over SSH) or create users manually in the WebTAK admin console at `https://<server>:8443`. See [Troubleshooting](../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception).
 
 ```powershell
-Import-Module .\TAKServerPS\TAKServer.psm1
-Connect-TAKServer -HostName tak.example.com -Credential (Get-Credential)
+Import-Module .\TAKServerPS\TAKServer.psd1
+Connect-TAKServer -HostName tak.example.com -PfxPath .\certs\admin.p12 -PfxPassword $adminPass
 
 .\onboarding\New-TAKTeamRoster.ps1 -ManifestPath .\alpha\manifest.json
 # Enter the shared initial password when prompted
@@ -142,8 +142,8 @@ HTTP 409 responses (user already exists) are treated as a skip — safe to re-ru
 
 ## Step 4 — Build ATAK Data Packages (on Windows)
 
-{: .warning }
-**TAKServerPS — under development.** `New-TAKDataPackage.ps1` depends on TAKServerPS, which is currently not fully operational. This step is included for completeness only and the script output cannot be guaranteed accurate. Manual data package creation via the TAK Server cert enrollment endpoint (`https://<server>:8446`) is the reliable alternative.
+{: .note }
+**No `New-TAKDataPackage` cmdlet in TAKServerPS.** `New-TAKDataPackage.ps1` is a standalone onboarding helper script. TAKServerPS does not include a data-package cmdlet. The cert enrollment endpoint at `https://<server>:8446` is the reliable alternative for distributing client certificates to ATAK and WinTAK.
 
 ```powershell
 .\onboarding\New-TAKDataPackage.ps1 `
@@ -201,8 +201,8 @@ Then retrieve the `.p12` from `/opt/tak/certs/files/<username>.p12`.
 
 To create a TAK Server account for the new user:
 
-{: .warning }
-**TAKServerPS — under development.** `New-TAKUser` is part of the TAKServerPS module, which is not currently reliable. Use the WebTAK admin UI to create the account manually until this notice is removed.
+{: .note }
+`New-TAKUser` REST endpoint has a server-side ESAPI bug in TAK Server 5.7-RELEASE8 — see [Troubleshooting](../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception) for the `UserManager.jar` workaround, or create the account via WebTAK admin at `https://<server>:8443`.
 
 ```powershell
 $pw = Read-Host -AsSecureString 'Initial password'

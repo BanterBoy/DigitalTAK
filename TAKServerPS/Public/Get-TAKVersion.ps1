@@ -40,6 +40,6 @@ function Get-TAKVersion {
         Invoke-TAKRequest -Path '/Marti/api/version/info'
     }
     else {
-        Invoke-TAKRequest -Path '/Marti/api/ver'
+        Invoke-TAKRequest -Path '/Marti/api/version'
     }
 }

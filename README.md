@@ -89,7 +89,7 @@ Scripts live in `InstallShellScripts/`; byte-identical copies exist in `TXTScrip
 ### Prerequisites
 
 - Rocky Linux 9 (fresh install recommended)
-- `takserver-5.7-RELEASE8.noarch.rpm` — downloaded from [tak.gov](https://tak.gov) into the same directory as the scripts
+- `takserver-5.7-RELEASE8.noarch.rpm` — downloaded from [tak.gov](https://tak.gov) into the same directory as the scripts. **Requires a TAK.gov account with MFA enforced.** This file is `.gitignore`d and must not be committed.
 - `takserver-public-gpg.key` — from tak.gov (optional — used for GPG signature verification)
 
 ---
@@ -100,7 +100,7 @@ Both modules require **PowerShell 7.0+** and follow Microsoft best practices —
 
 ### TAKServerPS — REST API Module
 
-> **⚠️ Under Development.** TAKServerPS has not been fully validated against a live TAK Server instance and is known to have issues in practice. The cmdlets and documentation below are included for completeness. Do not rely on this module in production until testing is complete. Further updates will be published once these issues are resolved.
+> **✅ Validated — April 2026.** TAKServerPS has been tested end-to-end against a live TAK Server 5.7-RELEASE8 instance: 39 of 46 tests pass (85%). All GET cmdlets, `Connect-TAKServer`, user and mission lifecycle are operational. `New-TAKUser` REST and `Set-TAKUserGroup` have a known server-side ESAPI bug — [workaround documented](docs/troubleshooting.md). See the [Validation Report](docs/validation-report.md) for full results.
 
 **Path:** `TAKServerPS/`  
 **Manifest:** `TAKServer.psd1` · **Version:** 1.0.0

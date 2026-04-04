@@ -11,7 +11,7 @@ Deploy a fully operational TAK Server instance on a Rocky Linux 9 Hyper-V guest 
 | Rocky Linux 9 Hyper-V guest | 9.5+ | Provisioned by `Deploy-TAKServer.ps1` or manually |
 | Docker Engine | 24+ | Install via steps below |
 | Docker Compose | v2 (plugin) | Bundled with Docker Engine 24+ |
-| TAK Server RPM | 5.7-RELEASE8 | Free download from [tak.gov](https://tak.gov) |
+| TAK Server RPM | 5.7-RELEASE8 | Download from [tak.gov](https://tak.gov) — **TAK.gov account required (MFA enforced)** |
 | Internet access (build time only) | — | To pull Rocky Linux and PostgreSQL base images |
 
 ---
@@ -41,8 +41,11 @@ docker compose version
 
 ## 2 — Obtain the TAK Server RPM
 
-1. Create a free account at [tak.gov](https://tak.gov).
-2. Download `takserver-5.7-RELEASE8.noarch.rpm`.
+{: .warning }
+**The TAK Server RPM is not included in this repository and must not be committed.** It is over 500 MB and is subject to TAK Server distribution terms. `*.noarch.rpm` is listed in `.gitignore` and `docker/.gitignore`. If VS Code shows a "Files too large" warning when committing, click **Cancel** — do not commit the RPM.
+
+1. Create a free account at [tak.gov](https://tak.gov). **Multi-factor authentication (MFA) is required** to log in and access the downloads portal.
+2. Navigate to **Downloads → TAK Server** and download `takserver-5.7-RELEASE8.noarch.rpm`.
 3. Optionally download `takserver-public-gpg.key` for RPM signature verification (recommended).
 4. Copy both files into the `docker/` directory of this repository:
 
@@ -167,8 +170,8 @@ Both `Alpha` and `Bravo` should appear in the response.
 
 ## 7 — Connect a TAK Client (ATAK / WinTAK)
 
-1. Generate a client certificate using the certificate enrollment endpoint at `https://<vm-ip>:8446`, or use the PowerShell `TAKServerPS` module once it is fully validated — see the [API Reference](https://digitaltak.lukeleigh.com/api-reference/) for status.
-   > **Note:** The `TAKServerPS` PowerShell module is currently under development and not fully operational. Use the enrollment endpoint for production deployments.
+1. Generate a client certificate using the certificate enrollment endpoint at `https://<vm-ip>:8446`, or use the `TAKServerPS` module — see the [API Reference](https://digitaltak.lukeleigh.com/api-reference/) and [Validation Report](https://digitaltak.lukeleigh.com/validation-report/) for current status.
+   > **Note:** Most `TAKServerPS` cmdlets are validated (39/46 pass). `New-TAKUser` REST and `Set-TAKUserGroup` have a server-side ESAPI bug in TAK Server 5.7-RELEASE8 RPM — use the enrollment endpoint or `UserManager.jar` over SSH as the workaround.
 2. Configure the TAK client:
    - **Server**: `<vm-ip>`
    - **Port**: `8089`

@@ -27,7 +27,7 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 | **VM Provisioning** | Unattended Rocky Linux 9 install via Hyper-V + kickstart |
 | **TAK Server Install** | RPM install over SSH with SELinux and firewalld configured |
 | **Certificate Management** | CA, server certs, per-user client certs (.p12) |
-| **REST API Wrapper** | 44 PowerShell cmdlets for TAK Server 5.7 — ⚠️ [under development](api-reference/#takserverps-module) |
+| **REST API Wrapper** | 44 PowerShell cmdlets for TAK Server 5.7 — 39/46 validated ✅ ([Validation Report](validation-report/)) |
 | **XMPP Chat** | Optional Openfire integration for TAK Chat |
 | **Let's Encrypt** | Optional public TLS via Certbot |
 | **Rollback** | Snapshot-based phase rollback |
@@ -41,7 +41,8 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 | [Deployment Guide](deployment/) | Step-by-step `Deploy-TAKServer.ps1` walkthrough with all parameters |
 | [Post-Deployment](post-deployment/) | What a successful deployment produces, validation tests, first access steps |
 | [Team Onboarding](onboarding/) | Per-user cert generation, user accounts, and ATAK data package distribution |
-| [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS — ⚠️ TAKServerPS section under development |
+| [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
+| [Validation Report](validation-report/) | TAKServerPS end-to-end test results — 39/46 tests pass (April 2026) |
 | [Troubleshooting](troubleshooting/) | Diagnosis and fixes for common failures |
 | [Configuration Reference](config/baseline/) | CoreConfig.xml settings, certificate layout, port inventory |
 | [Agent Configuration](agent-configuration/) | Managing deployments with AI agents |

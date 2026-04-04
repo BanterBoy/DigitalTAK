@@ -1,11 +1,15 @@
-# ── Secrets — never commit ────────────────────────────────────────────────────
+# ── Secrets -- never commit ───────────────────────────────────────────────────
 .env
 
-# ── TAK Server RPM (binary, download from tak.gov) ───────────────────────────
-*.rpm
+# ── TAK Server RPM (must be downloaded from tak.gov — NOT included in repo) ──
+# Requires a TAK.gov account with MFA. Copy the RPM here after downloading.
+# See Documentation/Docker-Deploy-Runbook.md § 2 — Obtain the TAK Server RPM.
+takserver-*.noarch.rpm
+takserver-*.rpm
+takserver-public-gpg.key
 
-# ── GPG key (download from tak.gov alongside the RPM) ────────────────────────
-*.key
-
-# ── Docker build cache and temp files ────────────────────────────────────────
+# ── Generated test artefacts -- never commit ─────────────────────────────────
+*.p12
+*.jks
+*.pem
 *.log

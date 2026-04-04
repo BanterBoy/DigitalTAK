@@ -21,10 +21,10 @@ Describe 'Get-TAKVersion — Short path (default)' {
         Mock Invoke-TAKRequest -ModuleName TAKServer { '5.7-RELEASE-8' }
     }
 
-    It 'calls /Marti/api/ver when -Detailed is not specified' {
+    It 'calls /Marti/api/version when -Detailed is not specified' {
         Get-TAKVersion
         Should -Invoke Invoke-TAKRequest -ModuleName TAKServer -Times 1 -ParameterFilter {
-            $Path -eq '/Marti/api/ver'
+            $Path -eq '/Marti/api/version'
         }
     }
 
@@ -68,10 +68,10 @@ Describe 'Get-TAKVersion — Detailed path (-Detailed)' {
         $result.gitCommit | Should -Be 'abc1234'
     }
 
-    It 'does NOT call /Marti/api/ver when -Detailed is specified' {
+    It 'does NOT call /Marti/api/version when -Detailed is specified' {
         Get-TAKVersion -Detailed
         Should -Invoke Invoke-TAKRequest -ModuleName TAKServer -Times 0 -ParameterFilter {
-            $Path -eq '/Marti/api/ver'
+            $Path -eq '/Marti/api/version'
         }
     }
 }

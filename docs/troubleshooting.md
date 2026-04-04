@@ -507,6 +507,48 @@ Get-TAKVersion   # Should return the server version string
 
 ---
 
+### Symptom: `New-TAKUser` or `Set-TAKUserGroup` returns HTTP 500 — NullPointerException
+
+**Cause:** `ESAPI.properties` (OWASP Enterprise Security API — used for input validation and password hashing) is absent from the TAK Server 5.7-RELEASE8 RPM installation at `/opt/tak/`. Two API methods in `FileUserAccountManagementApi` depend on ESAPI:
+
+| Endpoint | API Method |
+|----------|-----------|
+| `POST /Marti/api/users/` | `createSingleFileUser` |
+| `PUT /user-management/api/update-groups` | `updateGroupsForUser` |
+
+The TAKServerPS cmdlets are correct — the fault is server-side. Endpoints for password change (`PUT .../change-user-password`) and user delete (`DELETE /Marti/api/users/{user}`) are **not** affected.
+
+**Diagnosis:**
+```bash
+# Check the API log on the server for the NullPointerException stack trace
+sudo tail -n 100 /opt/tak/logs/takserver-api.log | grep -A 10 "NullPointerException"
+```
+
+Look for: `ERROR c.b.u.FileUserAccountManagementApi - Error in createSingleFileUser` or `Error in updateGroupsForUser`.
+
+**Workaround — Create a user:**
+```bash
+# Over SSH on the TAK Server (as a user with sudo)
+sudo java -jar /opt/tak/utils/UserManager.jar usermod -p 'Password1234!Secret' username
+```
+
+**Workaround — Assign a user to a group:**
+```bash
+sudo java -jar /opt/tak/utils/UserManager.jar usermod -g GROUP_NAME username
+```
+
+**Workaround — From PowerShell via Posh-SSH:**
+```powershell
+# Requires an active Posh-SSH session ($sshSession)
+Invoke-SSHCommand -SessionId $sshSession.SessionId `
+    -Command "sudo java -jar /opt/tak/utils/UserManager.jar usermod -p 'Password1234!' username"
+```
+
+{: .note }
+Users created via `UserManager.jar` are fully recognised by all other REST endpoints. `Set-TAKUserPassword`, `Remove-TAKUser`, and `Get-TAKUser -AccountList` all work correctly with these accounts.
+
+---
+
 ## Deployment Resume / Snapshot Issues
 
 ### Symptom: Re-running `Deploy-TAKServer.ps1` does not resume from the last checkpoint

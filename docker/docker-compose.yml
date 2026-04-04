@@ -1,94 +1,83 @@
-# DigitalTAK – TAK Server 5.7 Docker Compose
+# DigitalTAK -- TAK Server 5.7 Docker Compose
+#
+# Builds from the official tak.gov Docker release package.
+# Application content is COPY'd from takserver-docker-5.7-RELEASE-8/tak/
+# at image build time (build context is the repo root).
 #
 # Usage:
-#   cp .env.example .env
-#   # Edit .env with your values
+#   cp .env.example .env && edit .env
 #   docker compose build
 #   docker compose up -d
+#   docker exec -it docker-takserver-1 /opt/tak/docker/init-certs.sh
+#   docker exec -it docker-takserver-1 bash -c 'cd /opt/tak && java -jar utils/UserManager.jar certmod -A certs/files/admin.pem'
+#   docker cp docker-takserver-1:/opt/tak/certs/files/admin.p12 .
 #
 # Prerequisites:
-#   - Place takserver-5.7-RELEASE8.noarch.rpm in this directory (download from tak.gov)
-#   - Docker Engine 24+ and Docker Compose v2 installed on the Rocky Linux host
-#
-# See Documentation/Docker-Deploy-Runbook.md for full deployment instructions.
+#   Extract takserver-docker-5.7-RELEASE-8.zip to takserver-docker-5.7-RELEASE-8/
+#   in the repo root (sibling to docker/).  Download from https://tak.gov.
 
 services:
 
-  # ── PostgreSQL 16 ─────────────────────────────────────────────────────────────
-  db:
-    image: postgres:16
-    restart: unless-stopped
+  # -- PostgreSQL 15 with PostGIS (official TAK DB image approach) -------------
+  tak-database:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.db
+    image: tak-database:5.7
     environment:
-      POSTGRES_DB:       ${TAK_DB_NAME:-cot}
-      POSTGRES_USER:     ${TAK_DB_USER:-martiuser}
-      POSTGRES_PASSWORD: ${TAK_DB_PASSWORD}
+      # envpass is read by takserver-setup-db.sh to set the martiuser DB password
+      envpass: ${TAK_DB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - tak_pg_data:/var/lib/postgresql/15/data
     networks:
-      - tak_internal
+      - tak_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${TAK_DB_USER:-martiuser} -d ${TAK_DB_NAME:-cot}"]
+      test: ["CMD-SHELL", "su postgres -c 'pg_isready -d cot'"]
       interval: 10s
       timeout: 5s
-      retries: 12
-      start_period: 30s
+      retries: 20
+      start_period: 120s
 
-  # ── TAK Server 5.7 ───────────────────────────────────────────────────────────
+  # -- TAK Server 5.7 ----------------------------------------------------------
   takserver:
     build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        TAK_RPM: ${TAK_RPM_FILENAME:-takserver-5.7-RELEASE8.noarch.rpm}
-        TAK_GPG_KEY: ${TAK_GPG_KEY_FILENAME:-takserver-public-gpg.key}
-    image: digitaktak/takserver:5.7
-    restart: unless-stopped
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: takserver:5.7
     depends_on:
-      db:
+      tak-database:
         condition: service_healthy
     environment:
-      # ── Database connection ────────────────────────────────────────────────
-      TAK_DB_HOST:     db
-      TAK_DB_PORT:     ${TAK_DB_PORT:-5432}
-      TAK_DB_NAME:     ${TAK_DB_NAME:-cot}
-      TAK_DB_USER:     ${TAK_DB_USER:-martiuser}
-      TAK_DB_PASSWORD: ${TAK_DB_PASSWORD}
-      # ── Certificate metadata (UPPERCASE, no spaces) ────────────────────────
-      TAK_CERT_STATE:   ${TAK_CERT_STATE}
-      TAK_CERT_CITY:    ${TAK_CERT_CITY}
-      TAK_CERT_ORG:     ${TAK_CERT_ORG}
-      TAK_CERT_OU:      ${TAK_CERT_OU}
+      TAK_DB_PASSWORD:  ${TAK_DB_PASSWORD}
+      # Cert metadata -- consumed by init-certs.sh via docker exec
+      TAK_CERT_STATE:   ${TAK_CERT_STATE:-VA}
+      TAK_CERT_CITY:    ${TAK_CERT_CITY:-TESTCITY}
+      TAK_CERT_ORG:     ${TAK_CERT_ORG:-TESTORG}
+      TAK_CERT_OU:      ${TAK_CERT_OU:-TESTUNIT}
       TAK_CERT_CA_NAME: ${TAK_CERT_CA_NAME:-TAK-CA}
-      TAK_CERT_PASS:    ${TAK_CERT_PASS}
-      # ── Admin cert ────────────────────────────────────────────────────────
-      TAK_ADMIN_CERT_NAME: ${TAK_ADMIN_CERT_NAME:-admin}
-      # ── Post-init groups (comma-separated) ────────────────────────────────
-      TAK_INIT_GROUPS: ${TAK_INIT_GROUPS:-Alpha,Bravo}
-    ports:
-      - "${TAK_PORT_COT:-8089}:8089"       # CoT clients (TLS)
-      - "${TAK_PORT_WEB:-8443}:8443"       # WebTAK / REST API / Admin
-      - "${TAK_PORT_ENROLL:-8446}:8446"    # Certificate enrollment
+      TAK_CERT_PASS:    ${TAK_CERT_PASS:-atakatak}
+      POSTGRES_HOST:    tak-database
+      POSTGRES_PORT:    5432
     volumes:
-      - tak_certs:/opt/tak/certs/files     # Persisted CA chain + server/admin certs
-      - tak_logs:/opt/tak/logs             # Persisted logs
-      - tak_data:/opt/tak/data             # Persisted mission/data package store
+      - tak_certs:/opt/tak/certs/files
+      - tak_logs:/opt/tak/logs
+    ports:
+      - "${TAK_PORT_COT:-8089}:8089"
+      - "${TAK_PORT_WEB:-8443}:8443"
+      - "${TAK_PORT_ENROLL:-8446}:8446"
     networks:
-      - tak_internal
+      - tak_net
     healthcheck:
-      test: ["CMD", "/opt/tak/docker/healthcheck.sh"]
+      test: ["CMD-SHELL", "nc -zw3 localhost 8443"]
       interval: 30s
       timeout: 10s
-      retries: 12
-      start_period: 180s
+      retries: 10
+      start_period: 120s
 
-# ── Named volumes ─────────────────────────────────────────────────────────────
 volumes:
-  postgres_data:
+  tak_pg_data:
   tak_certs:
   tak_logs:
-  tak_data:
 
-# ── Networks ──────────────────────────────────────────────────────────────────
 networks:
-  tak_internal:
-    driver: bridge
+  tak_net:
