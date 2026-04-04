@@ -35,8 +35,24 @@ jobs:
           source: ./docs
           destination: ./_site
 
+      - name: Archive GitHub Pages artifact
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory "./_site" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=".[^/]*" \
+            .
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-artifact@v6
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   deploy:
     environment:
