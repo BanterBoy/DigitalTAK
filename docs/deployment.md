@@ -78,10 +78,10 @@ You will be prompted for:
 For non-interactive / scripted deployments:
 
 ```powershell
-$cred   = [PSCredential]::new('atak', (ConvertTo-SecureString 'IamGroot.3742' -AsPlainText -Force))
-$rootPw = ConvertTo-SecureString 'R00t!Secure42' -AsPlainText -Force
-$ksPw   = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
-$certPw = ConvertTo-SecureString 'C3rtP@ss2025!' -AsPlainText -Force
+$cred   = [PSCredential]::new('atak', (ConvertTo-SecureString '<SshPassword>' -AsPlainText -Force))
+$rootPw = ConvertTo-SecureString '<RootPassword>' -AsPlainText -Force
+$ksPw   = ConvertTo-SecureString '<KeystorePassword>' -AsPlainText -Force
+$certPw = ConvertTo-SecureString '<CertPassword>' -AsPlainText -Force
 
 .\Deploy-TAKServer.ps1 `
     -VMName           'TAK-Prod-01' `
@@ -97,6 +97,8 @@ $certPw = ConvertTo-SecureString 'C3rtP@ss2025!' -AsPlainText -Force
     -CAName           'ACME-TAK-CA' `
     -Confirm:$false
 ```
+
+> *Chuck Norris doesn't need `-Confirm:$false`. PowerShell never questions him.*
 
 ---
 

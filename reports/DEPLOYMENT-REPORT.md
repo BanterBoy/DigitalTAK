@@ -11,7 +11,7 @@
 | Item | Value |
 |------|-------|
 | VM Name | TAKServer |
-| VM IP | 10.10.0.144 |
+| VM IP | [REDACTED] |
 | SSH User | atak |
 | OS | Rocky Linux release 9.7 (Blue Onyx) |
 | Java | openjdk version "17.0.18" 2026-01-20 LTS |
@@ -27,10 +27,10 @@
 
 | Field | Value |
 |-------|-------|
-| State | ESSEX |
-| City | SOUTHEND-ON-SEA |
-| Organization | LEIGH-SERVICES |
-| OU | IT-DEPARTMENT |
+| State | [REDACTED] |
+| City | [REDACTED] |
+| Organization | [REDACTED] |
+| OU | [REDACTED] |
 | CA Name | TAK-CA |
 
 ## Credentials
@@ -38,9 +38,9 @@
 | Item | Value |
 |------|-------|
 | SSH user | atak |
-| SSH user password | romeOfed.3742 |
-| Root password | romeOfed.3742 |
-| Deployment keystore password parameter | romeOfed.3742 |
+| SSH user password | [REDACTED] |
+| Root password | [REDACTED] |
+| Deployment keystore password parameter | [REDACTED] |
 | Generated PKCS#12 / PFX password | atakatak |
 
 Notes:
@@ -55,11 +55,11 @@ Notes:
 PowerShell commands used to start the deployment:
 
 ```powershell
-Set-Location 'C:\Users\LukeLeigh\DigitalTAK'
-$cred = [PSCredential]::new('atak', (ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force))
-$rootPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
-$ksPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
-.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -Confirm:$false -State 'ESSEX' -City 'SOUTHEND-ON-SEA' -Organization 'LEIGH-SERVICES' -OrganizationalUnit 'IT-DEPARTMENT' -CAName 'TAK-CA'
+Set-Location 'C:\GitRepos\DigitalTAK'
+$cred = [PSCredential]::new('atak', (ConvertTo-SecureString '[REDACTED]' -AsPlainText -Force))
+$rootPw = ConvertTo-SecureString '[REDACTED]' -AsPlainText -Force
+$ksPw = ConvertTo-SecureString '[REDACTED]' -AsPlainText -Force
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -Confirm:$false -State '[REDACTED]' -City '[REDACTED]' -Organization '[REDACTED]' -OrganizationalUnit '[REDACTED]' -CAName 'TAK-CA'
 ```
 
 ## Installation Phases
@@ -72,7 +72,7 @@ $ksPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
 
 ## Post-Deployment Test Results (DIG-53 Validation — 2026-04-03)
 
-Integration tests run via `Invoke-IntegrationTests.ps1` against live VM at **10.10.0.144**.
+Integration tests run via `Invoke-IntegrationTests.ps1` against live VM at **[REDACTED]**.
 
 **22 / 22 core health checks passed**
 
@@ -131,7 +131,7 @@ Integration tests run via `Invoke-IntegrationTests.ps1` against live VM at **10.
 
 ### Notes on API Tests
 
-- **Port 8443 (WebTAK)**: Returns HTTP 000 (SSL handshake rejected) without a client certificate. This is correct TAK Server behaviour — mTLS is enforced. To validate, import `admin.p12` into browser and navigate to `https://10.10.0.144:8443`.
+- **Port 8443 (WebTAK)**: Returns HTTP 000 (SSL handshake rejected) without a client certificate. This is correct TAK Server behaviour — mTLS is enforced. To validate, import `admin.p12` into browser and navigate to `https://[REDACTED]:8443`.
 - **Port 8446 (cert enrollment)**: Returns HTTP 403 for unauthenticated requests. Correct behaviour.
 - **API tests requiring `admin.p12`** (user management, group management) were skipped — `admin.p12` was not downloaded to the host `certs/` directory. These tests pass when `certs/admin.p12` is present.
 
@@ -139,17 +139,17 @@ Integration tests run via `Invoke-IntegrationTests.ps1` against live VM at **10.
 
 | Service | URL |
 |---------|-----|
-| WebTAK / Admin UI | https://10.10.0.144:8443 |
-| Cursor-on-Target (CoT) | 10.10.0.144:8089 (TLS) |
-| Certificate Enrollment | https://10.10.0.144:8446 |
+| WebTAK / Admin UI | https://[REDACTED]:8443 |
+| Cursor-on-Target (CoT) | [REDACTED]:8089 (TLS) |
+| Certificate Enrollment | https://[REDACTED]:8446 |
 
 ## Next Steps
 
 1. Retrieve `/home/atak/admin.p12` from the server and import it into your browser:
    ```powershell
-   scp atak@10.10.0.144:/home/atak/admin.p12 .\certs\admin.p12
+   scp atak@[REDACTED]:/home/atak/admin.p12 .\certs\admin.p12
    ```
-2. Navigate to `https://10.10.0.144:8443` to access the TAK Server admin UI.
+2. Navigate to `https://[REDACTED]:8443` to access the TAK Server admin UI.
 3. To create user certificates, SSH to the server and run:
    ```bash
    cd /opt/tak/certs

@@ -9,6 +9,8 @@ nav_title: Troubleshooting
 Diagnosis and resolution steps for common DigitalTAK deployment failures.
 {: .fs-6 .fw-300 }
 
+> *Chuck Norris doesn't troubleshoot. Problems quietly fix themselves before he notices.*
+
 ## Table of Contents
 {: .no_toc .text-delta }
 

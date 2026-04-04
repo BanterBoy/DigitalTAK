@@ -45,7 +45,7 @@
 .EXAMPLE
     # Full integration run against a local deployment:
     $env:TAK_INTEGRATION_HOST = '192.168.1.50'
-    $env:TAK_SSH_PASS         = 'IamGroot.3742'
+    $env:TAK_SSH_PASS         = '<SshPassword>'
     .\Invoke-IntegrationTests.ps1
 
 .EXAMPLE

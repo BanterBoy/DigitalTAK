@@ -14,8 +14,12 @@
          href="{{ '/' | absolute_url }}">Home</a>
       <a class="sidebar-nav-item{% if page.url contains 'getting-started' %} active{% endif %}"
          href="{{ '/getting-started/' | absolute_url }}">Getting Started</a>
-      <a class="sidebar-nav-item{% if page.url contains 'deployment' %} active{% endif %}"
+      <a class="sidebar-nav-item{% if page.url == '/deployment/' %} active{% endif %}"
          href="{{ '/deployment/' | absolute_url }}">Deployment</a>
+      <a class="sidebar-nav-item{% if page.url contains 'post-deployment' %} active{% endif %}"
+         href="{{ '/post-deployment/' | absolute_url }}">Post-Deployment</a>
+      <a class="sidebar-nav-item{% if page.url contains 'onboarding' %} active{% endif %}"
+         href="{{ '/onboarding/' | absolute_url }}">Team Onboarding</a>
       <a class="sidebar-nav-item{% if page.url contains 'agent-configuration' %} active{% endif %}"
          href="{{ '/agent-configuration/' | absolute_url }}">Agent Configuration</a>
       <a class="sidebar-nav-item{% if page.url contains 'api-reference' %} active{% endif %}"

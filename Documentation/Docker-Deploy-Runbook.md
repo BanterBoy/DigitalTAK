@@ -65,12 +65,12 @@ nano .env   # or vi, code, etc.
 
 | Variable | Description | Example |
 |---|---|---|
-| `TAK_DB_PASSWORD` | PostgreSQL password for the TAK database user | `S3cur3P@ss!` |
+| `TAK_DB_PASSWORD` | PostgreSQL password for the TAK database user | `<your-db-password>` |
 | `TAK_CERT_STATE` | State code — UPPERCASE, no spaces | `VA` |
 | `TAK_CERT_CITY` | City code — UPPERCASE, no spaces | `ARLINGTON` |
 | `TAK_CERT_ORG` | Organisation — UPPERCASE, no spaces | `MYORG` |
 | `TAK_CERT_OU` | Org unit — UPPERCASE, no spaces | `MYUNIT` |
-| `TAK_CERT_PASS` | Certificate keystore password | `C3rtP@ss!` |
+| `TAK_CERT_PASS` | Certificate keystore password | `<your-cert-password>` |
 
 All other variables have sensible defaults and can be left unchanged for a baseline deployment.
 

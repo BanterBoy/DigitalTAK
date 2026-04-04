@@ -99,9 +99,9 @@
     .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 
 .EXAMPLE
-    $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString 'IamGroot.3742' -AsPlainText -Force))
-    $rootPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
-    $ksPw   = ConvertTo-SecureString 'T@kServ3r2025!' -AsPlainText -Force
+    $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString '<SshPassword>' -AsPlainText -Force))
+    $rootPw = ConvertTo-SecureString '<RootPassword>' -AsPlainText -Force
+    $ksPw   = ConvertTo-SecureString '<KeystorePassword>' -AsPlainText -Force
     $certPw = Read-Host -AsSecureString 'Certificate (.p12) password'
     .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
 

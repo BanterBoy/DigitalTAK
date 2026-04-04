@@ -39,6 +39,8 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 |------|-------------|
 | [Getting Started](getting-started/) | Prerequisites, repo layout, module installation, CI pipeline |
 | [Deployment Guide](deployment/) | Step-by-step `Deploy-TAKServer.ps1` walkthrough with all parameters |
+| [Post-Deployment](post-deployment/) | What a successful deployment produces, validation tests, first access steps |
+| [Team Onboarding](onboarding/) | Per-user cert generation, user accounts, and ATAK data package distribution |
 | [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
 | [Troubleshooting](troubleshooting/) | Diagnosis and fixes for common failures |
 | [Configuration Reference](config/baseline/) | CoreConfig.xml settings, certificate layout, port inventory |

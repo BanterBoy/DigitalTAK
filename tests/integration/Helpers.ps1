@@ -23,7 +23,7 @@
     # Set environment, then run all integration tests:
     $env:TAK_INTEGRATION_HOST = '192.168.1.50'
     $env:TAK_SSH_USER         = 'atak'
-    $env:TAK_SSH_PASS         = 'IamGroot.3742'
+    $env:TAK_SSH_PASS         = '<SshPassword>'
     Invoke-Pester ./IntegrationTests -Output Detailed
 #>
 

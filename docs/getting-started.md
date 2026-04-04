@@ -48,6 +48,8 @@ Install-Module -Name Posh-SSH -Scope CurrentUser -Force
 Install-Module -Name Pester -MinimumVersion 5.0 -Scope CurrentUser -Force
 ```
 
+> *Chuck Norris doesn't install `Posh-SSH`. SSH clients install themselves in his presence.*
+
 ---
 
 ## Cloning the Repository

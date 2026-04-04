@@ -1,0 +1,233 @@
+---
+layout: page
+title: Post-Deployment
+nav_title: Post-Deployment
+---
+
+# Post-Deployment
+{: .no_toc }
+
+What a successful `Deploy-TAKServer.ps1` run produces and how to verify it.
+{: .fs-6 .fw-300 }
+
+> *Chuck Norris's deployments always pass 22 out of 22 tests. There used to be a 23rd — "Is Chuck Norris satisfied?" — but it was retired for being redundant.*
+
+## Table of Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## What the Script Produces
+
+When the deployment completes all phases, you will have:
+
+- A running Hyper-V Gen 2 VM with Rocky Linux 9.7 and TAK Server 5.7
+- A full certificate authority (CA) on the VM with server and admin certificates
+- Client certificate files (`admin.p12`, `user.p12`) downloaded to a local `certs/` directory
+- The admin certificate imported into your Windows certificate store
+- A deployment report at `reports/DEPLOYMENT-REPORT-<timestamp>.md`
+
+---
+
+## Example Deployment Report
+
+The script generates a report at the end of every run. Below is an annotated example showing what each section contains.
+
+### Header
+
+```
+# TAK Server Deployment Report
+
+Generated:  2026-04-02 13:18:11
+Duration:   00:11:12
+Result:     ALL TESTS PASSED
+```
+
+A failed deployment will show `FAILED` here and list which phase errored.
+
+---
+
+### Environment
+
+| Item | Value |
+|------|-------|
+| VM Name | TAKServer |
+| VM IP | `<assigned by DHCP or static — your network>` |
+| SSH User | atak |
+| OS | Rocky Linux release 9.7 (Blue Onyx) |
+| Java | openjdk version "17.0.18" 2026-01-20 LTS |
+| TAK Server | takserver-5.7-RELEASE8.noarch |
+| Total Memory | 7.5Gi |
+| Disk Usage (/) | /dev/mapper/rl_takserver-root   48G  4.0G   44G   9% / |
+| Hyper-V Generation | 2 |
+| vCPU | 4 |
+| RAM | 8 GB (fixed) |
+| VHD | 80 GB (dynamic VHDX) |
+| vSwitch | TAK-External |
+
+The `VM IP` is the address you will use for all subsequent access. Note it down — it is not stored elsewhere by the script.
+
+---
+
+### Certificate Configuration
+
+| Field | Value |
+|-------|-------|
+| State | `<value you supplied>` |
+| City | `<value you supplied>` |
+| Organization | `<value you supplied>` |
+| OU | `<value you supplied>` |
+| CA Name | `<CAName you supplied>` |
+
+These values are embedded in every certificate the CA issues. They cannot be changed without regenerating the full CA.
+
+---
+
+### Credentials
+
+| Item | Value |
+|------|-------|
+| SSH user | atak |
+| SSH user password | *(your SSH password — not stored in report)* |
+| Root password | *(your root password — not stored in report)* |
+| Deployment keystore password | *(your `-KeystorePassword` value — not stored)* |
+| Generated PKCS#12 / PFX password | `atakatak` |
+
+{: .note }
+The `.p12` client certificate files use the TAK Server upstream default PKCS#12 password **`atakatak`**. This is distinct from the `-KeystorePassword` you supplied, which governs the server-side JKS keystores. Use `atakatak` when importing `.p12` files into a browser or ATAK client.
+
+---
+
+### Installation Phases
+
+| Phase | Result | Typical Duration |
+|-------|--------|-----------------|
+| Install TAK Server | Success | ~3–4 min |
+| Create Certificates | Success | ~1–2 min |
+| Promote Admin Cert | Success | ~1 min |
+
+If any phase fails, the script stops and reports the error. Re-running restores from the last successful phase snapshot automatically.
+
+---
+
+### Post-Deployment Validation Tests
+
+The script runs 22 automated checks over SSH immediately after install. All 22 must pass for the deployment to be marked successful.
+
+| # | Test | What It Verifies |
+|---|------|-----------------|
+| 1 | `takserver` service is active | systemd service running |
+| 2 | `takserver` service is enabled | survives reboot |
+| 3 | Java 17 is installed | correct JDK version |
+| 4 | PostgreSQL is running | database service active |
+| 5 | Port 8089 listening | CoT TCP socket open |
+| 6 | Port 8443 listening | WebTAK HTTPS socket open |
+| 7 | Port 8446 listening | cert enrollment socket open |
+| 8 | firewalld is active | firewall service running |
+| 9 | Firewall has 8089/tcp | rule present |
+| 10 | Firewall has 8443/tcp | rule present |
+| 11 | Firewall has 8446/tcp | rule present |
+| 12 | SELinux takserver module loaded | module installed |
+| 13 | CoreConfig.xml exists | TAK config file present |
+| 14 | CA truststore exists | JKS truststore created |
+| 15 | Server certificate exists | server JKS created |
+| 16 | Admin .p12 cert exists | admin cert under `/opt/tak/certs/files/` |
+| 17 | Admin .p12 in /home/atak/ | copied to SSH user home |
+| 18 | Cert enrollment HTTPS responds on 8446 | HTTP 403 (unauthenticated — expected) |
+| 19 | cert-metadata.sh has correct State | cert metadata patched correctly |
+| 20 | TAK Server RPM installed | package registered with dnf |
+| 21 | nofile ulimit configured | file-descriptor limit set (32768) |
+| 22 | OS is Rocky Linux 9 | correct OS |
+
+---
+
+### Access URLs
+
+| Service | URL |
+|---------|-----|
+| WebTAK / Admin UI | `https://<SERVER_IP>:8443` |
+| Cursor-on-Target (CoT) | `<SERVER_IP>:8089` (TLS) |
+| Certificate Enrollment | `https://<SERVER_IP>:8446` |
+
+Replace `<SERVER_IP>` with the IP shown in the Environment section of your deployment report.
+
+---
+
+## Certificate Files
+
+### On the VM
+
+```
+/opt/tak/certs/files/
+├── admin.p12                       ← admin client certificate
+├── user.p12                        ← default user client certificate
+├── truststore-root.jks
+├── truststore-intermediate-ca.jks
+└── takserver.jks                   ← server keystore
+```
+
+The admin `.p12` is also copied to `/home/atak/admin.p12` for easy retrieval.
+
+### Downloaded Locally
+
+At the end of a successful run the script copies `.p12` files to `certs/` in your repo working directory:
+
+```
+certs/
+├── admin.p12
+└── user.p12
+```
+
+{: .warning }
+The `certs/` directory is excluded by `.gitignore`. Never commit `.p12` files to version control.
+
+---
+
+## First Steps After Deployment
+
+### 1 — Retrieve the admin certificate (if not auto-downloaded)
+
+```powershell
+scp atak@<SERVER_IP>:/home/atak/admin.p12 .\certs\admin.p12
+```
+
+### 2 — Import into your browser
+
+Most browsers read from the Windows certificate store. If the auto-import step ran successfully you can skip the manual import.
+
+**Manual import (Chrome / Edge):**
+
+1. Settings → Privacy and security → Manage certificates
+2. Personal tab → Import
+3. Select `admin.p12`
+4. Enter password: `atakatak`
+5. Place in **Personal** store
+
+### 3 — Access the WebTAK Admin UI
+
+Navigate to `https://<SERVER_IP>:8443` in your browser.  
+The browser will prompt you to select a client certificate — choose the imported `admin` cert.
+
+You will see the TAK Server admin interface. From here you can manage users, groups, data packages, and server settings.
+
+### 4 — Verify CoT connectivity
+
+Point an ATAK or WinTAK client at `<SERVER_IP>:8089` with TLS enabled.  
+The client will need a server connection profile and the `truststore-intermediate-ca.p12` file to validate the server certificate.
+
+---
+
+## Notes on Port 8443 Behaviour
+
+Port 8443 enforces mutual TLS (mTLS). A browser or tool connecting **without** a client certificate will receive an SSL handshake rejection (curl shows `HTTP 000`). This is correct behaviour — not a firewall or service issue. The connection only succeeds once a certificate signed by the TAK CA is presented.
+
+---
+
+## Next Steps
+
+- [Team Onboarding](../onboarding/) — generate per-user certificates and build ATAK data packages for a team
+- [Troubleshooting](../troubleshooting/) — common failure patterns and fixes
+- [API Reference](../api-reference/) — manage users, groups, and data packages via PowerShell cmdlets
