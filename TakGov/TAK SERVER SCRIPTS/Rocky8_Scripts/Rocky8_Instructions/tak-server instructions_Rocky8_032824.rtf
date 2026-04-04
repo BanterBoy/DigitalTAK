@@ -1,0 +1,355 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fswiss\fcharset0 Helvetica-Oblique;
+\f3\fnil\fcharset0 Menlo-Regular;\f4\fnil\fcharset0 Menlo-Bold;\f5\fswiss\fcharset0 ArialMT;
+\f6\fswiss\fcharset0 Helvetica-BoldOblique;}
+{\colortbl;\red255\green255\blue255;\red14\green14\blue14;\red0\green0\blue0;\red253\green128\blue8;
+\red230\green230\blue230;\red0\green0\blue0;\red253\green134\blue8;\red251\green2\blue7;\red205\green205\blue205;
+\red253\green128\blue8;\red230\green230\blue230;\red48\green51\blue63;}
+{\*\expandedcolortbl;;\cssrgb\c6667\c6667\c6667;\cssrgb\c0\c0\c0;\cssrgb\c100000\c57637\c0;
+\csgray\c92143;\csgray\c0\c0;\cssrgb\c100000\c60000\c0;\cssrgb\c100000\c14913\c0;\csgray\c84070;
+\cssrgb\c100000\c57637\c0;\csgray\c92143;\cssrgb\c24706\c26275\c31373;}
+\margl1440\margr1440\vieww16500\viewh17760\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 Installing TAK-SERVER RPM on Linux Virtual Server. (Written for Rocky8)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 \
+[Download TAK-SERVER,  Instructions, Scripts and Data Package Master Folder]\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 \
+Go to http://maps.takserver.us and and go to the TAK-SERVER Folder download the TAK SERVER SCRIPTS FOLDER and the MASTER_SERVER_NAME_FOLDER_STRUCTURE onto your local machine.\
+\
+Go to www.tak.gov and download Rocky8 version of TAK-Server onto your local machine.\
+\
+****modify 
+\f2\i Script
+\f0\i0  - RL8.9_tak5r69_install.sh to match the TAK Server version and release number*******\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 [Launch local or virtual machine and create Admin User named atak with password of atakatak]
+\f0\b0 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+Create a new user named\'a0\cf3 atak\cf2 , run:
+\f3  
+\f4\b \cf4 \cb5 sudo useradd -m atak\cb6 \
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf7 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b0 \cf2 Set the password, run:\'a0
+\f4\b \cf4 \cb5 sudo passwd atak\cb6 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f5\b0 \cf2 \cb1 Type in the password:
+\f4\b \cf4 \cb5  atakatak\cf8 \cb6  \{you will get this message, \'93BAD PASSWORD: The password contains the user name in some form\'94 it\'92s ok just retype atakatak again.\}\
+You will know you did it right when you get this message in return \'93all authentication tokens updated successfully.\'94\
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 By creating this user named atak this also made a folder called atak under the home folder. This will become important in a few more steps.\cf7 \
+\pard\pardeftab720\partightenfactor0
+
+\f5\b0 \cf2 \cb1 \
+Make atak user \'91sudo user\'92 run :\cb5 \'a0
+\f4\b \cf4 sudo usermod -aG wheel atak \
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 \cb6 [Switch from the root user to the atak user]\
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb9 su - atak  
+\f5\b0\fs36 \cf2 \cb1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b\fs28 \cf0 \kerning1\expnd0\expndtw0 [Copy scripts and TAK-SERVER RPM files into ATAK folder via FTP Client]\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f2\i\b0 \cf0 Script 
+\f0\i0 - takUserCreateCerts_doNotRunAsRoot.sh\
+
+\f2\i Script
+\f0\i0  - createTakCerts.sh\
+
+\f2\i Script
+\f0\i0  - RL8.9_tak5r69_install.sh\
+
+\f2\i Script
+\f0\i0  - takserver_createLECerts.sh\
+
+\f2\i Script
+\f0\i0  - takserver_renewLECerts.sh\
+
+\f2\i Script
+\f0\i0  - promoteAdmin.sh
+\f1\b \
+
+\f2\i\b0 RPM Installer
+\f0\i0  - takserver-5.0-RELEASE69.noarch.rpm\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 \
+[Install TAK-SERVER]
+\f0\b0 \
+\
+Get to the atak folder where all the scrips and tak server rpm file are; 
+\f3 \cf4 \cb5 cd /home/atak
+\f0 \cf0 \cb1 \
+\
+Queue up the TAK-SERVER install run; 
+\f3 \cf4 \cb5 sudo chmod +x RL8.9_tak5r69_install.sh\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf3 \cb6 Enter password if asked for atak user
+\f0 \cf0 \cb1 \
+\
+Execute the TAK-SERVER installation run; 
+\f3 \cf4 \cb5 ./RL8.9_tak5r69_install.sh\cb6 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0 \cf2 \cb1 \expnd0\expndtw0\kerning0
+It\'92s going to update and clean stuff and it will stall for a while on certain processes. It\'92s ok, go grab a sparkling water\'85.Topo Chico or Rambler preferred\'85
+\f1\b \cf0 \kerning1\expnd0\expndtw0 \
+\
+
+\f6\i \cf2 \expnd0\expndtw0\kerning0
+\ul \ulc2 1st user promp\ulnone t
+\f0\i0\b0  will be for the atak user password for installing Java 17\
+\
+
+\f6\i\b \ul 2nd user prompt
+\f0\i0\b0 \ulnone  install 1 package answer yes\
+\
+
+\f6\i\b \ul 3rd User prompt
+\f0\i0\b0 \ulnone  select java option choose - 1\
+\
+will start configuring the certificates.\
+\
+Enter the following with NO SPACES (you can put whatever you want)\
+STATE:\
+CITY:\
+ORG:\
+ORG UNIT:\
+\
+4th User Prompt, give a name for the Certificate Authority, has to be at least five characters\
+\
+5th User Prompt - answer 'y' to the "Do you want me to move files around" question, it's for the intermediate signing CA\
+\
+The script will give a 90 second countdown to ensure takserver is fully restarted prior to promoting\
+the admin.pem certificate to the administrator role\
+\
+Will ask for password for atak\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf8 This may fail- \
+\
+Success looks like this;\
+\
+promoting admin.pem to administrator\
+New User Added:\
+	Username:      'admin'\
+	Role:          ROLE_ADMIN\
+	Fingerprint:   9C:9A:75:94:A2:31:18:00:67:15:76:82:81:9A:87:6C:3C:28:75:81:5B:7F:16:20:4F:A7:41:0C:27:50:DF:EF\
+	Groups (read and write permission):        \
+		__ANON__\
+\
+If this does not show up do not worry. \
+\
+I have this happen all the time on SSD node but it may not happen. \
+\
+This seems to occur when using a server version only of Rocky8.\
+\
+The full version of Rock with a gui does not seem to have this issue and the fix is easy.\
+\
+Give the TAK-Server a few minutes to restart.\
+\
+Next get to the atak directory cd /home/atak\
+\
+\cf3 Copy this script\cf8  \cf10 \cb11 sudo chmod +x promoteAdmin.sh\cf3 \cb6  then press enter\
+\
+Copy this script .\cf4 \cb5 /promoteAdmin.sh\cf3 \cb6  then press enter\
+\
+You should see this\
+\
+\cf8 promoting admin.pem to administrator\
+New User Added:\
+	Username:      'admin'\
+	Role:          ROLE_ADMIN\
+	Fingerprint:   9C:9A:75:94:A2:31:18:00:67:15:76:82:81:9A:87:6C:3C:28:75:81:5B:7F:16:20:4F:A7:41:0C:27:50:DF:EF\
+	Groups (read and write permission):        \
+		__ANON__\
+\
+restarting tak server\cb1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 ====================================================================================================================================================\
+upon completion, either disable the firewall for testing, or configure it properly\
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb6 This version will add tcp 8089/8443/8446 to firewalld\cf2 \cb1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 \
+to disable for testing, type      sudo systemctl stop firewalld      (sudo systemctl start firewalld will start it)\
+\
+To login to your new TAK-Server instance you need to import the admin.p12 into your browser.\
+\
+Another file you will need for building a datapackage for connection is the trust store-intermediate-ca.p12 file.\
+\
+Move them both to you your local machine.\
+\
+Firefox has been the easiest in my experience.\
+\
+To do this move browse to the root directory opt/tak/certs/files on the virtual machine and copy them to your to your local machine.\
+\
+This script also made a copy of the admin cert and put it in the atak folder (the same folder you placed all the scripts and task-server rpm file in)\
+\
+In Firefox go to your settings and in the search bar type in Certificates\
+\
+Click on View Certificates, then click on Your Certificates, click on Import and browse to wherever you stored the admin.p12 file then click OK.\
+\
+You will notice Fire Fox will list the certificate by the ORG name you set up.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 To get to your TAK-Server enter your ip address and port 8443; example https://ipaddresshere:8443\
+\
+You will be promoted to choose your certificate - you only have to do this once.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 [Create user on the TAK-Server]\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 Now go to hamburger menu upper right, click on Administration, Manage Users.\
+\
+Create a new user in upper left hand corner - type in unique username and password. Then click on \'93create user\'94 \
+\
+I am not going to cover creating filer groups at this time.
+\f1\b \
+
+\f0\b0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 [Create DataPackage for Connection for IP address only TAK-Server - if you are going to use a public facing web domain you can skip this step for now]\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 For an ATAK client to be able to connect to the server using the servers authority the device must have the truststore-intermediate-ca.p12 file.\
+\
+The easiest way to get the client onto the server is to create a DataPackage (a zipped file) with the trust store-intermediate-ca.p12 file, a manifest and a preference file with the server IP address.\
+\
+When you downloaded the MASTER_SERVER_NAME_FOLDER_STRUCTURE it came with a boiler plate profile preference file and a manifest you can modify to reflect this information.\
+\
+Once the datapackage is created you can share that out with the user\'92s unique username and password you created using the TAK-Server GUI.\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 [Install LetsEncrypt Keys - Not Required] This will allow you to use the enroll for certificate from ATAK using a public facing domain.\
+\
+Step 1 - go to your domain host provider like go daddy.com and add an A record to point to the IP address of the TAK-Server\
+\
+After the A record had been changed now log into terminal or the web console of your virtual machine.\
+\
+This script will also add what is called a cronjob to your server which will mostly automatically renew your LetsEncrypt certificate.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 Get to the Downloads folder in the atak directory run; 
+\f3 \cf4 \cb5 cd /home/atak
+\f0 \cf2 \cb1 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+
+\f5\fs36 \cf2 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 \kerning1\expnd0\expndtw0 Que up the LetEncrypt install run; 
+\f3 \cf4 \cb5 \expnd0\expndtw0\kerning0
+sudo chmod +x takserver_createLECerts.sh\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf3 \cb6 Enter Password for atak\cf4 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0 \cf0 \cb1 \kerning1\expnd0\expndtw0 Execute the TAK-SERVER installation run; \cf4 \cb11 sudo 
+\f3 ./takserver\cf4 \cb5 _createLECerts.sh\cb6 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f5\fs36 \cf2 \cb1 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf0 \kerning1\expnd0\expndtw0 1st prompt - enter an email address where letsencrypt can reach you. \
+\
+2nd prompt - agree to terms of service - enter y\
+\
+3rd prompt - sharing of email choose y or n\
+\
+4th prompt - Enter your domain name - example tak1.mytakserver.com (be careful not to typo!)\
+\
+5th Prompt - Enter certificate name - example tak1.mytakserver.com\
+\
+You should then get this returned - \
+\
+Entry for alias tak1.mytakserver.com successfully imported.\
+Import command completed:  1 entries successfully imported, 0 entries failed or cancelled\
+complete - wait a minute before checking\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 [Connecting an ATAK client to the TAK-Server with a public facing domain]\
+\
+Option 1 - Create DataPackage for Connection\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 For an ATAK client to be able to connect to the server using the LetsEncrypt authority you will follow the same steps as using an IP address but just use your web address inlace of an IP address.\
+\
+The easiest way to get the client onto the server is to create a DataPackage (a zipped file) with the truststore-intermediate-ca.p12 file, a manifest and a preference file with the web address.\
+\
+When you downloaded the MASTER_SERVER_NAME_FOLDER_STRUCTURE it came with a boiler plate profile preference file and a manifest you can modify to reflect this information.\
+\
+Once the datapackage is created you can share that out with the user\'92s unique username and password you created using the TAK-Server GUI.\
+\
+The end user will download the data package onto their device, use the import feature in ATAK, upon import ATAK will prompt for the username and password.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 Option 2 - 
+\f0\b0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+The second option is the ATAK client can add a connection manually and enroll for a certificate.\
+\
+To do that share the web address of the server i.e. tak1.mytakserver.com and the username and password you created on the TakServer web GUI.\
+\
+From ATAK the user can add the takserver connection using the domain address and then choose enroll for certificate and then at prompt enter the username and password combo you issued to them. \
+\
+I have included a pdf instructional for how to do this. You can share that with your end user. \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b \cf0 [Here are some helpful commands]
+\f0\b0 \
+\
+CLI instruction to restart takserver\
+sudo systemctl restart takserver\
+
+\fs24 \
+\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+}

@@ -1,0 +1,420 @@
+**********************
+PowerShell transcript start
+Start time: 20260404182152
+Username: AzureAD\LukeLeigh
+RunAs User: AzureAD\LukeLeigh
+Configuration Name: 
+Machine: LUKE (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll
+Process ID: 43864
+PSVersion: 7.6.0
+PSEdition: Core
+GitCommitId: 7.6.0
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Transcript started, output file is C:\GitRepos\DigitalTAK\reports\InstallTranscript.txt
+┌──(LukeLeigh💀LUKE)-[C:/GitRepos/DigitalTAK]-[prod]                                                                                                                                                                4ms   
+└─# 
+PS>$cred   = [PSCredential]::new('atak', (ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force))
+$rootPw = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
+$ksPw   = ConvertTo-SecureString 'romeOfed.3742' -AsPlainText -Force
+.\Deploy-TAKServer.ps1 `
+    -VMName           'TAK-BMTN-01' `
+    -SwitchName       'TAK-External' `
+    -RockyIsoPath     "C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso" `
+    -RpmPath          "C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm" `
+    -Credential       $cred `
+    -RootPassword     $rootPw `
+    -KeystorePassword $ksPw `
+    -VMBasePath       "C:\Hyper-V\VMs\" `
+    -State            'ESSEX' -City 'SOUTHEND-ON-SEA' `
+    -Organization     'BTMN-OPS' -OrganizationalUnit 'TAK' `
+    -CAName           'BTMN-TAK-CA' `
+    -Confirm:$false
+
+============================================================
+  TAK Server Full Deployment
+  VM: TAK-BMTN-01 | Switch: TAK-External
+============================================================
+
+[OK] Rocky ISO and TAK RPM found
+
+── Phase 0: Creating VM & Installing Rocky Linux ──
+  [OK] Kickstart generated
+  [OK] OEMDRV disk created: C:\Hyper-V\VMs\TAK-BMTN-01\TAK-BMTN-01-oemdrv.vhdx
+  [OK] OS VHDX created
+  [OK] VM created and configured
+  [OK] Rocky DVD + OEMDRV disk attached, boot order set
+  [OK] Sent Enter to skip GRUB menu
+  VM started — Rocky Linux installation in progress...
+  Waiting for SSH... 600s remaining
+  Waiting for SSH... 584s remaining
+  Waiting for SSH... 569s remaining
+  Waiting for SSH... 554s remaining
+  Waiting for SSH... 538s remaining
+  Waiting for SSH... 523s remaining
+  Waiting for SSH... 507s remaining
+  Waiting for SSH... 492s remaining
+  Waiting for SSH... 476s remaining
+  Waiting for SSH... 461s remaining
+  Waiting for SSH... 446s remaining
+  Waiting for SSH... 430s remaining
+  Waiting for SSH... 415s remaining
+  Waiting for SSH... 399s remaining
+  Waiting for SSH... 383s remaining
+  Waiting for SSH... 368s remaining
+  Waiting for SSH... 352s remaining
+  [OK] SSH is up at 10.10.0.149
+  Rebooting VM after media cleanup...
+  [OK] Phase 0 complete — VM 'TAK-BMTN-01' is running at 10.10.0.149
+  [OK] Snapshot: Phase0-RockyInstalled
+
+── Phase 1: Establishing SSH Connection ──
+WARNING: Host key is not being verified since Force switch is used.
+[OK] SSH session established (ID: 0)
+
+── Phase 2: Installing TAK Server ──
+VERBOSE: Performing the operation "Install TAK Server 5.7-RELEASE8" on target "10.10.0.149".
+VERBOSE:   => Raise nofile ulimit
+
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Install dnf-plugins-core, vim, epel-release
+Host       : 10.10.0.149
+Output     : {Rocky Linux 9 - BaseOS                           21 MB/s |  17 MB     00:00    , Rocky Linux 9 - AppStream                        26 MB/s |  17 MB     00:00    , Rocky Linux 9 - Extras
+                   43 kB/s |  17 kB     00:00    , Package dnf-plugins-core-4.3.0-24.el9_7.noarch is already installed.…}
+ExitStatus : 0
+
+VERBOSE:   => Install PostgreSQL PGDG repo
+Host       : 10.10.0.149
+Output     : {pgdg-redhat-repo-latest.noarch.rpm               91 kB/s |  13 kB     00:00    , Dependencies resolved., ================================================================================,  Package
+                 Arch       Version                 Repository        Size…}
+ExitStatus : 0
+
+VERBOSE:   => Disable built-in postgresql module
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Update system packages
+Host       : 10.10.0.149
+Output     : {Last metadata expiration check: 0:00:02 ago on Sat 04 Apr 2026 18:27:40 BST., Dependencies resolved., ================================================================================,  Package
+                    Arch   Version                      Repo       Size…}
+ExitStatus : 0
+
+VERBOSE:   => Install OpenJDK 17
+Host       : 10.10.0.149
+Output     : {Last metadata expiration check: 0:01:29 ago on Sat 04 Apr 2026 18:27:40 BST., Dependencies resolved., ====================================================================================================,
+             Package                                   Arch    Version                          Repo        Size…}
+ExitStatus : 0
+
+VERBOSE:   => Enable CRB repo
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Create remote work dir /tmp/tak_install
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => SCP upload: takserver-5.7-RELEASE8.noarch.rpm -> /tmp/tak_install/
+VERBOSE: Using SSH Username and Password authentication for connection.
+WARNING: Host key is not being verified since Force switch is used.
+VERBOSE: Connection successful
+VERBOSE: Uploading: C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm
+VERBOSE: Destination: /tmp/tak_install/takserver-5.7-RELEASE8.noarch.rpm
+VERBOSE:   => Install takserver RPM
+Host       : 10.10.0.149
+Output     : {Rocky Linux 9 - BaseOS                           15 kB/s | 4.3 kB     00:00    , Rocky Linux 9 - AppStream                        17 kB/s | 4.8 kB     00:00    , Rocky Linux 9 - CRB
+                  8.8 MB/s | 4.3 MB     00:00    , Dependencies resolved.…}
+ExitStatus : 0
+
+VERBOSE:   => Install checkpolicy
+Host       : 10.10.0.149
+Output     : {Last metadata expiration check: 0:00:24 ago on Sat 04 Apr 2026 18:29:34 BST., Package checkpolicy-3.6-1.el9.x86_64 is already installed., Dependencies resolved., Nothing to do.…}
+ExitStatus : 0
+
+VERBOSE:   => Apply TAK SELinux policy
+Host       : 10.10.0.149
+Output     : {SELinux Enabled. Applying policy., Enforcing policy, takserver-policy}
+ExitStatus : 0
+
+VERBOSE:   => daemon-reload
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Enable + start takserver
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: Waiting for 'takserver' to become active (timeout 120s)...
+VERBOSE: 'takserver' is active.
+VERBOSE:   => Install and enable firewalld
+Host       : 10.10.0.149
+Output     : {Last metadata expiration check: 0:00:30 ago on Sat 04 Apr 2026 18:29:34 BST., Package firewalld-1.3.4-18.el9_7.noarch is already installed., Dependencies resolved., Nothing to do.…}
+ExitStatus : 0
+
+VERBOSE:   => Open port 8089/tcp
+Host       : 10.10.0.149
+Output     : {success}
+ExitStatus : 0
+
+VERBOSE:   => Open port 8443/tcp
+Host       : 10.10.0.149
+Output     : {success}
+ExitStatus : 0
+
+VERBOSE:   => Open port 8446/tcp
+Host       : 10.10.0.149
+Output     : {success}
+ExitStatus : 0
+
+VERBOSE:   => Reload firewall
+Host       : 10.10.0.149
+Output     : {success}
+ExitStatus : 0
+
+VERBOSE:   => Copy cert scripts to /opt/tak/certs
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Remove remote work dir
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: TAK Server installation complete.
+VERBOSE: Next: Run New-TAKServerCertificate, then Set-TAKAdminCertificate.
+[OK] TAK Server installed (02:49)
+  [OK] Snapshot: Phase2-TAKInstalled
+
+── Phase 3: Creating Certificates ──
+VERBOSE: Performing the operation "Create TAK Server certificates and configure CoreConfig.xml" on target "10.10.0.149".
+VERBOSE:   => Remove old cert files
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Patch cert-metadata.sh
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Patch CAPASS in cert-metadata.sh
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Create Root CA: BTMN-TAK-CA
+Host       : 10.10.0.149
+Output     : {Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters, I will make one for you, Using legacy provider, Making a CA for
+             /C=US/ST=ESSEX/L=SOUTHEND-ON-SEA/O=BTMN-OPS/OU=TAK/CN=BTMN-TAK-CA}
+ExitStatus : 0
+
+VERBOSE:   => Create Intermediate CA
+Host       : 10.10.0.149
+Output     : {Using legacy provider, ca, intermediate-ca, Making a ca cert for  /C=US/ST=ESSEX/L=SOUTHEND-ON-SEA/O=BTMN-OPS/OU=TAK/CN=intermediate-ca…}
+ExitStatus : 0
+
+VERBOSE:   => Create takserver certificate
+Host       : 10.10.0.149
+Output     : {Using legacy provider, server, takserver, Making a server cert for  /C=US/ST=ESSEX/L=SOUTHEND-ON-SEA/O=BTMN-OPS/OU=TAK/CN=takserver}
+ExitStatus : 0
+
+VERBOSE:   => Create admin client certificate
+Host       : 10.10.0.149
+Output     : {Using legacy provider, client, admin, Making a client cert for  /C=US/ST=ESSEX/L=SOUTHEND-ON-SEA/O=BTMN-OPS/OU=TAK/CN=admin}
+ExitStatus : 0
+
+VERBOSE:   => Create initial user certificate
+Host       : 10.10.0.149
+Output     : {Using legacy provider, client, user, Making a client cert for  /C=US/ST=ESSEX/L=SOUTHEND-ON-SEA/O=BTMN-OPS/OU=TAK/CN=user}
+ExitStatus : 0
+
+VERBOSE:   => Restart takserver
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: Waiting for 'takserver' to become active (timeout 300s)...
+VERBOSE: 'takserver' is active.
+VERBOSE:   => Enable x509 TLS input on 8089
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Switch to intermediate CA trust store
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Insert certificate signing block
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Validate CoreConfig.xml signing block
+VERBOSE:   => Enable x509 group cache
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Patch main TLS connector passwords in CoreConfig.xml
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE:   => Final restart
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: Waiting for 'takserver' to become active (timeout 300s)...
+VERBOSE: 'takserver' is active.
+VERBOSE: TAK Server certificate creation complete.
+VERBOSE: Next: Run Set-TAKAdminCertificate to promote the admin certificate.
+[OK] Certificates created (01:35)
+
+── Phase 4: Promoting Admin Certificate ──
+VERBOSE: Performing the operation "Promote admin certificate to TAK Server administrator role" on target "10.10.0.149".
+VERBOSE: Waiting for 'takserver' to become active (timeout 300s)...
+VERBOSE: 'takserver' is active.
+VERBOSE: Waiting for TAK admin API to become reachable (timeout 300s)...
+VERBOSE:   => Check TAK admin API readiness
+VERBOSE:   => Check TAK admin API readiness
+VERBOSE:   => Check TAK admin API readiness
+VERBOSE:   => Check TAK admin API readiness
+VERBOSE:   => Check TAK admin API readiness
+VERBOSE: TAK admin API is reachable.
+VERBOSE:   => Promote admin.pem to administrator role
+VERBOSE:   => Restart takserver
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: Waiting for 'takserver' to become active (timeout 300s)...
+VERBOSE: 'takserver' is active.
+VERBOSE:   => Copy admin.p12 and set ownership
+Host       : 10.10.0.149
+Output     : {}
+ExitStatus : 0
+
+VERBOSE: Admin certificate promotion complete.
+VERBOSE: Retrieve /home/atak/admin.p12 and install it in your browser to access the TAK Server WebUI.
+[OK] Admin certificate promoted (01:22)
+  [OK] Snapshot: Phase4-CertsAndAdmin
+
+── Phase 5: Post-Deployment Validation ──
+  Waiting for TAK Server ports to bind...
+  [OK] Port 8443 is listening — proceeding with tests.
+  [PASS] takserver service is active
+  [PASS] takserver service is enabled
+  [PASS] Java 17 is installed
+  [PASS] PostgreSQL is running
+  [PASS] Port 8089 listening (CoT)
+  [PASS] Port 8443 listening (WebTAK)
+  [PASS] Port 8446 listening (Cert enrollment)
+  [PASS] firewalld is active
+  [PASS] Firewall has 8089/tcp open
+  [PASS] Firewall has 8443/tcp open
+  [PASS] Firewall has 8446/tcp open
+  [PASS] SELinux takserver module loaded
+  [PASS] CoreConfig.xml exists
+  [PASS] CA truststore exists
+  [PASS] Server certificate exists
+  [PASS] Admin .p12 cert exists
+  [PASS] Admin .p12 in /home/atak/
+  [PASS] Certificate enrollment HTTPS responds on 8446
+  [PASS] cert-metadata.sh has correct State
+  [PASS] TAK Server RPM installed
+  [PASS] nofile ulimit configured
+  [PASS] OS is Rocky Linux 9
+
+Test Results: 22/22 passed
+
+── Phase 6: Downloading Certificates ──
+WARNING: Host key is not being verified since Force switch is used.
+  [OK] Downloaded admin.p12
+  [OK] Downloaded user.p12
+  [OK] Downloaded truststore-intermediate-ca.p12
+
+── Phase 7: Generating Deployment Report ──
+[OK] Report saved to: C:\GitRepos\DigitalTAK\reports\DEPLOYMENT-REPORT-20260404183348.md
+
+══════════════════════════════════════════════════════════════
+  TAK Server deployment complete!
+
+  VM:         TAK-BMTN-01 (10.10.0.149)
+  WebTAK:     https://10.10.0.149:8443
+  CoT:        10.10.0.149:8089 (TLS)
+  Cert Enrol: https://10.10.0.149:8446
+  Federation: https://10.10.0.149:9001 (TLS)
+
+  Tests:      22/22 passed
+  Report:     C:\GitRepos\DigitalTAK\reports\DEPLOYMENT-REPORT-20260404183348.md
+
+  Admin cert: /home/atak/admin.p12
+  Import into your browser to access the WebTAK admin UI.
+══════════════════════════════════════════════════════════════
+
+SSH session closed.
+┌──(LukeLeigh💀LUKE)-[C:/GitRepos/DigitalTAK]-[prod]                                                                                                                                                            11m 43s   
+└─# 
+PS>.\Remove-CivTAK.ps1 -VMName TAK-BMTN-01
+
+═══════════════════════════════════════════════════════
+  Remove-CivTAK — Full Teardown
+  VM: TAK-BMTN-01
+═══════════════════════════════════════════════════════
+
+  This will permanently destroy the VM and all local artefacts.
+
+Confirm
+Are you sure you want to perform this action?
+Performing the operation "Permanently remove CivTAK VM and all deployment artefacts" on target "TAK-BMTN-01".
+&Yes  Yes to &All  &No  No to A&ll  &Suspend
+Y
+
+── Step 2: Removing Hyper-V VM ──
+  [OK] VM stopped
+  [OK] Removed 3 snapshot(s)
+  [OK] VM 'TAK-BMTN-01' removed from Hyper-V
+
+── Step 3: Deleting VHDX ──
+  [OK] Deleted: C:\Hyper-V\VMs\TAK-BMTN-01\TAK-BMTN-01.vhdx
+  [OK] Removed empty VM directory: C:\Hyper-V\VMs\TAK-BMTN-01
+
+── Step 4: Removing local certificate files ──
+  [OK] Removed 3 .p12 file(s) from certs\
+
+── Step 5: Removing TAK certificates from Windows store ──
+  Removed: CN=intermediate-ca, OU=TAK, O=BTMN-OPS, L=SOUTHEND-ON-SEA, S=ESSEX, C=US (My)
+  Removed: CN=BTMN-TAK-CA, OU=TAK, O=BTMN-OPS, L=SOUTHEND-ON-SEA, S=ESSEX, C=US (My)
+  Removed: CN=admin, OU=TAK, O=BTMN-OPS, L=SOUTHEND-ON-SEA, S=ESSEX, C=US (My)
+  [OK] Removed 3 certificate(s) from Windows store
+
+── Step 6: Cleaning up temp files ──
+  No OEMDRV temp files found
+
+═══════════════════════════════════════════════════════
+  Remove-CivTAK complete — 'TAK-BMTN-01' fully removed.
+═══════════════════════════════════════════════════════
+
+┌──(LukeLeigh💀LUKE)-[C:/GitRepos/DigitalTAK]-[prod]                                                                                                                                                                 9s   
+└─# 
+PS>Stop-Transcript
+**********************
+PowerShell transcript end
+End time: 20260404183826
+**********************

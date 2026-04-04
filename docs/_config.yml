@@ -1,6 +1,6 @@
 title: DigitalTAK
 tagline: "TAK Server 5.7 automation for Rocky Linux 9 on Hyper-V"
-description: "Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V Gen 2"
+description: "Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V"
 lang: en-GB
 baseurl: ""
 url: "https://digitaltak.lukeleigh.com"
