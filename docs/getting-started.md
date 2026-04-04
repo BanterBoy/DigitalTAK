@@ -140,12 +140,12 @@ Get-TAKMission
 Disconnect-TAKServer
 ```
 
-For the full cmdlet reference, see the [Agents & Skills Reference](agents-skills-reference) page or run `Get-Help <CmdletName> -Full` in PowerShell.
+For the full cmdlet reference, see the [Agents & Skills Reference](../agents-skills-reference/) page or run `Get-Help <CmdletName> -Full` in PowerShell.
 
 ---
 
 ## Next Steps
 
-- [Deploy a CivTAK Server](deployment) — full step-by-step guide
-- [Agent Configuration](agent-configuration) — manage deployments using AI agents
-- [Agents & Skills Reference](agents-skills-reference) — full module and cmdlet reference
+- [Deploy a CivTAK Server](../deployment/) — full step-by-step guide
+- [Agent Configuration](../agent-configuration/) — manage deployments using AI agents
+- [Agents & Skills Reference](../agents-skills-reference/) — full module and cmdlet reference

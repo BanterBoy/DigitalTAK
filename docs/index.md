@@ -37,12 +37,12 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 
 | Page | Description |
 |------|-------------|
-| [Getting Started](getting-started) | Prerequisites, repo layout, module installation, CI pipeline |
-| [Deployment Guide](deployment) | Step-by-step `Deploy-TAKServer.ps1` walkthrough with all parameters |
-| [API Reference](api-reference) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
-| [Troubleshooting](troubleshooting) | Diagnosis and fixes for common failures |
-| [Configuration Reference](config/baseline) | CoreConfig.xml settings, certificate layout, port inventory |
-| [Agent Configuration](agent-configuration) | Managing deployments with AI agents |
+| [Getting Started](getting-started/) | Prerequisites, repo layout, module installation, CI pipeline |
+| [Deployment Guide](deployment/) | Step-by-step `Deploy-TAKServer.ps1` walkthrough with all parameters |
+| [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, and TAKServerPS |
+| [Troubleshooting](troubleshooting/) | Diagnosis and fixes for common failures |
+| [Configuration Reference](config/baseline/) | CoreConfig.xml settings, certificate layout, port inventory |
+| [Agent Configuration](agent-configuration/) | Managing deployments with AI agents |
 
 ## Architecture Overview
 
