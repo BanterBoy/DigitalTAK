@@ -9,11 +9,13 @@
     a mandatory caller-supplied password.
 
     Test groups:
-      1. Mandatory-parameter enforcement — Deploy-TAKServer.ps1 declares
-         -CertPassword as mandatory and the helper config function returns
-         null CertPass when TAK_CERT_PASS is not set.
+      1. Parameter enforcement — Deploy-TAKServer.ps1 exposes -KeystorePassword as a
+         mandatory SecureString and does NOT declare -CertPassword (removed in DIG-53).
+         KeystorePassword is the single password applied to CAPASS, all JKS keystores,
+         .p12 exports, and CoreConfig.xml TLS connectors.
+         The helper config function returns null CertPass when TAK_CERT_PASS is not set.
       2. Remote PKCS#12 validity — the .p12 files on the server are openable
-         with the caller-supplied TAK_CERT_PASS (not any hardcoded default).
+         with the caller-supplied TAK_CERT_PASS (i.e. the KeystorePassword used at deploy).
       3. Remote wrong-password rejection — openssl rejects the default community
          password 'atakatak' for .p12 files generated with a user-supplied key.
       4. Windows certificate import — X509Certificate2 import succeeds with the
@@ -24,7 +26,8 @@
 
     Required environment variables:
         TAK_INTEGRATION_HOST  — IP / hostname of the running TAK Server VM
-        TAK_CERT_PASS         — PKCS#12 password used at deployment time
+        TAK_CERT_PASS         — value of -KeystorePassword used at deployment time
+                                (controls CAPASS, JKS keystores, .p12 exports, CoreConfig.xml)
 
     Optional environment variables:
         TAK_SSH_USER          — SSH username (default: atak)
@@ -68,16 +71,23 @@ AfterAll {
 
 Describe 'Cert Password — Mandatory Parameter Enforcement' -Tag 'CertPassword', 'Parameters' {
 
-    It 'Deploy-TAKServer.ps1 declares -CertPassword as a mandatory SecureString parameter' {
+    It 'Deploy-TAKServer.ps1 declares -KeystorePassword as a mandatory SecureString parameter' {
         $scriptPath = Join-Path $script:RepoRoot 'Deploy-TAKServer.ps1'
         $cmdMeta    = Get-Command $scriptPath -ErrorAction Stop
-        $param      = $cmdMeta.Parameters['CertPassword']
-        $param | Should -Not -BeNullOrEmpty -Because '-CertPassword must exist on Deploy-TAKServer.ps1'
+        $param      = $cmdMeta.Parameters['KeystorePassword']
+        $param | Should -Not -BeNullOrEmpty -Because '-KeystorePassword must exist on Deploy-TAKServer.ps1'
         $param.ParameterType | Should -Be ([SecureString]) -Because 'password should be a SecureString, not plain text'
         $isMandatory = $param.Attributes |
             Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] } |
             Select-Object -ExpandProperty Mandatory -First 1
-        $isMandatory | Should -Be $true -Because 'no default password is allowed post-DIG-36'
+        $isMandatory | Should -Be $true -Because 'the unified keystore/cert password is mandatory — no default is allowed'
+    }
+
+    It 'Deploy-TAKServer.ps1 does not declare the removed -CertPassword parameter' {
+        $scriptPath = Join-Path $script:RepoRoot 'Deploy-TAKServer.ps1'
+        $cmdMeta    = Get-Command $scriptPath -ErrorAction Stop
+        $cmdMeta.Parameters.ContainsKey('CertPassword') | Should -Be $false `
+            -Because '-CertPassword was removed in DIG-53; -KeystorePassword is the single unified password'
     }
 
     It 'Get-TAKIntegrationConfig returns config with null CertPass when TAK_CERT_PASS is not set' {
