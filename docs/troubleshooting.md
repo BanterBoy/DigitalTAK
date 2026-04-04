@@ -79,8 +79,7 @@ Get-NetAdapter | Where-Object Status -eq 'Up'
 New-VMSwitch -Name 'ExternalSwitch' -NetAdapterName 'Ethernet' -AllowManagementOS $true
 
 # Re-run the deployment
-$certPw = Read-Host -AsSecureString 'Certificate password'
-.\Deploy-TAKServer.ps1 -SwitchName 'ExternalSwitch' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+.\Deploy-TAKServer.ps1 -SwitchName 'ExternalSwitch' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 ```
 
 ---
@@ -108,8 +107,7 @@ $certPw = Read-Host -AsSecureString 'Certificate password'
 - If port 22 is unreachable, verify the guest firewall: `sudo firewall-cmd --list-all`.
 - Extend the SSH timeout when re-running:
   ```powershell
-  $certPw = Read-Host -AsSecureString 'Certificate password'
-  .\Deploy-TAKServer.ps1 -SSHTimeoutSeconds 1800 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+  .\Deploy-TAKServer.ps1 -SSHTimeoutSeconds 1800 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
   ```
 
 ---
@@ -525,8 +523,7 @@ Get-VMSnapshot -VMName 'TAKServer' | Select-Object Name, CreationTime
 - If the snapshot names differ from the expected values, you can rename them in Hyper-V Manager, or use `-DisableSnapshotResume` to force a fresh run from Phase 0.
 - If the VM was renamed, pass the `-VMName` parameter explicitly:
   ```powershell
-  $certPw = Read-Host -AsSecureString 'Certificate password'
-  .\Deploy-TAKServer.ps1 -VMName 'TAKServer-Prod' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+  .\Deploy-TAKServer.ps1 -VMName 'TAKServer-Prod' -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
   ```
 
 ---

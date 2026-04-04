@@ -26,9 +26,8 @@ Step-by-step guide for deploying a CivTAK server using `Deploy-TAKServer.ps1`.
 - Installs and configures TAK Server 5.7 over SSH
 - Creates a full certificate authority, server certs, and client certs
 - Promotes the admin certificate
-- Runs 20 post-deployment validation tests (service health, ports, SELinux, firewall, certs)
+- Runs 22 post-deployment validation tests (service health, ports, SELinux, firewall, certs)
 - Downloads `.p12` client certificates to your local machine
-- Imports certificates into the Windows certificate store
 - Generates a deployment report
 
 **Re-running is safe.** The script detects existing phase snapshots and resumes from the latest checkpoint. You never need to start from scratch after a partial failure.
@@ -58,10 +57,9 @@ The simplest deployment uses all defaults and prompts interactively for certific
 # Run from the repo root as Administrator
 $cred   = Get-Credential -UserName 'atak'
 $rootPw = Read-Host -AsSecureString 'Root password'
-$ksPw   = Read-Host -AsSecureString 'Keystore password'
-$certPw = Read-Host -AsSecureString 'Certificate (.p12) password'
+$ksPw   = Read-Host -AsSecureString 'Keystore / certificate password'
 
-.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 ```
 
 You will be prompted for:
@@ -81,17 +79,16 @@ For non-interactive / scripted deployments:
 $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString '<SshPassword>' -AsPlainText -Force))
 $rootPw = ConvertTo-SecureString '<RootPassword>' -AsPlainText -Force
 $ksPw   = ConvertTo-SecureString '<KeystorePassword>' -AsPlainText -Force
-$certPw = ConvertTo-SecureString '<CertPassword>' -AsPlainText -Force
 
 .\Deploy-TAKServer.ps1 `
     -VMName           'TAK-Prod-01' `
+    -VMBasePath       'D:\Hyper-V\VMs' `
     -SwitchName       'External LAN' `
     -RockyIsoPath     'D:\ISO\Rocky-9.7-x86_64-dvd.iso' `
     -RpmPath          'D:\TAK\takserver-5.7-RELEASE8.noarch.rpm' `
     -Credential       $cred `
     -RootPassword     $rootPw `
     -KeystorePassword $ksPw `
-    -CertPassword     $certPw `
     -State            'TX' -City 'AUSTIN' `
     -Organization     'ACME-OPS' -OrganizationalUnit 'TAK' `
     -CAName           'ACME-TAK-CA' `
@@ -113,10 +110,9 @@ The script executes in 9 phases. A Hyper-V snapshot is taken after key phases so
 | 2 | TAK Install | Installs TAK Server RPM, configures SELinux and firewalld | **Yes** — `Phase2-TAKInstalled` |
 | 3 | Create Certs | Creates CA, server certificates, client certificates, patches CoreConfig.xml | No |
 | 4 | Promote Admin | Promotes admin.pem to TAK Server administrator | **Yes** — `Phase4-CertsAndAdmin` |
-| 5 | Validation | 20 post-deployment tests (service, ports, firewall, certs, SELinux, OS) | No |
+| 5 | Validation | 22 post-deployment tests (service, ports, firewall, certs, SELinux, OS) | No |
 | 6 | Download Certs | Transfers `.p12` client certificates via SFTP | No |
-| 7 | Import Certs | Imports `.p12` into Windows certificate store | No |
-| 8 | Report | Generates deployment report in `reports/` | No |
+| 7 | Report | Generates deployment report in `reports/` | No |
 
 {: .note }
 Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase numbers in the table above.
@@ -128,16 +124,16 @@ Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase num
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `-VMName` | string | `TAKServer` | Hyper-V VM name |
+| `-VMBasePath` | string | `C:\Hyper-V\VMs` | Root folder for VM files. The OEMDRV VHDX and (if not specified) the OS VHDX are created under `$VMBasePath\$VMName\` |
 | `-SwitchName` | string | `TAK-External` | Hyper-V virtual switch. Must already exist |
 | `-RockyIsoPath` | string | `C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso` | Path to Rocky Linux 9 DVD ISO |
-| `-VHDPath` | string | `C:\Hyper-V\VMs\TAKServer\TAKServer.vhdx` | Path for the dynamic VHDX |
+| `-VHDPath` | string | *(auto: `$VMBasePath\$VMName\$VMName.vhdx`)* | Override path for the OS VHDX. Auto-derived from `-VMBasePath` if omitted |
 | `-VHDSizeBytes` | int64 | `80 GB` | Maximum VHDX size |
 | `-MemoryBytes` | int64 | `8 GB` | Fixed RAM assigned to the VM |
 | `-ProcessorCount` | int | `4` | Number of virtual CPUs |
 | `-Credential` | PSCredential | **(mandatory)** | Linux admin account (username + password) |
 | `-RootPassword` | SecureString | **(mandatory)** | Root account password |
-| `-KeystorePassword` | SecureString | **(mandatory)** | TAK Server keystore password (min 6 chars) |
-| `-CertPassword` | SecureString | **(mandatory)** | PKCS#12 (.p12) certificate password |
+| `-KeystorePassword` | SecureString | **(mandatory)** | Unified password applied to CAPASS, all Java keystores, `.p12` exports, and `CoreConfig.xml` TLS connectors (min 6 chars) |
 | `-RpmPath` | string | `C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm` | Path to TAK Server RPM |
 | `-State` | string | *(prompted, default: ESSEX)* | Certificate subject state |
 | `-City` | string | *(prompted, default: SOUTHEND-ON-SEA)* | Certificate subject city |
@@ -157,13 +153,13 @@ If a deployment fails mid-way, simply re-run the same command. The script automa
 
 ```powershell
 # Re-run with the same credentials — resumes from last checkpoint automatically
-.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+.\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 ```
 
 To force a complete rebuild from scratch:
 
 ```powershell
-.\Deploy-TAKServer.ps1 -DisableSnapshotResume -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+.\Deploy-TAKServer.ps1 -DisableSnapshotResume -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 ```
 
 ---
@@ -309,7 +305,7 @@ scp atak@<VM-IP>:/home/atak/admin.p12 .\certs\admin.p12
 
 **OpenSSL 3.x (Rocky Linux 9) and RC2-40-CBC PKCS#12 files.** The upstream TAK Server cert tooling produces PKCS#12 files encrypted with the legacy RC2-40-CBC cipher. OpenSSL 3.x (included in Rocky Linux 9) requires the `-legacy` flag to read these directly on the guest. This is a server-side inspection issue only — the `.p12` files are valid and import correctly into Windows without any workaround.
 
-**PKCS#12 password.** The generated `.p12` files (`admin.p12`, `user.p12`, `truststore-intermediate-ca.p12`) use the upstream default password `atakatak`, regardless of the `-KeystorePassword` supplied to the deployment script. The keystore password governs the server-side JKS stores; the PKCS#12 password is set separately by the TAK cert generation tools.
+**PKCS#12 password.** The generated `.p12` files (`admin.p12`, `user.p12`, `truststore-intermediate-ca.p12`) use the value you supplied for `-KeystorePassword`. This same password is written to `CAPASS` in `cert-metadata.sh`, applied to all Java keystores generated by `makeCert.sh`, and patched into `CoreConfig.xml`. There is no separate `.p12` password — use your `-KeystorePassword` value when importing these files into a browser or ATAK client.
 
 ### Test Infrastructure Fixes Applied
 
