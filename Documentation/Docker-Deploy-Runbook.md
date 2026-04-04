@@ -167,7 +167,8 @@ Both `Alpha` and `Bravo` should appear in the response.
 
 ## 7 — Connect a TAK Client (ATAK / WinTAK)
 
-1. Generate a client certificate using the PowerShell `TAKServerPS` module, or use the certificate enrollment endpoint at `https://<vm-ip>:8446`.
+1. Generate a client certificate using the certificate enrollment endpoint at `https://<vm-ip>:8446`, or use the PowerShell `TAKServerPS` module once it is fully validated — see the [API Reference](https://digitaltak.lukeleigh.com/api-reference/) for status.
+   > **Note:** The `TAKServerPS` PowerShell module is currently under development and not fully operational. Use the enrollment endpoint for production deployments.
 2. Configure the TAK client:
    - **Server**: `<vm-ip>`
    - **Port**: `8089`

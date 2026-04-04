@@ -7,6 +7,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — 2026-04-04
+
+### Known Issues
+- **TAKServerPS module — validation incomplete.** The TAKServerPS REST API wrapper (44 cmdlets) has not been fully tested against a live TAK Server 5.7 instance. Several cmdlets are known to produce incorrect results. All TAKServerPS documentation and onboarding steps that rely on this module have been marked with under-development notices. The module remains in the repository for completeness. Further updates will be published once end-to-end validation is complete.
+
+---
+
 ## [Unreleased] — 2026-04-03
 
 ### Removed

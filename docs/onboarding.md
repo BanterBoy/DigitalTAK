@@ -18,6 +18,9 @@ How to generate client certificates, create user accounts, and distribute ATAK d
 
 ---
 
+{: .warning }
+**TAKServerPS is currently under development.** Steps 3 and 4 of this guide use `TAKServerPS` PowerShell cmdlets that have not been fully validated against a live TAK Server. The cmdlets are known to have issues. Do not follow the PowerShell account-creation or data-package steps in a production environment until this notice is removed. Use the WebTAK admin UI at `https://<server>:8443` to manage users manually in the meantime.
+
 ## Overview
 
 Once TAK Server is deployed you need to provision certificates and accounts for each team member. The onboarding workflow has four stages that run across two locations — the TAK Server (Rocky Linux) and your Windows workstation.
@@ -38,6 +41,9 @@ tak-team-certs.sh                 New-TAKTeamRoster.ps1
 - `TAKServerPS` module loaded on your Windows workstation
 - An active connection to TAK Server: `Connect-TAKServer -HostName <host> -Credential (Get-Credential)`
 - JDK 11+ with `keytool` on PATH (for truststore conversion)
+
+{: .warning }
+**TAKServerPS (Connect-TAKServer and related cmdlets) is not currently reliable.** The `Connect-TAKServer` step and all subsequent PowerShell-based user and certificate operations in this guide depend on TAKServerPS, which is under active development. Proceed with caution.
 
 ---
 
@@ -114,6 +120,9 @@ The `.p12` files are sensitive. Treat them like passwords. Delete them from the 
 
 ## Step 3 — Create User Accounts (on Windows)
 
+{: .warning }
+**TAKServerPS — under development.** The PowerShell commands below use `TAKServerPS` cmdlets that are known to have issues. This step is included for completeness only. Use the WebTAK admin console at `https://<server>:8443 → User Management` to create accounts until this notice is removed. Further updates will be published once TAKServerPS validation is complete.
+
 ```powershell
 Import-Module .\TAKServerPS\TAKServer.psm1
 Connect-TAKServer -HostName tak.example.com -Credential (Get-Credential)
@@ -132,6 +141,9 @@ HTTP 409 responses (user already exists) are treated as a skip — safe to re-ru
 ---
 
 ## Step 4 — Build ATAK Data Packages (on Windows)
+
+{: .warning }
+**TAKServerPS — under development.** `New-TAKDataPackage.ps1` depends on TAKServerPS, which is currently not fully operational. This step is included for completeness only and the script output cannot be guaranteed accurate. Manual data package creation via the TAK Server cert enrollment endpoint (`https://<server>:8446`) is the reliable alternative.
 
 ```powershell
 .\onboarding\New-TAKDataPackage.ps1 `
@@ -188,6 +200,9 @@ sudo -u tak ./takUserCreateCerts_doNotRunAsRoot.sh <username>
 Then retrieve the `.p12` from `/opt/tak/certs/files/<username>.p12`.
 
 To create a TAK Server account for the new user:
+
+{: .warning }
+**TAKServerPS — under development.** `New-TAKUser` is part of the TAKServerPS module, which is not currently reliable. Use the WebTAK admin UI to create the account manually until this notice is removed.
 
 ```powershell
 $pw = Read-Host -AsSecureString 'Initial password'

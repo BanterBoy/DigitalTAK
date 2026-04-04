@@ -10,6 +10,9 @@ nav_title: API Reference
 Complete cmdlet reference for all three DigitalTAK PowerShell modules.
 {: .fs-6 .fw-300 }
 
+{: .warning }
+**TAKServerPS module — under development.** The TAKServerPS REST API wrapper (44 cmdlets) has not been fully validated against a live TAK Server instance and is known to produce incorrect results in some operations. The TAKServerPS sections of this reference are included for completeness only and should be treated as inaccurate until testing is complete and this notice is removed. The **TAKDeploy** and **TAKInstall** module sections are fully operational and are not affected.
+
 ## Table of Contents
 {: .no_toc .text-delta }
 
@@ -411,6 +414,9 @@ Update-TAKLetsEncryptCertificate -SshSession $sess -DomainName 'tak.example.com'
 ---
 
 ## TAKServerPS Module
+
+{: .warning }
+**This module is currently under development and not production-ready.** TAKServerPS has not completed end-to-end testing against a live TAK Server. The cmdlet signatures, parameters, and behaviours documented below are correct as designed but have known issues in practice. Further updates will be published once these issues are resolved. In the meantime, use the WebTAK admin console at `https://<server>:8443` to manage users, groups, missions, and certificates.
 
 REST API wrapper for TAK Server 5.x. All 44 cmdlets share a module-scoped session established with `Connect-TAKServer`.
 
@@ -1031,7 +1037,10 @@ Get-TAKDeviceProfile
 | `New-TAKLetsEncryptCertificate` | Issue Let's Encrypt TLS cert |
 | `Update-TAKLetsEncryptCertificate` | Renew Let's Encrypt TLS cert |
 
-### TAKServerPS (44 cmdlets)
+### TAKServerPS (44 cmdlets) ⚠️ Under Development
+
+{: .warning }
+The TAKServerPS cmdlets listed below are included for completeness. End-to-end testing against a live TAK Server is incomplete. Do not rely on these cmdlets in production until this notice is removed.
 
 | Category | Cmdlets |
 |----------|---------|

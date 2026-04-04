@@ -100,6 +100,8 @@ Both modules require **PowerShell 7.0+** and follow Microsoft best practices —
 
 ### TAKServerPS — REST API Module
 
+> **⚠️ Under Development.** TAKServerPS has not been fully validated against a live TAK Server instance and is known to have issues in practice. The cmdlets and documentation below are included for completeness. Do not rely on this module in production until testing is complete. Further updates will be published once these issues are resolved.
+
 **Path:** `TAKServerPS/`  
 **Manifest:** `TAKServer.psd1` · **Version:** 1.0.0
 
