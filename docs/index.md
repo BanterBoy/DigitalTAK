@@ -6,7 +6,7 @@ nav_title: Home
 
 # DigitalTAK Documentation
 
-Fully automated CivTAK deployment and management for Rocky Linux 9.7 on Hyper-V Gen 2.
+Fully automated CivTAK deployment and management for Rocky Linux on Hyper-V.
 
 [Get Started](getting-started/) &middot;
 [Deployment Guide](deployment/) &middot;
