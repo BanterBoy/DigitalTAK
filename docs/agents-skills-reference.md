@@ -34,7 +34,7 @@ DigitalTAK provides three PowerShell modules that layer from infrastructure to a
 
 Manages Hyper-V virtual machine lifecycle for DigitalTAK deployments.
 
-**Import:** `Import-Module ./TAKDeploy`
+**Import:** `Import-Module .\TAKDeploy\TAKDeploy.psm1`
 
 ### Cmdlets
 
@@ -67,7 +67,7 @@ Reserved internal scaffolding. `Deploy-TAKServer.ps1` calls `New-TAKVirtualMachi
 
 Provisions a TAK Server on a remote Rocky Linux host over SSH.
 
-**Import:** `Import-Module ./TAKInstall`
+**Import:** `Import-Module .\TAKInstall\TAKInstall.psm1`
 **Dependency:** `Posh-SSH` module
 
 ### Cmdlets
@@ -137,7 +137,7 @@ Update-TAKLetsEncryptCertificate -SshSession $session
 
 REST API wrapper for TAK Server 5.7. Provides 44 cmdlets covering all major TAK Server API endpoints.
 
-**Import:** `Import-Module ./TAKServerPS`
+**Import:** `Import-Module .\TAKServerPS\TAKServer.psm1`
 
 ### Session Management
 

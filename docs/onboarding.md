@@ -115,7 +115,7 @@ The `.p12` files are sensitive. Treat them like passwords. Delete them from the 
 ## Step 3 — Create User Accounts (on Windows)
 
 ```powershell
-Import-Module .\TAKServerPS\TAKServer.psd1
+Import-Module .\TAKServerPS\TAKServer.psm1
 Connect-TAKServer -HostName tak.example.com -Credential (Get-Credential)
 
 .\onboarding\New-TAKTeamRoster.ps1 -ManifestPath .\alpha\manifest.json

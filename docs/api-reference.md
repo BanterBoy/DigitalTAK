@@ -36,7 +36,7 @@ Provides high-level orchestration for creating Hyper-V Gen 2 VMs and driving the
 
 **Import:**
 ```powershell
-Import-Module .\TAKDeploy\TAKDeploy.psd1
+Import-Module .\TAKDeploy\TAKDeploy.psm1
 ```
 
 **Prerequisites:** Elevated (Administrator) PowerShell session · Hyper-V enabled · `Posh-SSH` module
@@ -151,7 +151,7 @@ Provides cmdlets for remote provisioning of TAK Server 5.7 on a Rocky Linux 9 ho
 **Import:**
 ```powershell
 Install-Module Posh-SSH -Scope CurrentUser
-Import-Module .\TAKInstall\TAKInstall.psd1
+Import-Module .\TAKInstall\TAKInstall.psm1
 ```
 
 **Prerequisites:** Active `Posh-SSH` SSH session · Target host with `sudo` access · TAK Server 5.7-RELEASE8 RPM
@@ -416,7 +416,7 @@ REST API wrapper for TAK Server 5.x. All 44 cmdlets share a module-scoped sessio
 
 **Import:**
 ```powershell
-Import-Module .\TAKServerPS\TAKServer.psd1
+Import-Module .\TAKServerPS\TAKServer.psm1
 ```
 
 **Prerequisites:** Running TAK Server instance · Admin `.p12` certificate (recommended) or username/password

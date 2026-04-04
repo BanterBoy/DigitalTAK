@@ -201,7 +201,7 @@ Available snapshot names:
 After deployment, you can add XMPP chat support via Openfire using the TAKInstall module:
 
 ```powershell
-Import-Module ./TAKInstall
+Import-Module .\TAKInstall\TAKInstall.psm1
 
 $session = New-SSHSession -ComputerName <VM-IP> -Credential $cred -AcceptKey
 Install-TAKOpenfire -SshSession $session
@@ -215,7 +215,7 @@ Remove-SSHSession -SessionId $session.SessionId
 To replace the self-signed certificate with a publicly trusted cert:
 
 ```powershell
-Import-Module ./TAKInstall
+Import-Module .\TAKInstall\TAKInstall.psm1
 
 $session = New-SSHSession -ComputerName <VM-IP> -Credential $cred -AcceptKey
 $ksPw = Read-Host -AsSecureString 'Keystore password'

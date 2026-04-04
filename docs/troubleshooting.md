@@ -459,7 +459,7 @@ sudo certbot renew --dry-run
 
 ## PowerShell Module Issues
 
-### Symptom: `Import-Module .\TAKDeploy\TAKDeploy.psd1` fails — "Module not found" or "Could not load file"
+### Symptom: `Import-Module .\TAKDeploy\TAKDeploy.psm1` fails — "Module not found" or "Could not load file"
 
 **Cause:** PowerShell execution policy is blocking the module, or the path is wrong.
 
@@ -473,7 +473,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # Confirm you are in the repo root
 Get-Location   # Should show C:\...\DigitalTAK
-Import-Module .\TAKDeploy\TAKDeploy.psd1 -Force
+Import-Module .\TAKDeploy\TAKDeploy.psm1 -Force
 ```
 
 ---

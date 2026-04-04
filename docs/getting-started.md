@@ -124,10 +124,10 @@ See `.github/workflows/ci.yml` for the full pipeline definition.
 Once you have a running TAK Server, use the REST API wrapper to manage it:
 
 ```powershell
-Import-Module ./TAKServerPS
+Import-Module .\TAKServerPS\TAKServer.psm1
 
 # Connect (self-signed certs are the norm)
-Connect-TAKServer -HostName "10.0.0.10" -Credential (Get-Credential) -SkipCertificateCheck
+Connect-TAKServer -HostName "10.0.0.10" -Credential (Get-Credential) -SkipCertificateCheck $true
 
 # List users
 Get-TAKUser
