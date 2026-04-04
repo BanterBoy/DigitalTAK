@@ -15,8 +15,7 @@
       Phase 4 — Promote admin certificate (Set-TAKAdminCertificate)
       Phase 5 — Run post-deployment validation tests
       Phase 6 — Download .p12 certificates to local certs/ directory
-      Phase 7 — Import certificates into Windows certificate store
-      Phase 8 — Generate reports/DEPLOYMENT-REPORT.md
+      Phase 7 — Generate reports/DEPLOYMENT-REPORT.md
 
     The Rocky Linux DVD ISO must be available locally. The VM is created from
     scratch with an unattended kickstart install. VM sizing, credentials, RPM
@@ -33,8 +32,14 @@
 .PARAMETER RockyIsoPath
     Full path to the Rocky Linux 9 DVD ISO.
 
+.PARAMETER VMBasePath
+    Base directory for VM storage. The script creates a subfolder named after
+    the VM (e.g. C:\Hyper-V\VMs\TAKServer\). The OEMDRV staging disk is also
+    placed here instead of %TEMP%. Defaults to 'C:\Hyper-V\VMs'.
+
 .PARAMETER VHDPath
-    Path for the new dynamic VHDX.
+    Full path for the new dynamic VHDX. If omitted, derived automatically as
+    <VMBasePath>\<VMName>\<VMName>.vhdx.
 
 .PARAMETER VHDSizeBytes
     Maximum size of the dynamic VHDX in bytes. Defaults to 80 GB.
@@ -54,11 +59,6 @@
 
 .PARAMETER KeystorePassword
     SecureString containing the TAK Server keystore password (min 6 chars).
-
-.PARAMETER CertPassword
-    SecureString for the PKCS#12 (.p12) certificate password used when exporting
-    admin, user, and intermediate-CA certificates.  Mandatory — no default.
-    This password is required for the Windows certificate import step.
 
 .PARAMETER RpmPath
     Path to the TAK Server RPM.
@@ -102,23 +102,21 @@
     $cred   = [PSCredential]::new('atak', (ConvertTo-SecureString '<SshPassword>' -AsPlainText -Force))
     $rootPw = ConvertTo-SecureString '<RootPassword>' -AsPlainText -Force
     $ksPw   = ConvertTo-SecureString '<KeystorePassword>' -AsPlainText -Force
-    $certPw = Read-Host -AsSecureString 'Certificate (.p12) password'
-    .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw -CertPassword $certPw
+    .\Deploy-TAKServer.ps1 -Credential $cred -RootPassword $rootPw -KeystorePassword $ksPw
 
 .EXAMPLE
     $cred   = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
     $rootPw = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
     $ksPw   = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
-    $certPw = ConvertTo-SecureString 'CertExample!23' -AsPlainText -Force
     .\Deploy-TAKServer.ps1 `
         -VMName 'TAK-Prod-01' `
+        -VMBasePath 'C:\Hyper-V\VMs' `
         -SwitchName 'External LAN' `
         -RockyIsoPath 'D:\ISO\Rocky-9.7-x86_64-dvd.iso' `
         -RpmPath 'D:\TAK\takserver-5.7-RELEASE8.noarch.rpm' `
         -Credential $cred `
         -RootPassword $rootPw `
         -KeystorePassword $ksPw `
-        -CertPassword $certPw `
         -State 'TX' `
         -City 'AUSTIN' `
         -Organization 'ACME-OPS' `
@@ -136,7 +134,8 @@ param (
     [string] $VMName            = 'TAKServer',
     [string] $SwitchName        = 'TAK-External',
     [string] $RockyIsoPath      = 'C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso',
-    [string] $VHDPath           = 'C:\Hyper-V\VMs\TAKServer\TAKServer.vhdx',
+    [string] $VMBasePath        = 'C:\Hyper-V\VMs',
+    [string] $VHDPath,
     [int64]  $VHDSizeBytes      = 80GB,
     [int64]  $MemoryBytes       = 8GB,
     [int]    $ProcessorCount    = 4,
@@ -156,9 +155,6 @@ param (
     [Parameter(Mandatory)]
     [SecureString] $KeystorePassword,
 
-    [Parameter(Mandatory)]
-    [SecureString] $CertPassword,
-
     # ── TAK Server configuration ──
     [string] $RpmPath             = 'C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm',
     [string] $State,
@@ -172,6 +168,11 @@ param (
 
 $ErrorActionPreference = 'Stop'
 $scriptStart = Get-Date
+
+# ── Derive VHDPath from VMBasePath if not explicitly supplied ─────────────
+if (-not $PSBoundParameters.ContainsKey('VHDPath') -or [string]::IsNullOrWhiteSpace($VHDPath)) {
+    $VHDPath = Join-Path $VMBasePath $VMName "$VMName.vhdx"
+}
 
 function Read-DeploymentMetadataValue {
     param(
@@ -271,7 +272,7 @@ if (-not (Test-Path $RpmPath)) {
 }
 Write-Host '[OK] Rocky ISO and TAK RPM found' -ForegroundColor Green
 
-$oemdrvPath    = Join-Path ([System.IO.Path]::GetTempPath()) "$VMName-oemdrv.vhdx"
+$oemdrvPath    = Join-Path $VMBasePath $VMName "$VMName-oemdrv.vhdx"
 $VMIpAddress   = $null
 $session       = $null
 $resumePhase   = 0
@@ -401,6 +402,8 @@ systemctl enable NetworkManager
     Write-Host '  [OK] Kickstart generated' -ForegroundColor Green
 
     # 0c. Create OEMDRV VHDX
+    $oemDrvDir = Split-Path $oemdrvPath -Parent
+    if (-not (Test-Path $oemDrvDir)) { New-Item -Path $oemDrvDir -ItemType Directory -Force | Out-Null }
     if (Test-Path $oemdrvPath) {
         Dismount-VHD -Path $oemdrvPath -ErrorAction SilentlyContinue
         Remove-Item -Path $oemdrvPath -Force
@@ -777,45 +780,9 @@ if ($resumePhase -le 4) {
 
     $results.CertDownload = 'Success'
 
-    # ── Phase 7: Windows Certificate Store ────────────────────────────────
+    # ── Phase 7: Generate Report ──────────────────────────────────────────
     Write-Host ''
-    Write-Host '── Phase 7: Managing Windows Certificate Store ──' -ForegroundColor Magenta
-
-    # Remove old TAK certs from Windows stores (match on Organization in subject)
-    $removedCount = 0
-    foreach ($storeName in @('Root', 'My')) {
-        $storePath = "Cert:\CurrentUser\$storeName"
-        $takCerts = Get-ChildItem -Path $storePath -ErrorAction SilentlyContinue |
-            Where-Object { $_.Subject -match 'TAK-CA|LEIGH-SERVICES|TAK' -and $_.Subject -match 'O=' }
-        foreach ($cert in $takCerts) {
-            Remove-Item -Path $cert.PSPath -Force
-            $removedCount++
-            Write-Host "  Removed: $($cert.Subject) from $storeName" -ForegroundColor Yellow
-        }
-    }
-    if ($removedCount -eq 0) {
-        Write-Host '  No old TAK certificates found in Windows stores' -ForegroundColor DarkGray
-    }
-
-    $pfxPassword = $CertPassword
-
-    # Import Intermediate CA into Trusted Root Certification Authorities
-    $intermediateP12Path = Join-Path $localCertDir 'truststore-intermediate-ca.p12'
-    Import-PfxCertificate -FilePath $intermediateP12Path -CertStoreLocation 'Cert:\CurrentUser\Root' `
-        -Password $pfxPassword -Exportable | Out-Null
-    Write-Host '  [OK] Intermediate CA imported to Trusted Root Certification Authorities' -ForegroundColor Green
-
-    # Import admin.p12 into Personal store
-    $adminP12Path = Join-Path $localCertDir 'admin.p12'
-    Import-PfxCertificate -FilePath $adminP12Path -CertStoreLocation 'Cert:\CurrentUser\My' `
-        -Password $pfxPassword -Exportable | Out-Null
-    Write-Host '  [OK] Admin certificate imported to Personal store' -ForegroundColor Green
-
-    $results.CertImport = 'Success'
-
-    # ── Phase 8: Generate Report ──────────────────────────────────────────
-    Write-Host ''
-    Write-Host '── Phase 8: Generating Deployment Report ──' -ForegroundColor Magenta
+    Write-Host '── Phase 7: Generating Deployment Report ──' -ForegroundColor Magenta
 
     $endTime = Get-Date
     $totalDuration = ($endTime - $scriptStart).ToString('hh\:mm\:ss')
@@ -865,13 +832,7 @@ if ($resumePhase -le 4) {
     $reportLines += "| SSH user | $($Credential.UserName) |"
     $reportLines += "| SSH user password | $([System.Net.NetworkCredential]::new('', $Credential.Password).Password) |"
     $reportLines += "| Root password | $([System.Net.NetworkCredential]::new('', $RootPassword).Password) |"
-    $reportLines += "| Deployment keystore password parameter | $([System.Net.NetworkCredential]::new('', $KeystorePassword).Password) |"
-    $reportLines += "| PKCS#12 / PFX certificate password | $([System.Net.NetworkCredential]::new('', $CertPassword).Password) |"
-    $reportLines += ''
-    $reportLines += 'Notes:'
-    $reportLines += ''
-    $reportLines += '- The Windows-imported certificate files use the `-CertPassword` value supplied at deployment time.'
-    $reportLines += '- This applies to `admin.p12`, `user.p12`, and `truststore-intermediate-ca.p12`.'
+    $reportLines += "| Keystore / PKCS#12 certificate password | $([System.Net.NetworkCredential]::new('', $KeystorePassword).Password) |"
     $reportLines += ''
     $reportLines += '## Deployment Commands'
     $reportLines += ''

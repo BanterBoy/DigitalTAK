@@ -153,6 +153,21 @@ function New-TAKServerCertificate {
         )
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Patch cert-metadata.sh' -Command ($sedCmds -join '; ')
 
+        # ── 2b. Patch CAPASS in cert-metadata.sh ──────────────────────────────
+        # cert-metadata.sh ships as: CAPASS=${CAPASS:-atakatak}
+        # The pattern 'CAPASS=atakatak' does not match that form — sed exits 0
+        # silently and the default is never changed.
+        #
+        # $bPass is bash-single-quoted by ConvertTo-TAKBashArg (e.g. 'pass').
+        # Embedding it directly inside a sed single-quoted expression breaks the
+        # quoting for any password.  Instead:
+        #   1. Assign to a shell variable using $bPass (safe for all chars).
+        #   2. Pipe through sed to escape |, \\ and & (sed replacement specials).
+        #   3. Run sed with ^CAPASS=.* — matches the line regardless of its
+        #      current value (variable-expansion form or a prior literal patch).
+        $capassCmd = 'CAPASS_VAL=' + $bPass + '; SAFE=$(printf ''%s'' "$CAPASS_VAL" | sed ''s/[\\|&]/\\&/g''); sudo sed -i "s|^CAPASS=.*|CAPASS=${SAFE}|" /opt/tak/certs/cert-metadata.sh'
+        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Patch CAPASS in cert-metadata.sh' -Command $capassCmd
+
         # ── 3. Create Root CA ─────────────────────────────────────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Creating Root CA' -PercentComplete 18
         # makeRootCa.sh reads the CA name from stdin.
@@ -231,6 +246,19 @@ sudo sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="c
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Enable x509 group cache' -Command @'
 sudo sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
 '@
+
+        # ── 12b. CoreConfig.xml — main TLS connector keystore/truststore passwords ──
+        # makeCert.sh uses CAPASS for every .jks keystore and every .p12 export it
+        # generates.  CoreConfig.xml ships from the TAK Server RPM with:
+        #   keystorePass="atakatak"   (main HTTPS connector — takserver.jks)
+        #   truststorePass="atakatak" (trust stores)
+        # After changing CAPASS these must match, otherwise TAK Server cannot open
+        # takserver.jks on startup, port 8443 never binds, and the admin API is
+        # unreachable.  The certificateSigning keystorePass was already written with
+        # the correct value in Step 11; this step patches every remaining "atakatak"
+        # occurrence.  The same safe-escaping pattern used in Step 2b is applied.
+        $tlsPassCmd = 'CAPASS_VAL=' + $bPass + '; SAFE=$(printf ''%s'' "$CAPASS_VAL" | sed ''s/[\\|&]/\\&/g''); sudo sed -i "s|keystorePass=\"atakatak\"|keystorePass=\"${SAFE}\"|g; s|truststorePass=\"atakatak\"|truststorePass=\"${SAFE}\"|g" /opt/tak/CoreConfig.xml'
+        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Patch main TLS connector passwords in CoreConfig.xml' -Command $tlsPassCmd
 
         # ── 13. Second takserver restart ──────────────────────────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Restarting takserver (2/2)' -PercentComplete 88

@@ -12,10 +12,9 @@ The script orchestrates the full deployment flow:
 4. Installs the TAK Server RPM through the `TAKInstall` module
 5. Creates CA, server, admin, and user certificates
 6. Promotes the admin certificate
-7. Runs post-install validation checks
-8. Downloads generated `.p12` files
-9. Imports the admin and trust certificates into the current Windows user store
-10. Generates `reports/DEPLOYMENT-REPORT.md`
+7. Runs post-install validation checks (22 tests)
+8. Downloads generated `.p12` files to `certs/` on the Windows host
+9. Generates `reports/DEPLOYMENT-REPORT-<timestamp>.md`
 
 ## Canonical script names
 
@@ -54,7 +53,8 @@ There are three broad groups:
 - `VMName`
 - `SwitchName`
 - `RockyIsoPath`
-- `VHDPath`
+- `VMBasePath` — base directory for VM storage; the script creates `<VMBasePath>\<VMName>\` automatically. Defaults to `C:\Hyper-V\VMs`
+- `VHDPath` — optional override for the VHDX path; if omitted, derived as `<VMBasePath>\<VMName>\<VMName>.vhdx`
 - `VHDSizeBytes`
 - `MemoryBytes`
 - `ProcessorCount`
@@ -66,10 +66,9 @@ There are three broad groups:
 
 - `Credential` — Linux admin user created by kickstart
 - `RootPassword` — Linux root password
-- `KeystorePassword` — password for the TAK Server Java keystore
-- `CertPassword` — password used when exporting PKCS#12 (`.p12`) certificate files
+- `KeystorePassword` — single password used for all of: the TAK Server Java keystores, the `CAPASS` value written to `cert-metadata.sh`, the PKCS#12 (`.p12`) export passphrase, and any subsequent import of those `.p12` files into browser or application stores
 
-> **Security requirement:** `-CertPassword` has no default value. The script fails immediately if this parameter is not supplied. Choose a strong, unique password that is not shared with any other system. Do not reuse the `KeystorePassword` value.
+> **Security requirement:** `-KeystorePassword` has no default. The script fails immediately if this parameter is not supplied. Choose a strong password that is not shared with any other system.
 
 ### 3. Certificate metadata
 
@@ -90,16 +89,14 @@ Use this when you want the script to prompt for certificate subject values while
 ```powershell
 Set-Location 'C:\GitRepos\DigitalTAK'
 
-$cred    = Get-Credential -UserName 'atak'
-$rootPw  = Read-Host -AsSecureString -Prompt 'Root password'
-$ksPw    = Read-Host -AsSecureString -Prompt 'TAK keystore password'
-$certPw  = Read-Host -AsSecureString -Prompt 'Certificate (.p12) password'
+$cred   = Get-Credential -UserName 'atak'
+$rootPw = Read-Host -AsSecureString -Prompt 'Root password'
+$ksPw   = Read-Host -AsSecureString -Prompt 'TAK keystore / certificate password'
 
 .\Deploy-TAKServer.ps1 `
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
-    -CertPassword $certPw `
     -Confirm:$false
 ```
 
@@ -118,16 +115,15 @@ Use this when you want a reproducible deployment with no metadata prompts.
 ```powershell
 Set-Location 'C:\GitRepos\DigitalTAK'
 
-$cred    = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
-$rootPw  = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
-$ksPw    = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
-$certPw  = ConvertTo-SecureString 'CertExample!23' -AsPlainText -Force
+$cred   = [PSCredential]::new('takadmin', (ConvertTo-SecureString 'ExamplePass!23' -AsPlainText -Force))
+$rootPw = ConvertTo-SecureString 'RootExample!23' -AsPlainText -Force
+$ksPw   = ConvertTo-SecureString 'KeystoreExample!23' -AsPlainText -Force
 
 .\Deploy-TAKServer.ps1 `
     -VMName 'TAK-Prod-01' `
+    -VMBasePath 'D:\Hyper-V\VMs' `
     -SwitchName 'External LAN' `
     -RockyIsoPath 'D:\ISO\Rocky-9.7-x86_64-dvd.iso' `
-    -VHDPath 'D:\VMs\TAK-Prod-01\TAK-Prod-01.vhdx' `
     -VHDSizeBytes 120GB `
     -MemoryBytes 16GB `
     -ProcessorCount 8 `
@@ -137,7 +133,6 @@ $certPw  = ConvertTo-SecureString 'CertExample!23' -AsPlainText -Force
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
-    -CertPassword $certPw `
     -State 'TX' `
     -City 'AUSTIN' `
     -Organization 'ACME-OPS' `
@@ -167,7 +162,6 @@ Use `-DisableSnapshotResume` when you want the script to ignore prior checkpoint
     -Credential $cred `
     -RootPassword $rootPw `
     -KeystorePassword $ksPw `
-    -CertPassword $certPw `
     -DisableSnapshotResume `
     -Confirm:$false
 ```
@@ -179,7 +173,8 @@ Use `-DisableSnapshotResume` when you want the script to ignore prior checkpoint
 - `VMName`: Hyper-V VM name to create or resume
 - `SwitchName`: external Hyper-V vSwitch used for network access
 - `RockyIsoPath`: full path to the Rocky Linux DVD ISO
-- `VHDPath`: full path to the VM disk file to create
+- `VMBasePath`: base directory for VM storage. The script creates `<VMBasePath>\<VMName>\` and places both the VHDX and the OEMDRV staging disk there. Default: `C:\Hyper-V\VMs`
+- `VHDPath`: full path to the VM disk file. If not supplied, derived as `<VMBasePath>\<VMName>\<VMName>.vhdx`
 - `VHDSizeBytes`: maximum size of the dynamic VHDX
 - `MemoryBytes`: fixed startup memory assigned to the VM
 - `ProcessorCount`: number of vCPUs assigned to the VM
@@ -191,15 +186,13 @@ Use `-DisableSnapshotResume` when you want the script to ignore prior checkpoint
 
 - `Credential`: the Linux admin account created by kickstart and used for SSH
 - `RootPassword`: root account password written into kickstart
-- `KeystorePassword`: password for the TAK Server Java keystore; recorded in the deployment report
-- `CertPassword`: password used when creating and exporting PKCS#12 (`.p12`) certificate files — `admin.p12`, `user.p12`, and `truststore-intermediate-ca.p12`; also used when importing those certificates into the Windows certificate store
+- `KeystorePassword`: single password used for all certificate material — written to `CAPASS` in `cert-metadata.sh`, applied to every Java keystore (`.jks`) and every PKCS#12 (`.p12`) export on the server, and embedded in `CoreConfig.xml`
 
-**`CertPassword` requirements:**
+**`KeystorePassword` requirements:**
 
-- **Mandatory** — the script fails immediately with an error if this parameter is not supplied. There is no default.
+- **Mandatory** — the script fails immediately if this parameter is not supplied. There is no default.
 - Use a strong, unique password (minimum 8 characters; mix of upper/lower case, digits, and symbols recommended).
-- Do not reuse the `KeystorePassword` value for this parameter.
-- Record this password securely; it is required any time a client imports the `.p12` files.
+- Record this password securely — it is required any time a `.p12` file is imported into a browser or ATAK client.
 
 ### Certificate metadata
 
@@ -229,16 +222,17 @@ Examples:
 
 On a successful run, the script produces:
 
-- a deployed TAK Server VM
-- local certificate downloads under `certs/`
-- Windows certificate store imports for the admin and trust material
-- deployment report at `reports/DEPLOYMENT-REPORT.md`
+- a deployed TAK Server VM running TAK Server 5.7-RELEASE8
+- certificate artifacts downloaded to `certs/` on the Windows host
+- a timestamped deployment report at `reports/DEPLOYMENT-REPORT-<yyyyMMddHHmmss>.md`
 
-Primary remote outputs:
+Primary remote outputs (also SFTPed locally):
 
-- `/home/atak/admin.p12`
-- `/home/atak/user.p12`
-- `/home/atak/truststore-intermediate-ca.p12`
+- `/home/atak/admin.p12` — admin browser certificate; protected with `KeystorePassword`
+- `/home/atak/user.p12` — sample user certificate; protected with `KeystorePassword`
+- `/home/atak/truststore-intermediate-ca.p12` — intermediate CA trust anchor; protected with `KeystorePassword`
+
+> These `.p12` files are **not** automatically imported into the Windows certificate store. Import them manually using the `KeystorePassword` when prompted.
 
 ## Validation coverage
 
@@ -274,11 +268,11 @@ For routine use:
 
 ## Migration note for existing deployments
 
-Previous versions of this script generated `.p12` files using a hardcoded community password. That default has been removed.
+Previous versions of this script used the publicly-known default keystore password `atakatak` for all certificate material. That default is now replaced by the mandatory `-KeystorePassword` parameter.
 
-**If you have existing `.p12` files generated before this change:**
+**If you have `.p12` files generated before this change:**
 
-- Those files were protected with the old community password, which is publicly known. They should be treated as compromised.
-- After upgrading to this version of the script, re-run the certificate generation step by running a new deployment (or using snapshot resume from before the cert phase). Supply a fresh, strong `-CertPassword` value.
-- Redistribute the new `.p12` files to all ATAK/WinTAK clients and update any automated import scripts that previously used the old default.
-- Remove or revoke the old `.p12` files from client devices where possible.
+- Those files were protected with `atakatak`, which is publicly known. Treat them as compromised.
+- Run a clean deployment (or resume from the `Phase2-TAKInstalled` snapshot) and supply a strong `-KeystorePassword`.
+- Redistribute the new `.p12` files to all ATAK/WinTAK clients.
+- Remove the old `.p12` files from client devices where possible.
