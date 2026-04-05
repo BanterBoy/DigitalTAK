@@ -1,0 +1,45 @@
+{
+  "team": "charlie",
+  "users": [
+    {
+      "username": "c.walker",
+      "role": "Team Lead"
+    },
+    {
+      "username": "n.foster",
+      "role": "Assistant Lead"
+    },
+    {
+      "username": "p.garcia",
+      "role": "Operator"
+    },
+    {
+      "username": "o.webb",
+      "role": "Operator"
+    },
+    {
+      "username": "e.munoz",
+      "role": "Operator"
+    },
+    {
+      "username": "f.riley",
+      "role": "Operator"
+    },
+    {
+      "username": "g.kim",
+      "role": "Operator"
+    },
+    {
+      "username": "h.brooks",
+      "role": "Operator"
+    },
+    {
+      "username": "i.cole",
+      "role": "Operator"
+    },
+    {
+      "username": "w.price",
+      "role": "Operator"
+    }
+  ]
+}
