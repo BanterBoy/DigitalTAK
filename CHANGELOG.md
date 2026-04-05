@@ -7,6 +7,56 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — 2026-04-05
+
+### Added
+- `Invoke-TAKOnboarding.ps1` (root-level) — new one-command team onboarding entry
+  point. Automates the complete pipeline end-to-end: per-user certificate generation
+  on the TAK Server over SSH, `.p12` download via SFTP, server-side cleanup, user
+  account creation via `UserManager.jar` over SSH, group assignment, and ATAK data
+  package build. Supports both auto-roster (10 or 20 person template) and custom
+  CSV/JSON rosters with a `Team` filter column. All SSH and SFTP operations handled
+  automatically; no Linux knowledge required on the operator workstation.
+  See `onboarding/README.md` for step-by-step workflow details.
+- `tests/integration/09-RemovalVerification.Tests.ps1` — Pester 5 integration tests
+  for `Remove-CivTAK.ps1` Windows certificate store cleanup (Step 5). Tests create
+  synthetic self-signed certificates with an isolated test CA name, verify `WhatIf`
+  targeting, perform actual removal, and confirm the store is clean post-removal.
+  Requires Administrator; automatically skipped in non-elevated sessions using
+  `BeforeDiscovery`-time elevation detection.
+- `tests/integration/10-DataPackageBuild.Tests.ps1` — Pester 5 unit tests for
+  `New-TAKDataPackage.ps1` truststore lookup and `srcStoreType` detection logic.
+  Covers the four resolution branches (explicit path, `.jks` auto-discover, `.p12`
+  fallback, neither-found error). No live TAK Server or JDK installation required.
+- `tests/integration/11-CertDistCleanup.Tests.ps1` — Pester 5 unit tests for
+  `Remove-CivTAK.ps1` filesystem teardown (Steps 4 and 4b). Creates a synthetic
+  `certs\` and `dist\` tree, exercises the removal logic, and verifies idempotency.
+  No VM, Hyper-V, or Administrator privilege required.
+
+### Fixed
+- `onboarding/New-TAKDataPackage.ps1` — Truststore lookup now checks
+  `truststore-intermediate-ca.p12` as a fallback when `truststore-intermediate-ca.jks`
+  is absent. TAK Server 5.7-RELEASE8 stages `.p12` format; the previous code was
+  hardcoded to `.jks` and always threw `Truststore not found`. The `keytool
+  -srcstoretype` argument is now derived dynamically (`'PKCS12'` for `.p12` input,
+  `'JKS'` for `.jks`) rather than hardcoded to `'JKS'`.
+- `Remove-CivTAK.ps1` (Step 4) — Certificate file cleanup is now recursive and
+  covers all key/cert extensions (`*.p12`, `*.pfx`, `*.jks`, `*.pem`, `*.key`,
+  `*.crt`, `*.cer`) across all team subdirectories (`certs\bravo\`, `certs\charlie\`,
+  etc.). Previously only `*.p12` in the root `certs\` directory was removed, leaving
+  team subdirectories and other file types behind.
+- `Remove-CivTAK.ps1` (Step 4b — new) — Added removal of the `dist\` directory
+  (per-user ATAK `.zip` data packages), which embed `.p12` certificates and server
+  connection credentials. Must be removed alongside cert files to fully clean up
+  credential material.
+- Root `.gitignore` — Added comprehensive coverage for certificate and key material
+  (`*.p12`, `*.pfx`, `*.jks`, `*.key`, `*.pem`, `*.crt`, `*.cer`), generated output
+  directories (`dist/`, `certs/*/`), and the top-level `admin.p12` explicitly.
+  Previously the root `.gitignore` had no cert-type entries, meaning cert files could
+  be accidentally staged and committed.
+
+---
+
 ## [Unreleased] — 2026-04-04
 
 ### Known Issues

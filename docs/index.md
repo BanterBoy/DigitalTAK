@@ -27,11 +27,12 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 | **VM Provisioning** | Unattended Rocky Linux 9 install via Hyper-V + kickstart |
 | **TAK Server Install** | RPM install over SSH with SELinux and firewalld configured |
 | **Certificate Management** | CA, server certs, per-user client certs (.p12) |
+| **Team Onboarding** | One-command provisioning — `Invoke-TAKOnboarding.ps1` generates certs, creates users, and builds ATAK data packages |
 | **REST API Wrapper** | 44 PowerShell cmdlets for TAK Server 5.7 — 39/46 validated ✅ ([Validation Report](validation-report/)) |
 | **XMPP Chat** | Optional Openfire integration for TAK Chat |
 | **Let's Encrypt** | Optional public TLS via Certbot |
 | **Rollback** | Snapshot-based phase rollback |
-| **Teardown** | Full VM + cert cleanup with `Remove-CivTAK.ps1` |
+| **Teardown** | Full cleanup with `Remove-CivTAK.ps1` — VM, VHDX, all cert files, ATAK data packages, and Windows certificate store |
 
 ## Documentation
 
@@ -50,11 +51,23 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 ## Architecture Overview
 
 ```
-Deploy-TAKServer.ps1 (entry point)
+Deploy-TAKServer.ps1 (server entry point)
 ├── TAKDeploy/          Hyper-V VM orchestration (3 cmdlets)
 ├── TAKInstall/         Remote SSH provisioning (6 cmdlets)
 │   └── InstallShellScripts/   Bash scripts that run on Rocky Linux
 └── TAKServerPS/        REST API wrapper (44 cmdlets)
+
+Invoke-TAKOnboarding.ps1 (team onboarding entry point)
+├── tak-team-certs.sh   Per-user cert generation (runs on TAK Server over SSH)
+├── New-TAKTeamRoster   User account + group creation (via UserManager.jar)
+└── New-TAKDataPackage  Per-user ATAK .zip build
+    └── dist\\ (output, git-ignored)
+
+Remove-CivTAK.ps1 (teardown)
+├── VM + VHDX removal
+├── certs\\ — all cert/key files, team subdirectories
+├── dist\\  — ATAK data packages (.zip with embedded .p12)
+└── Windows certificate store — root CA, intermediate CA, admin cert
 ```
 
 ## Target Environment

@@ -17,8 +17,15 @@ DigitalTAK/
 ├── TXTScripts/                 ← Byte-identical TXT mirrors of every .sh file
 ├── TAKServerPS/                ← PowerShell module — TAK Server REST API (44 cmdlets)
 ├── TAKInstall/                 ← PowerShell module — remote provisioning via SSH (6 cmdlets)
+├── TAKDeploy/                  ← PowerShell module — Hyper-V VM creation & orchestration (3 cmdlets)
+├── onboarding/                 ← Team onboarding assets (roster scripts, cert batch, data package builder)
+├── tests/integration/          ← Pester 5 integration tests (45 tests across 12 test files)
+├── dist/                       ← Per-user ATAK .zip data packages (generated; git-ignored)
+├── certs/                      ← Downloaded client certificates per team (generated; git-ignored)
 ├── Documentation/              ← Official TAK Server 5.7 & Federation Hub guides (PDF)
 ├── channels.zip                ← ATAK client data package for device distribution
+├── Invoke-TAKOnboarding.ps1    ← One-command team onboarding (certs → users → data packages)
+├── Remove-CivTAK.ps1           ← Full CivTAK teardown (VM, VHDX, certs, Windows store, dist/)
 └── reports/                    ← Deployment and test reports
 ```
 
@@ -36,6 +43,72 @@ Use `Deploy-TAKServer.ps1` when you want to deploy a server from this repository
 Detailed operator guidance is in [Documentation/Deploy-TAKServer.md](Documentation/Deploy-TAKServer.md).
 
 The project wiki is at [github.com/BanterBoy/DigitalTAK/wiki](https://github.com/BanterBoy/DigitalTAK/wiki).
+
+---
+
+## Team Onboarding
+
+`Invoke-TAKOnboarding.ps1` is the single-command zero-to-team onboarding entry point. It automates the complete workflow — from certificate generation through user account creation to ATAK data package build — with no Linux experience required.
+
+**Prerequisites:**
+- PowerShell 7.0+, Posh-SSH (`Install-Module Posh-SSH`)
+- JDK 11+ with `keytool` on PATH (for data packages) — [Eclipse Temurin](https://adoptium.net) recommended
+- `admin.p12` downloaded from the TAK Server
+
+**Workflow:**
+1. Generate per-user client certificates on the TAK Server over SSH
+2. Download `.p12` files and manifest to the Windows workstation over SFTP
+3. Delete certificates from the server (security hygiene)
+4. Create TAK Server user accounts via `UserManager.jar` over SSH
+5. Assign group memberships (`<team>` for all users, `<team>-Lead` for leads)
+6. Build per-user ATAK data packages (`.zip`) ready to distribute
+
+```powershell
+# Auto-roster: 10-person template
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Custom roster from CSV
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName bravo `
+    -RosterPath .\onboarding\rosters\sample-roster-10.csv -AdminPfxPath .\certs\admin.p12
+
+# Skip data package build (no JDK required)
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName charlie -TeamSize 10 -SkipDataPackages
+```
+
+Output: `dist\<TeamName>\<username>.zip` — one file per team member, ready for distribution.
+
+See `onboarding/README.md` for the manual step-by-step workflow and `onboarding/rosters/` for CSV roster examples.
+
+---
+
+## CivTAK Teardown
+
+`Remove-CivTAK.ps1` performs a full idempotent teardown of a CivTAK deployment. Run it from the repo root with Administrator privileges.
+
+**What it removes:**
+
+| Step | Action |
+|------|--------|
+| 1 | Stop and remove the Hyper-V VM (all snapshots included) |
+| 2 | Delete the VHDX disk file |
+| 3 | Remove all cert/key files from `certs\` recursively (`*.p12`, `*.pfx`, `*.jks`, `*.pem`, `*.key`, `*.crt`, `*.cer`) — covers all team subdirectories |
+| 3b | Remove all ATAK data packages from `dist\` |
+| 4 | Remove imported TAK certificates from the Windows certificate store (root CA, intermediate CA, admin cert) |
+| 5 | Remove any leftover OEMDRV temp VHDXs |
+
+```powershell
+# Standard teardown
+.\Remove-CivTAK.ps1
+
+# Custom CA name / organisation (must match deployment parameters)
+.\Remove-CivTAK.ps1 -Organization 'MYORG' -CAName 'TAK-CA'
+
+# Clean guest uninstall before VM destruction
+$cred = Get-Credential -UserName 'atak'
+.\Remove-CivTAK.ps1 -UninstallGuest -Credential $cred
+```
+
+> **Security note:** The `certs\` and `dist\` directories contain `.p12` certificate material and embedded credentials. `Remove-CivTAK.ps1` removes these automatically. The root `.gitignore` is configured to prevent any cert or key file from being accidentally committed.
 
 Quick start:
 
@@ -234,7 +307,7 @@ New-TAKLetsEncryptCertificate -SshSession $ssh -Domain 'tak.example.com' -Email 
 
 ## Tests
 
-Both modules include Pester 5 unit tests in their `Tests/` subdirectories. All 179 tests pass. No live TAK Server or SSH host is required — all external calls are mocked.
+Both modules include Pester 5 unit tests in their `Tests/` subdirectories. An additional suite of integration tests (no live server required) validates the onboarding pipeline and teardown scripts. All 224 tests pass.
 
 ```
 TAKServerPS/Tests/
@@ -247,12 +320,20 @@ TAKInstall/Tests/
     ConvertTo-TAKBashArg.Tests.ps1    ← bash arg escaping (4 tests)
     Invoke-TAKRemoteCommand.Tests.ps1 ← SSH command executor (16 tests)
     Wait-TAKServiceReady.Tests.ps1    ← service polling helper (14 tests)
+
+tests/integration/
+    09-RemovalVerification.Tests.ps1  ← Remove-CivTAK.ps1 Windows cert store cleanup
+    10-DataPackageBuild.Tests.ps1     ← New-TAKDataPackage.ps1 truststore logic
+    11-CertDistCleanup.Tests.ps1      ← Remove-CivTAK.ps1 filesystem teardown (Steps 4 / 4b)
 ```
+
+> **Note:** Integration tests 09 and 11 require Administrator privileges to write to `Cert:\CurrentUser\Root`. They are automatically skipped in non-elevated sessions.
 
 Run a single file to avoid memory pressure:
 
 ```powershell
 Invoke-Pester -Path .\TAKServerPS\Tests\TAKServerPS.Module.Tests.ps1 -Output Detailed
+Invoke-Pester -Path .\tests\integration\10-DataPackageBuild.Tests.ps1 -Output Detailed
 ```
 
 Full results: [reports/TEST-REPORT.md](reports/TEST-REPORT.md)

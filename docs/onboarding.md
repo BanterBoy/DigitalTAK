@@ -21,16 +21,45 @@ How to generate client certificates, create user accounts, and distribute ATAK d
 {: .note }
 **TAKServerPS validated — April 2026.** `Connect-TAKServer`, user creation (`New-TAKUser` via SSH workaround), password management, mission lifecycle, and `Remove-TAKUser` all pass. `Set-TAKUserGroup` fails with HTTP 500 due to a server-side ESAPI bug — the WebTAK admin console remains the workaround for group assignment. See the [Validation Report](../validation-report/) for full test results.
 
+## Recommended approach — `Invoke-TAKOnboarding.ps1`
+
+For most operators, **`Invoke-TAKOnboarding.ps1`** at the repo root provides one-command onboarding. It automates the complete pipeline end-to-end with no Linux knowledge required: cert generation over SSH, download via SFTP, server-side cleanup, user account creation, group assignment, and ATAK data package build.
+
+```powershell
+# Auto-roster — 10-person template
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Custom roster from CSV (see onboarding/rosters/sample-roster-10.csv for format)
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName bravo `
+    -RosterPath .\onboarding\rosters\sample-roster-10.csv `
+    -AdminPfxPath .\certs\admin.p12
+
+# Skip data package build (no JDK required)
+.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName charlie -TeamSize 10 -SkipDataPackages
+```
+
+**Prerequisites for `Invoke-TAKOnboarding.ps1`:**
+- PowerShell 7.0+, Posh-SSH (`Install-Module Posh-SSH`)
+- JDK 11+ with `keytool` on PATH — [Eclipse Temurin](https://adoptium.net) recommended (skip with `-SkipDataPackages`)
+- `admin.p12` downloaded from the TAK Server
+
+The manual steps below are retained for operators who need partial automation or custom workflows.
+
+---
+
 ## Overview
 
-Once TAK Server is deployed you need to provision certificates and accounts for each team member. The onboarding workflow has four stages that run across two locations — the TAK Server (Rocky Linux) and your Windows workstation.
+Once TAK Server is deployed you need to provision certificates and accounts for each team member. The full pipeline has four stages.
 
 ```
-TAK Server (Rocky Linux)          Windows Workstation
-──────────────────────────        ────────────────────────────────
-tak-team-certs.sh                 New-TAKTeamRoster.ps1
-  └─ generates per-user .p12  ──► New-TAKDataPackage.ps1
-                                    └─ builds per-user .zip to distribute
+Invoke-TAKOnboarding.ps1 (automated entry point)
+│
+├── TAK Server (Rocky Linux)          Windows Workstation
+│   ──────────────────────────        ────────────────────────────────
+│   tak-team-certs.sh                 New-TAKTeamRoster.ps1
+│     └─ generates per-user .p12  ──► New-TAKDataPackage.ps1
+│                                       └─ builds per-user .zip to distribute
+└── dist\<team>\<username>.zip  ──► distribute to team
 ```
 
 ### What you need before starting
@@ -40,7 +69,7 @@ tak-team-certs.sh                 New-TAKTeamRoster.ps1
 - `/opt/tak/certs/makeCert.sh` present and executable on the VM
 - `TAKServerPS` module loaded on your Windows workstation
 - An active connection to TAK Server: `Connect-TAKServer -HostName <host> -Credential (Get-Credential)`
-- JDK 11+ with `keytool` on PATH (for truststore conversion)
+- JDK 11+ with `keytool` on PATH (for truststore conversion — see [Eclipse Temurin](https://adoptium.net))
 
 {: .note }
 `Connect-TAKServer` is validated and operational. PFX file authentication is the recommended approach for admin operations.
@@ -86,9 +115,13 @@ Output directory: `/opt/tak/certs/files/teams/alpha/`
 alpha-lead.p12
 alpha-asst-lead.p12
 alpha-op-01.p12  …  alpha-op-08.p12
-truststore-intermediate-ca.jks
+truststore-intermediate-ca.p12   ← TAK Server 5.7-RELEASE8
+# (or truststore-intermediate-ca.jks on earlier releases)
 manifest.json
 ```
+
+{: .note }
+**TAK Server 5.7-RELEASE8 stages a `.p12` truststore**, not `.jks`. `Invoke-TAKOnboarding.ps1` and `New-TAKDataPackage.ps1` both handle either format automatically.
 
 The `manifest.json` file is required by the PowerShell scripts in the next steps.
 
@@ -234,10 +267,12 @@ New-TAKUser -Username '<username>' -Password $pw -Groups 'alpha'
 
 > *Chuck Norris doesn't distribute `.p12` files. ATAK clients connect to him directly.*
 
-The `.gitignore` blocks:
-- `*.p12`, `*.jks`, `*.key`, `*.pem` — certificate files
-- `dist/`, `files/` — output directories
+The root `.gitignore` comprehensively blocks all certificate and key material:
+- `*.p12`, `*.pfx`, `*.jks`, `*.key`, `*.pem`, `*.crt`, `*.cer` — all cert/key types
+- `dist/`, `certs/*/` — generated output directories
 - `*.zip` — assembled data packages
+
+`Remove-CivTAK.ps1` handles cleanup automatically — Steps 4, 4b, and 5 recursively remove all cert files from `certs\`, all data packages from `dist\`, and imported TAK certificates from the Windows certificate store.
 
 If you accidentally stage key material:
 

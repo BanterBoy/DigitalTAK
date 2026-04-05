@@ -71,8 +71,9 @@ cd DigitalTAK
 ```
 DigitalTAK/
 ├── Deploy-TAKServer.ps1        # Main entry point — full automated deployment
+├── Invoke-TAKOnboarding.ps1    # One-command team onboarding (certs → users → data packages)
 ├── Invoke-TAKRollback.ps1      # Roll back to a deployment phase snapshot
-├── Remove-CivTAK.ps1           # Tear down and clean up everything
+├── Remove-CivTAK.ps1           # Full teardown: VM, VHDX, certs\, dist\, Windows cert store
 ├── Invoke-IntegrationTests.ps1 # Run end-to-end integration tests
 ├── Sync-TXTMirrors.ps1         # Maintain .txt mirrors of .sh files (CI helper)
 │
@@ -80,8 +81,14 @@ DigitalTAK/
 ├── TAKInstall/                 # PowerShell SSH provisioning module (6 cmdlets)
 ├── TAKDeploy/                  # PowerShell Hyper-V orchestration module (3 cmdlets)
 │
+├── onboarding/                 # Team onboarding scripts and roster helpers
+│   └── rosters/                # Sample CSV/JSON roster files
+├── certs/                      # Downloaded team cert files (generated; git-ignored)
+├── dist/                       # Per-user ATAK .zip data packages (generated; git-ignored)
+│
 ├── InstallShellScripts/        # Bash scripts executed on the Rocky Linux guest
 ├── TXTScripts/                 # Byte-identical .txt mirrors of all .sh files
+├── tests/integration/          # Pester 5 integration tests (no live server required)
 │
 ├── Documentation/              # TAK Server PDF and Markdown guides
 ├── docs/                       # This documentation site
@@ -100,7 +107,20 @@ Invoke-Pester ./TAKServerPS/Tests/ -Output Detailed
 Invoke-Pester ./TAKInstall/Tests/ -Output Detailed
 ```
 
-Expected output: **179 tests, all passing**.
+Expected output: **179 unit tests, all passing**.
+
+### Integration tests
+
+A separate suite of integration tests validates the onboarding pipeline and teardown scripts without a live server:
+
+```powershell
+# Run integration tests (no TAK Server required)
+Invoke-Pester ./tests/integration/ -Output Detailed
+```
+
+Expected: **45 integration tests pass**. Tests that require Administrator (Windows cert store writes) are automatically skipped in non-elevated sessions.
+
+Total across all test suites: **224 tests, all passing**.
 
 ### What the tests cover
 
@@ -108,6 +128,9 @@ Expected output: **179 tests, all passing**.
 |---|---|---|
 | TAKServerPS | 109 | Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets |
 | TAKInstall | 70 | Module manifest, 6-function inventory, bash escaping, SSH execution, service polling |
+| Integration (09) | — | `Remove-CivTAK.ps1` Windows cert store cleanup (skipped without elevation) |
+| Integration (10) | — | `New-TAKDataPackage.ps1` truststore lookup — `.jks` and `.p12` paths |
+| Integration (11) | — | `Remove-CivTAK.ps1` filesystem teardown (Steps 4 / 4b) |
 
 ---
 
@@ -117,10 +140,12 @@ Every push to `prod` and all pull requests run the full CI pipeline via GitHub A
 
 | Job | Tool | What it checks |
 |---|---|---|
-| **Pester** | PowerShell | 179 unit tests across TAKServerPS + TAKInstall |
+| **Pester** | PowerShell | 179 unit tests across TAKServerPS, TAKInstall, TAKDeploy + integration test infrastructure |
 | **PSScriptAnalyzer** | PowerShell | Code quality and best practices |
 | **ShellCheck** | Bash | Shell script linting (severity: warning) |
 | **TXT Sync** | Bash | .txt mirrors byte-identical to .sh files |
+
+The GitHub Pages documentation site is built and deployed separately via `.github/workflows/pages.yml` on every push to `prod` that modifies `docs/**`.
 
 See `.github/workflows/ci.yml` for the full pipeline definition.
 

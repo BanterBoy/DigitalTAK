@@ -2,13 +2,31 @@
 
 Scripts and documentation for provisioning 10- and 20-person teams on TAK Server 5.7.
 
+## Recommended approach — `Invoke-TAKOnboarding.ps1`
+
+For most operators, use **`Invoke-TAKOnboarding.ps1`** at the repo root. It automates the complete pipeline in a single command \u2014 cert generation, download, user creation, group assignment, and ATAK data packages:
+
+```powershell
+# 10-person team from auto-template
+.\\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Custom roster from CSV (see rosters/sample-roster-10.csv for format)
+.\\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName bravo \`
+    -RosterPath .\\onboarding\\rosters\\sample-roster-10.csv -AdminPfxPath .\\certs\\admin.p12
+```
+
+The manual steps below are provided for operators who need partial automation or custom workflows.
+
+---
+
 ## What's here
 
 | File | Runs on | Purpose |
 |------|---------|---------|
 | `tak-team-certs.sh` | Rocky Linux (TAK Server) | Generates per-user client certificates |
 | `New-TAKTeamRoster.ps1` | Windows (PowerShell 7) | Creates TAK Server user accounts via API |
-| `New-TAKDataPackage.ps1` | Windows (PowerShell 7) | Builds per-user ATAK data packages (.zip) |
+| `New-TAKDataPackage.ps1` | Windows (PowerShell 7) | Builds per-user ATAK data packages (.zip) — supports `.jks` and `.p12` truststore |
+| `rosters/sample-roster-10.csv` | — | Sample 20-person CSV roster with `Username`, `Role`, and `Team` columns |
 
 ---
 
@@ -53,7 +71,7 @@ TEAM_NAME=alpha TEAM_SIZE=10 bash tak-team-certs.sh
 
 Output: `/opt/tak/certs/files/teams/alpha/`
 - `alpha-lead.p12`, `alpha-asst-lead.p12`, `alpha-op-01.p12` … `alpha-op-08.p12`
-- `truststore-intermediate-ca.jks`
+- `truststore-intermediate-ca.p12` (TAK 5.7-RELEASE8) **or** `truststore-intermediate-ca.jks` (earlier releases)
 - `manifest.json`
 
 ### Step 2 — Transfer cert files to Windows workstation (securely)
@@ -159,11 +177,12 @@ Configurator 2 or MDM. Consider this for teams larger than 5 iOS users.
 
 ### What MUST NOT appear in git
 
-The `.gitignore` in this directory blocks:
-- `*.p12`, `*.jks`, `*.key`, `*.pem` — certificate files
-- `dist/`, `files/` — output directories
+The root `.gitignore` (and this directory's `.gitignore`) block:
+- `*.p12`, `*.pfx`, `*.jks`, `*.key`, `*.pem`, `*.crt`, `*.cer` — all certificate and key types
+- `dist/`, `certs/*/` — output directories containing generated material
 - `*.zip` — assembled data packages
 
+`Remove-CivTAK.ps1` removes both `certs\\` and `dist\\` automatically during teardown.
 If you accidentally stage key material, remove it with:
 ```bash
 git rm --cached <file>
