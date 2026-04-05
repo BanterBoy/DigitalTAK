@@ -1,4 +1,5 @@
 {
+  "team": "bravo",
   "users": [
     {
       "username": "b.holloway",
@@ -40,6 +41,5 @@
       "username": "a.nguyen",
       "role": "Operator"
     }
-  ],
-  "team": "bravo"
+  ]
 }

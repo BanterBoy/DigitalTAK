@@ -163,11 +163,16 @@ $resolvedCertDir = if ($CertDir) { $CertDir } else { Split-Path $ManifestPath -P
 $jksPath = if ($TrustStorePath) {
     $TrustStorePath
 } else {
-    Join-Path $resolvedCertDir 'truststore-intermediate-ca.jks'
+    $jksCandidate = Join-Path $resolvedCertDir 'truststore-intermediate-ca.jks'
+    $p12Candidate = Join-Path $resolvedCertDir 'truststore-intermediate-ca.p12'
+    if      (Test-Path $jksCandidate) { $jksCandidate }
+    elseif  (Test-Path $p12Candidate) { $p12Candidate }
+    else    { $jksCandidate }  # let the next check produce a clear error
 }
 if (-not (Test-Path $jksPath)) {
     throw "Truststore not found at '$jksPath'. Provide -TrustStorePath explicitly."
 }
+$srcStoreType = if ($jksPath -match '\.p12$') { 'PKCS12' } else { 'JKS' }
 
 # ── Truststore passphrase ──────────────────────────────────────────────────────
 if (-not $TrustStorePassphrase) {
@@ -186,7 +191,7 @@ try {
     $keytoolArgs = @(
         '-importkeystore'
         '-srckeystore',  $jksPath
-        '-srcstoretype', 'JKS'
+        '-srcstoretype', $srcStoreType
         '-srcstorepass', $jksPassPlain
         '-destkeystore', $trustP12
         '-deststoretype','PKCS12'

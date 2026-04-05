@@ -10,9 +10,11 @@
 
       1. Stop and remove the Hyper-V VM (and all its snapshots)
       2. Delete the VHDX disk file
-      3. Remove locally downloaded .p12 certificates from certs\
-      4. Remove imported TAK certificates from the Windows certificate store
-      5. Remove any leftover OEMDRV temp VHDXs
+      3. Remove all locally downloaded cert/key files from certs\ (recursive,
+         covers team subdirs) and delete the certs\<team>\ directories
+      4. Remove ATAK data packages from dist\ (contain embedded .p12 certs)
+      5. Remove imported TAK certificates from the Windows certificate store
+      6. Remove any leftover OEMDRV temp VHDXs
 
     To also uninstall TAK Server software from inside the running guest VM
     before destroying it, use -UninstallGuest.  This SSHes into the VM and
@@ -203,23 +205,46 @@ else {
     Write-Host "  VHDX not found at $VHDPath (already removed)" -ForegroundColor DarkGray
 }
 
-# ── Step 4: Remove local .p12 certificates ───────────────────────────────────
+# ── Step 4: Remove local certificate files and data packages ─────────────────
 Write-Host ''
 Write-Host '── Step 4: Removing local certificate files ──' -ForegroundColor Magenta
 
 $localCertDir = Join-Path $PSScriptRoot 'certs'
 if (Test-Path $localCertDir) {
-    $p12Files = Get-ChildItem -Path $localCertDir -Filter '*.p12' -ErrorAction SilentlyContinue
-    if ($p12Files) {
-        $p12Files | Remove-Item -Force
-        Write-Host "  [OK] Removed $($p12Files.Count) .p12 file(s) from certs\" -ForegroundColor Green
+    # Remove all key/cert material recursively (covers team subdirs: certs\bravo\, certs\charlie\, etc.)
+    $certExtensions = '*.p12', '*.pfx', '*.jks', '*.pem', '*.key', '*.crt', '*.cer'
+    $certFiles = foreach ($ext in $certExtensions) {
+        Get-ChildItem -Path $localCertDir -Filter $ext -Recurse -ErrorAction SilentlyContinue
+    }
+    if ($certFiles) {
+        $certFiles | Remove-Item -Force
+        Write-Host "  [OK] Removed $($certFiles.Count) cert/key file(s) from certs\" -ForegroundColor Green
     }
     else {
-        Write-Host '  No .p12 files found in certs\ (already removed)' -ForegroundColor DarkGray
+        Write-Host '  No cert/key files found in certs\ (already removed)' -ForegroundColor DarkGray
+    }
+
+    # Remove team subdirectories entirely (they contain manifests referencing cert paths)
+    $teamDirs = Get-ChildItem -Path $localCertDir -Directory -ErrorAction SilentlyContinue
+    foreach ($dir in $teamDirs) {
+        Remove-Item -Path $dir.FullName -Recurse -Force
+        Write-Host "  [OK] Removed team cert dir: certs\$($dir.Name)\" -ForegroundColor Green
     }
 }
 else {
     Write-Host '  certs\ directory not found (already removed)' -ForegroundColor DarkGray
+}
+
+Write-Host ''
+Write-Host '── Step 4b: Removing ATAK data packages ──' -ForegroundColor Magenta
+
+$localDistDir = Join-Path $PSScriptRoot 'dist'
+if (Test-Path $localDistDir) {
+    Remove-Item -Path $localDistDir -Recurse -Force
+    Write-Host "  [OK] Removed dist\ (ATAK data packages)" -ForegroundColor Green
+}
+else {
+    Write-Host '  dist\ not found (already removed)' -ForegroundColor DarkGray
 }
 
 # ── Step 5: Remove TAK certificates from Windows store ───────────────────────

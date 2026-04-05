@@ -35,8 +35,18 @@
 #>
 
 BeforeDiscovery {
-    # $script:SkipWinStore must be set at discovery time so -Skip:$script:SkipWinStore works.
-    $script:SkipWinStore = -not $IsWindows
+    # Evaluated at discovery time so -Skip:$script:SkipWinStore works on all It blocks.
+    if ($IsWindows) {
+        $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+        $isAdmin   = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+        # Certificate store group: requires admin to write to CurrentUser\Root on Windows 11.
+        $script:SkipWinStore = -not $isAdmin
+        # Admin-only tests (run Remove-CivTAK.ps1 -WhatIf etc.)
+        $script:SkipAdmin    = -not $isAdmin
+    } else {
+        $script:SkipWinStore = $true
+        $script:SkipAdmin    = $true
+    }
 }
 
 BeforeAll {
@@ -46,24 +56,6 @@ BeforeAll {
     $script:RemoveScript   = Join-Path $script:RepoRoot 'Remove-CivTAK.ps1'
     $script:TestCAName     = 'Pester-TestCA-REMOVE'
     $script:TestOrg        = 'Pester-Test-Org'
-
-    # $script:SkipWinStore is set as a boolean in BeforeDiscovery; keep a consistent
-    # runtime value for use inside test bodies (e.g. the BeforeAll guard at line ~136).
-    $script:SkipWinStore = -not $IsWindows
-
-    # Skip the -WhatIf test when not running as Administrator (Remove-CivTAK.ps1 requires elevation)
-    # Uses Set-ItResult inside test bodies to skip at run time — safer than -Skip: for
-    # Windows-only APIs like WindowsPrincipal that throw on Linux.
-    if ($IsWindows) {
-        $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-        $script:SkipAdmin = if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-            'Remove-CivTAK.ps1 requires Administrator — run Pester elevated to test -WhatIf'
-        } else {
-            $null
-        }
-    } else {
-        $script:SkipAdmin = 'Windows-only — skipping administrator check on non-Windows platform'
-    }
 
     # Tracking list for synthetic certs so AfterAll can clean them up
     $script:SyntheticThumbprints = [System.Collections.Generic.List[string]]::new()
@@ -141,7 +133,8 @@ Describe 'Remove-CivTAK.ps1 — Parameter Contract' -Tag 'Removal', 'Parameters'
 Describe 'Remove-CivTAK.ps1 — Certificate Store Cleanup' -Tag 'Removal', 'WindowsStore' {
 
     BeforeAll {
-        if ($null -ne $script:SkipWinStore) { return }
+        # Guard: skip cert-store setup when not elevated (already decided at discovery time).
+        if ($script:SkipWinStore) { return }
 
         # Helper: create an in-memory self-signed certificate with the test CA subject.
         # Defined here (not at file scope) so it is available in Pester 5's execution phase.
@@ -256,14 +249,7 @@ Describe 'Remove-CivTAK.ps1 — Certificate Store Cleanup' -Tag 'Removal', 'Wind
     }
 
     It 'applying cert-removal logic clears synthetic certs from CurrentUser\Root and CurrentUser\My' `
-        -Skip:$script:SkipWinStore {
-
-        # Removing from CurrentUser\Root requires a UI security prompt on Windows 11 (non-interactive
-        # sessions block it). Skip this test and flag it for elevated re-run.
-        if ($null -ne $script:SkipAdmin) {
-            Set-ItResult -Skipped -Because $script:SkipAdmin
-            return
-        }
+        -Skip:$script:SkipAdmin {
 
         # Execute the same removal logic as Remove-CivTAK.ps1 Step 5
         $caNameEsc = [regex]::Escape($script:TestCAName)
@@ -297,9 +283,7 @@ Describe 'Remove-CivTAK.ps1 — Certificate Store Cleanup' -Tag 'Removal', 'Wind
 Describe 'Remove-CivTAK.ps1 — Post-Removal Verification' -Tag 'Removal', 'WindowsStore' {
 
     It 'no root CA cert with test CAName remains in CurrentUser\Root after removal' `
-        -Skip:$script:SkipWinStore {
-
-        if ($null -ne $script:SkipAdmin) { Set-ItResult -Skipped -Because $script:SkipAdmin; return }
+        -Skip:$script:SkipAdmin {
 
         $caNameEsc = [regex]::Escape($script:TestCAName)
         $remaining = Get-ChildItem 'Cert:\CurrentUser\Root' -ErrorAction SilentlyContinue |
@@ -309,9 +293,7 @@ Describe 'Remove-CivTAK.ps1 — Post-Removal Verification' -Tag 'Removal', 'Wind
     }
 
     It 'no intermediate CA cert remains in CurrentUser\My after removal' `
-        -Skip:$script:SkipWinStore {
-
-        if ($null -ne $script:SkipAdmin) { Set-ItResult -Skipped -Because $script:SkipAdmin; return }
+        -Skip:$script:SkipAdmin {
 
         $remaining = Get-ChildItem 'Cert:\CurrentUser\My' -ErrorAction SilentlyContinue |
             Where-Object {
@@ -323,9 +305,7 @@ Describe 'Remove-CivTAK.ps1 — Post-Removal Verification' -Tag 'Removal', 'Wind
     }
 
     It 'Windows cert store contains no certificate with the test CAName after cleanup' `
-        -Skip:$script:SkipWinStore {
-
-        if ($null -ne $script:SkipAdmin) { Set-ItResult -Skipped -Because $script:SkipAdmin; return }
+        -Skip:$script:SkipAdmin {
 
         $caNameEsc = [regex]::Escape($script:TestCAName)
         $orgEsc    = [regex]::Escape($script:TestOrg)
@@ -346,14 +326,7 @@ Describe 'Remove-CivTAK.ps1 — Post-Removal Verification' -Tag 'Removal', 'Wind
     }
 
     It 'Remove-CivTAK.ps1 runs with -WhatIf without modifying the certificate store' `
-        -Skip:$script:SkipWinStore {
-
-        # Skip at runtime when not elevated — Remove-CivTAK.ps1 has #Requires -RunAsAdministrator.
-        # (Cannot rely on -Skip: evaluated at discovery time for $script:SkipAdmin set in BeforeAll.)
-        if ($null -ne $script:SkipAdmin) {
-            Set-ItResult -Skipped -Because $script:SkipAdmin
-            return
-        }
+        -Skip:$script:SkipAdmin {
 
         # Count certs before
         $beforeCount = (Get-ChildItem 'Cert:\CurrentUser\Root' -ErrorAction SilentlyContinue).Count +

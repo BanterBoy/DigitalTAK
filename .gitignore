@@ -1,4 +1,22 @@
-# Deployment reports contain credentials and must never be committed
+# ── Certificate and key material — NEVER commit ────────────────────────────
+# PKCS12 keystores (user/server certs, truststore)
+*.p12
+*.pfx
+# JKS keystores
+*.jks
+# PEM keys and certs
+*.key
+*.pem
+*.crt
+*.cer
+# ATAK data packages (embed .p12 files; distribute out-of-band only)
+dist/
+# Downloaded cert staging directories
+certs/*/
+# Safety net: never commit admin PFX regardless of location
+admin.p12
+
+# ── Deployment reports contain credentials and must never be committed ──────
 reports/DEPLOYMENT-REPORT-*.md
 
 # Integration test XML results
