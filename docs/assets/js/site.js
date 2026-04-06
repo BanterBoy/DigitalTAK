@@ -2,7 +2,7 @@ const themeCookie = 'digitaltak.lukeleigh.com',
     themeStorage = 'digitaltak.lukeleigh.com.theme';
 
 const setPersistent = (theme) => {
-    Cookies.set(themeCookie, { theme: theme }, { sameSite: 'strict' });
+    Cookies.set(themeCookie, theme, { sameSite: 'strict' });
     localStorage.setItem(themeStorage, theme);
 };
 
@@ -40,9 +40,9 @@ const removeTheme = () => {
 const getTheme = () => {
     var t = localStorage.getItem(themeStorage);
     if (t === null) {
-        var c = Cookies.getJSON(themeCookie);
+        var c = Cookies.get(themeCookie);
         if (c === undefined || c === null) { return 'system'; }
-        t = c.theme;
+        t = c;
         setPersistent(t);
     }
     return t;

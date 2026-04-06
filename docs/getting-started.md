@@ -4,7 +4,7 @@ title: Getting Started
 nav_title: Getting Started
 ---
 
-{: .no_toc }
+# Getting Started
 
 ## Table of Contents
 {: .no_toc .text-delta }
