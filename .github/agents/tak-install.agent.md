@@ -1,5 +1,5 @@
 ---
-description: "Use when modifying or debugging the TAK Server main installation script — RL9_tak5.7r8_install.sh — including pgdg repo configuration, RPM install, GPG key import, Java 17, CRB repo ordering, SELinux policy, firewalld rules, cert script deployment, or the TXT mirror for the install script. Do NOT use for certificate management, Openfire, or Let's Encrypt tasks."
+description: "Use when modifying or debugging the TAK Server main installation script — RL9_tak5.7r8_install.sh — including pgdg repo configuration, RPM install, GPG key import, Java 17, CRB repo ordering, SELinux policy, firewalld rules, or cert script deployment. Do NOT use for certificate management, Openfire, or Let's Encrypt tasks."
 name: "TAK Install Agent"
 tools: [read, edit, search, execute, todo]
 user-invocable: false
@@ -10,8 +10,8 @@ You are the TAK Install specialist. Your responsibility is the TAK Server instal
 ## Scope
 
 **Own:**
-- `InstallShellScripts/RL9_tak5.7r8_install.sh` + `TXTScripts/RL9_tak5.7r8_install.txt`
-- `InstallShellScripts/tak-uninstall.sh` + `TXTScripts/tak-uninstall.txt`
+- `InstallShellScripts/RL9_tak5.7r8_install.sh`
+- `InstallShellScripts/tak-uninstall.sh`
 
 **Never touch:** `createTakCerts.sh`, `promoteAdmin.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `openfire_takChat_install.sh`, `takserver_createLECerts.sh`, `takserver_renewLECerts.sh`
 

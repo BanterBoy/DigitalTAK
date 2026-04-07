@@ -75,7 +75,6 @@ DigitalTAK/
 ├── Invoke-TAKRollback.ps1      # Roll back to a deployment phase snapshot
 ├── Remove-CivTAK.ps1           # Full teardown: VM, VHDX, certs\, dist\, Windows cert store
 ├── Invoke-IntegrationTests.ps1 # Run end-to-end integration tests
-├── Sync-TXTMirrors.ps1         # Maintain .txt mirrors of .sh files (CI helper)
 │
 ├── TAKServerPS/                # PowerShell REST API wrapper (44 cmdlets)
 ├── TAKInstall/                 # PowerShell SSH provisioning module (6 cmdlets)
@@ -87,7 +86,6 @@ DigitalTAK/
 ├── dist/                       # Per-user ATAK .zip data packages (generated; git-ignored)
 │
 ├── InstallShellScripts/        # Bash scripts executed on the Rocky Linux guest
-├── TXTScripts/                 # Byte-identical .txt mirrors of all .sh files
 ├── tests/integration/          # Pester 5 integration tests (no live server required)
 │
 ├── Documentation/              # TAK Server PDF and Markdown guides

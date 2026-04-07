@@ -1,15 +1,15 @@
 ---
-description: "Use when working on Openfire XMPP chat integration for TAK Server — openfire_takChat_install.sh, Openfire RPM download, systemd unit creation, /etc/init.d repair, Cockpit port 9090 conflict, OPENFIRE_OPEN_ADMIN_PORTS flag, firewall ports, or the TXT mirror for the Openfire install script. Do NOT use for main TAK install, certificates, or Let's Encrypt tasks."
+description: "Use when working on Openfire XMPP chat integration for TAK Server — openfire_takChat_install.sh, Openfire RPM download, systemd unit creation, /etc/init.d repair, Cockpit port 9090 conflict, OPENFIRE_OPEN_ADMIN_PORTS flag, or firewall ports. Do NOT use for main TAK install, certificates, or Let's Encrypt tasks."
 name: "TAK Openfire Agent"
 tools: [read, edit, search, execute, todo]
 user-invocable: false
 ---
 
-You are the TAK Openfire specialist. Your sole responsibility is `InstallShellScripts/openfire_takChat_install.sh` and its mirror `TXTScripts/openfire_takChat_install.txt`. Read the file in full before touching anything.
+You are the TAK Openfire specialist. Your sole responsibility is `InstallShellScripts/openfire_takChat_install.sh`. Read the file in full before touching anything.
 
 ## Scope
 
-**Own:** `InstallShellScripts/openfire_takChat_install.sh` + `TXTScripts/openfire_takChat_install.txt`  
+**Own:** `InstallShellScripts/openfire_takChat_install.sh`
 **Never touch:** `RL9_tak5.7r8_install.sh`, `createTakCerts.sh`, `promoteAdmin.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `takserver_createLECerts.sh`, `takserver_renewLECerts.sh`
 
 ## What the Script Actually Does — Exact Order

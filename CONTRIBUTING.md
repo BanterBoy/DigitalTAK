@@ -55,16 +55,6 @@ $env:TAK_CERT_PASS        = 'your-cert-password'
 .\Invoke-E2ETests.ps1
 ```
 
-### Keeping TXT mirrors in sync
-
-Every `.sh` file in `InstallShellScripts/` has a byte-identical `.txt` mirror in `TXTScripts/`. After editing any `.sh` file, run:
-
-```powershell
-.\Sync-TXTMirrors.ps1
-```
-
-The CI `TXT Mirror Sync Check` job will fail if mirrors are out of date.
-
 ---
 
 ## CI Overview
@@ -76,10 +66,9 @@ The CI pipeline (`.github/workflows/ci.yml`) runs automatically on push/PR to `p
 | Pester Tests | ubuntu-latest | Unit + dry-run integration tests |
 | PSScriptAnalyzer | ubuntu-latest | PowerShell lint (needs: Pester) |
 | ShellCheck | ubuntu-latest | Bash lint (needs: PSScriptAnalyzer) |
-| TXT Mirror Sync | ubuntu-latest | Mirror consistency (needs: ShellCheck) |
 | Live-VM Integration | self-hosted tak-vm | Full suite against real VM (manual / release only) |
 
-All standard jobs (top four) run without secrets and pass for any fork with no additional setup. The live-VM job requires `TAK_SSH_PASS` and `TAK_CERT_PASS` repository secrets and a self-hosted runner — forks will naturally skip it.
+All standard jobs (top three) run without secrets and pass for any fork with no additional setup. The live-VM job requires `TAK_SSH_PASS` and `TAK_CERT_PASS` repository secrets and a self-hosted runner — forks will naturally skip it.
 
 ---
 

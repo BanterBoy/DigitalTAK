@@ -21,7 +21,6 @@
 - [ ] Pester unit tests pass locally (`Invoke-UnitTests.ps1`)
 - [ ] PSScriptAnalyzer clean (no new violations)
 - [ ] ShellCheck clean (if `.sh` files changed)
-- [ ] TXT mirrors updated (`Sync-TXTMirrors.ps1`) if `.sh` files changed
 - [ ] Integration tests run against live VM (if applicable)
 
 ## Checklist

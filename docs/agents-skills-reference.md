@@ -306,9 +306,6 @@ These scripts run on the Rocky Linux 9 guest. They are executed remotely by TAKI
 | `tak-uninstall.sh` | Full removal: TAK Server, PostgreSQL, Openfire |
 | `utils.sh` | Shared helpers: `bash_quote()`, `sed_replace_quote()`, `wait_for_service()` |
 
-{: .note }
-Every `.sh` file has a byte-identical `.txt` mirror in `TXTScripts/`. This is enforced by CI. If you modify a shell script, run `.\Sync-TXTMirrors.ps1` to update the mirrors.
-
 ---
 
 ## Top-Level Scripts
@@ -320,7 +317,6 @@ Every `.sh` file has a byte-identical `.txt` mirror in `TXTScripts/`. This is en
 | `Remove-CivTAK.ps1` | Tear down VM, VHDX, certs, and Windows certificate store entries |
 | `Invoke-IntegrationTests.ps1` | Run end-to-end integration tests (requires live `TAK_INTEGRATION_HOST`) |
 | `Deploy-TAKTestServer.ps1` | Test deployment wrapper |
-| `Sync-TXTMirrors.ps1` | Sync `.txt` mirrors of all `.sh` files |
 
 ---
 

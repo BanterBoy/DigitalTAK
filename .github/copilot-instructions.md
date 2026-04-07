@@ -13,7 +13,6 @@ Two PowerShell modules + a set of Bash scripts provide the full install, cert, a
 | `TAKInstall/` | PS module — remote provisioning over SSH via Posh-SSH |
 | `TAKDeploy/` | PS module — Hyper-V VM creation + deployment orchestration (3 cmdlets) |
 | `InstallShellScripts/` | Bash scripts run directly on the Rocky 9 server |
-| `TXTScripts/` | **Byte-identical** `.txt` mirrors of every `.sh` file |
 | `onboarding/` | Team onboarding assets — cert batch script, roster helpers, data-package builder |
 | `scripts/` | Standalone PS scripts |
 | `tests/e2e/` | E2E Pester tests incl. `07-OnboardingFlow.Tests.ps1` (formerly `scripts/Invoke-E2EOnboardingTest.ps1`) |
@@ -52,8 +51,6 @@ Invoke-ScriptAnalyzer -Path .\TAKServerPS\ -Settings .\TAKServerPS\PSScriptAnaly
 Invoke-ScriptAnalyzer -Path .\TAKInstall\  -Recurse
 Invoke-ScriptAnalyzer -Path .\TAKDeploy\   -Settings .\TAKDeploy\PSScriptAnalyzerSettings.psd1 -Recurse
 
-# Sync TXT mirrors after any .sh edit
-./Sync-TXTMirrors.ps1
 ```
 
 Full test results: [TEST-REPORT.md](../reports/TEST-REPORT.md)
@@ -99,17 +96,6 @@ Full test results: [TEST-REPORT.md](../reports/TEST-REPORT.md)
 - Helper functions live in `utils.sh`; all other scripts source it.
 - Scripts are idempotent where possible (check before creating).
 - Execution order matters — see [README § Execution Order](../README.md).
-
-### TXT mirror rule (critical)
-
-Every `.sh` file in `InstallShellScripts/` **must** have a byte-identical `.txt` copy in `TXTScripts/`.  
-After any edit to a `.sh` file, run:
-
-```powershell
-./Sync-TXTMirrors.ps1
-```
-
-CI enforces this — a PR with a stale mirror will fail.
 
 ---
 

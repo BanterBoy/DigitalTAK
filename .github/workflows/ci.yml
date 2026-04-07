@@ -165,36 +165,6 @@ jobs:
           scandir: './InstallShellScripts'
           severity: warning
 
-  # ─── TXT mirror sync check ──────────────────────────────────────────────────
-  txt-sync:
-    name: TXT Mirror Sync Check
-    runs-on: ubuntu-latest
-    needs: shellcheck
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Verify TXT mirrors match .sh files
-        run: |
-          fail=0
-          for f in InstallShellScripts/*.sh; do
-            base=$(basename "$f" .sh)
-            txt="TXTScripts/$base.txt"
-            if [ ! -f "$txt" ]; then
-              echo "MISSING: $txt (no TXT mirror for $f)"
-              fail=1
-            elif ! diff -q "$f" "$txt" > /dev/null 2>&1; then
-              echo "OUT OF SYNC: $txt does not match $f"
-              diff "$f" "$txt" || true
-              fail=1
-            fi
-          done
-          if [ "$fail" -eq 1 ]; then
-            echo ""
-            echo "Run ./Sync-TXTMirrors.ps1 to update TXT mirrors after editing .sh files."
-            exit 1
-          fi
-          echo "All TXT mirrors are in sync."
-
   # ─── Live-VM integration tests (manual / release only) ─────────────────────
   #
   # This job runs the full integration + E2E test suite against a real deployed

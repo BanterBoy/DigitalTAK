@@ -1,5 +1,5 @@
 ---
-description: "Use when working on Let's Encrypt TLS certificate issuance or renewal for TAK Server — takserver_createLECerts.sh (initial certbot issuance via snapd), takserver_renewLECerts.sh (cron-based renewal), /etc/takserver_renew.conf credentials file, PKCS12/JKS keystore conversion, CoreConfig.xml 8446 connector patch, port 80 firewalld rules, or TXT mirrors for these scripts. Do NOT use for TAK CA/self-signed certs, Openfire tasks."
+description: "Use when working on Let's Encrypt TLS certificate issuance or renewal for TAK Server — takserver_createLECerts.sh (initial certbot issuance via snapd), takserver_renewLECerts.sh (cron-based renewal), /etc/takserver_renew.conf credentials file, PKCS12/JKS keystore conversion, CoreConfig.xml 8446 connector patch, or port 80 firewalld rules. Do NOT use for TAK CA/self-signed certs, Openfire tasks."
 name: "TAK LetsEncrypt Agent"
 tools: [read, edit, search, execute, todo]
 user-invocable: false
@@ -10,8 +10,8 @@ You are the TAK LetsEncrypt specialist. Your responsibility is the Let's Encrypt
 ## Scope
 
 **Own:**
-- `InstallShellScripts/takserver_createLECerts.sh` + `TXTScripts/takserver_createLECerts.txt`
-- `InstallShellScripts/takserver_renewLECerts.sh` + `TXTScripts/takserver_renewLECerts.txt`
+- `InstallShellScripts/takserver_createLECerts.sh`
+- `InstallShellScripts/takserver_renewLECerts.sh`
 
 **Never touch:** `RL9_tak5.7r8_install.sh`, `createTakCerts.sh`, `promoteAdmin.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `openfire_takChat_install.sh`
 

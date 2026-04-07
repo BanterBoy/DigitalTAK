@@ -14,7 +14,6 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 ```
 DigitalTAK/
 ├── InstallShellScripts/        ← Bash deployment scripts (run on the server)
-├── TXTScripts/                 ← Byte-identical TXT mirrors of every .sh file
 ├── TAKServerPS/                ← PowerShell module — TAK Server REST API (44 cmdlets)
 ├── TAKInstall/                 ← PowerShell module — remote provisioning via SSH (6 cmdlets)
 ├── TAKDeploy/                  ← PowerShell module — Hyper-V VM creation & orchestration (3 cmdlets)
@@ -131,7 +130,7 @@ If you do not pass `-State`, `-City`, `-Organization`, `-OrganizationalUnit`, or
 
 ## Bash Installation Scripts
 
-Scripts live in `InstallShellScripts/`; byte-identical copies exist in `TXTScripts/` for environments that cannot execute `.sh` directly.
+Scripts live in `InstallShellScripts/`.
 
 ### Execution Order
 
