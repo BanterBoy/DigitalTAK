@@ -67,8 +67,8 @@ DigitalTAK/
 │   ├── README.md
 │   └── rosters/
 │       └── sample-roster-10.csv   ← 20-person roster (10 bravo + 10 charlie), has Team column
-├── scripts/
-│   └── Invoke-E2EOnboardingTest.ps1 ← 46-test E2E validator against live TAK Server
+├── tests/e2e/
+│   └── 07-OnboardingFlow.Tests.ps1 ← 46-test E2E validator against live TAK Server (moved from scripts/)
 ├── TXTScripts/                     ← TXT mirrors (must stay byte-identical to .sh)
 ├── Documentation/                  ← Official TAK PDFs + channels README
 ├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, E2E-ONBOARDING-REPORT.md

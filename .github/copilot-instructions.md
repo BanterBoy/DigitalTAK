@@ -15,7 +15,8 @@ Two PowerShell modules + a set of Bash scripts provide the full install, cert, a
 | `InstallShellScripts/` | Bash scripts run directly on the Rocky 9 server |
 | `TXTScripts/` | **Byte-identical** `.txt` mirrors of every `.sh` file |
 | `onboarding/` | Team onboarding assets — cert batch script, roster helpers, data-package builder |
-| `scripts/` | Standalone PS scripts (e.g. `Invoke-E2EOnboardingTest.ps1`) |
+| `scripts/` | Standalone PS scripts |
+| `tests/e2e/` | E2E Pester tests incl. `07-OnboardingFlow.Tests.ps1` (formerly `scripts/Invoke-E2EOnboardingTest.ps1`) |
 | `Documentation/` | Official TAK 5.7 and Federation Hub PDFs |
 | `Invoke-TAKOnboarding.ps1` | Root-level — zero-to-team onboarding (certs → users → data packages) |
 | `Deploy-TAKServer.ps1` | Root-level — end-to-end deployment orchestration (Phases 0–8) |

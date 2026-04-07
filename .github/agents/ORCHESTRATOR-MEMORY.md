@@ -61,8 +61,8 @@ DigitalTAK/
 │   ├── README.md
 │   └── rosters/
 │       └── sample-roster-10.csv        # 20-person roster (10 bravo + 10 charlie), Team column
-├── scripts/
-│   └── Invoke-E2EOnboardingTest.ps1    # 46-test E2E validator against live server
+├── tests/e2e/
+│   └── 07-OnboardingFlow.Tests.ps1     # 46-test E2E validator against live server (moved from scripts/)
 ├── reports/
 │   ├── TEST-REPORT.md       # Pester results
 │   ├── DEPLOYMENT-REPORT.md
