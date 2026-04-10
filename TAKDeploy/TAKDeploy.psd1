@@ -1,7 +1,7 @@
 @{
     # Module identity
     RootModule        = 'TAKDeploy.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.1.0'
     GUID              = 'c7a9e312-8f4b-4d76-b5e1-3a2c6d8f9e01'
     Author            = 'DigitalTAK'
     CompanyName       = 'DigitalTAK'
@@ -21,6 +21,8 @@
         'New-TAKVirtualMachine'
         'Wait-TAKLinuxInstall'
         'Start-TAKDeployment'
+        'Remove-TAKDeployment'
+        'Invoke-TAKRollback'
     )
 
     CmdletsToExport   = @()
@@ -31,7 +33,7 @@
         PSData = @{
             Tags         = @('TAK', 'TAKServer', 'Hyper-V', 'Rocky Linux', 'Deployment', 'VM')
             ProjectUri   = 'https://github.com/BanterBoy/DigitalTAK'
-            ReleaseNotes = 'v1.0.0 - Initial release. Interactive Hyper-V VM creation and TAK Server deployment for Rocky Linux 9.'
+            ReleaseNotes = 'v1.1.0 - Add Remove-TAKDeployment and Invoke-TAKRollback for full VM lifecycle management.'
         }
     }
 }
