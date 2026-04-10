@@ -71,14 +71,15 @@ cd DigitalTAK
 ```
 DigitalTAK/
 ├── Deploy-TAKServer.ps1        # Main entry point — full automated deployment
-├── Invoke-TAKOnboarding.ps1    # One-command team onboarding (certs → users → data packages)
-├── Invoke-TAKRollback.ps1      # Roll back to a deployment phase snapshot
-├── Remove-CivTAK.ps1           # Full teardown: VM, VHDX, certs\, dist\, Windows cert store
+├── Invoke-TAKOnboarding.ps1    # Thin wrapper → TAKOnboarding\Invoke-TAKOnboarding
+├── Invoke-TAKRollback.ps1      # Thin wrapper → TAKDeploy\Invoke-TAKRollback
+├── Remove-CivTAK.ps1           # Thin wrapper → TAKDeploy\Remove-TAKDeployment
 ├── Invoke-IntegrationTests.ps1 # Run end-to-end integration tests
 │
 ├── TAKServerPS/                # PowerShell REST API wrapper (44 cmdlets)
 ├── TAKInstall/                 # PowerShell SSH provisioning module (6 cmdlets)
-├── TAKDeploy/                  # PowerShell Hyper-V orchestration module (3 cmdlets)
+├── TAKDeploy/                  # PowerShell Hyper-V orchestration module (5 cmdlets)
+├── TAKOnboarding/              # PowerShell team onboarding module (3 cmdlets)
 │
 ├── onboarding/                 # Team onboarding scripts and roster helpers
 │   └── rosters/                # Sample CSV/JSON roster files
@@ -138,14 +139,33 @@ Every push to `prod` and all pull requests run the full CI pipeline via GitHub A
 
 | Job | Tool | What it checks |
 |---|---|---|
-| **Pester** | PowerShell | 179 unit tests across TAKServerPS, TAKInstall, TAKDeploy + integration test infrastructure |
+| **Pester** | PowerShell | Unit tests across TAKServerPS, TAKInstall, TAKDeploy, TAKOnboarding + integration test infrastructure |
 | **PSScriptAnalyzer** | PowerShell | Code quality and best practices |
 | **ShellCheck** | Bash | Shell script linting (severity: warning) |
-| **TXT Sync** | Bash | .txt mirrors byte-identical to .sh files |
 
 The GitHub Pages documentation site is built and deployed separately via `.github/workflows/pages.yml` on every push to `prod` that modifies `docs/**`.
 
 See `.github/workflows/ci.yml` for the full pipeline definition.
+
+---
+
+## Quick-Start: TAKOnboarding Module
+
+Once TAK Server is deployed, use the TAKOnboarding module for one-command team onboarding:
+
+```powershell
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
+
+# Onboard a 10-person team — prompts for all credentials
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Custom roster from CSV
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName bravo `
+    -RosterPath .\onboarding\rosters\sample-roster-10.csv `
+    -AdminPfxPath .\certs\admin.p12
+```
+
+For the full cmdlet reference, see [TAKOnboarding Module](modules/TAKOnboarding/).
 
 ---
 

@@ -7,7 +7,7 @@ nav_title: API Reference
 # PowerShell API Reference
 {: .no_toc }
 
-Complete cmdlet reference for all three DigitalTAK PowerShell modules.
+Complete cmdlet reference for all four DigitalTAK PowerShell modules.
 {: .fs-6 .fw-300 }
 
 {: .note }
@@ -25,8 +25,9 @@ Complete cmdlet reference for all three DigitalTAK PowerShell modules.
 
 | Module | Manifest | Cmdlets | Purpose |
 |--------|----------|---------|---------|
-| **TAKDeploy** | `TAKDeploy\TAKDeploy.psd1` | 3 | Hyper-V VM orchestration |
+| **TAKDeploy** | `TAKDeploy\TAKDeploy.psd1` | 5 | Hyper-V VM orchestration and teardown |
 | **TAKInstall** | `TAKInstall\TAKInstall.psd1` | 6 | Remote SSH provisioning over Posh-SSH |
+| **TAKOnboarding** | `TAKOnboarding\TAKOnboarding.psd1` | 3 | Team onboarding: certs, users, ATAK data packages |
 | **TAKServerPS** | `TAKServerPS\TAKServer.psd1` | 44 | TAK Server 5.x REST API wrapper |
 
 All modules require **PowerShell 7.0+**. All passwords must be passed as `SecureString`.
@@ -143,6 +144,80 @@ $session = Wait-TAKLinuxInstall -VMName 'TAKServer'
 Install-TAKServer -SshSession $session -RpmPath '.\takserver-5.7-RELEASE8.noarch.rpm' -Credential $cred
 
 $session = Wait-TAKLinuxInstall -VMName 'TAK-Lab' -TimeoutSeconds 600
+```
+
+---
+
+### `Remove-TAKDeployment`
+
+**Synopsis:** Fully removes a CivTAK deployment from Hyper-V and the local machine.
+
+Performs a complete teardown: stops and removes the Hyper-V VM (and all snapshots), deletes the VHDX, removes all cert/key files from `certs\`, removes ATAK data packages from `dist\`, removes imported TAK certificates from the Windows certificate store, and cleans up OEMDRV temp files. Idempotent — safe to re-run on an already-cleaned deployment.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `VMName` | String | `CivTAK` | Name of the Hyper-V VM to remove |
+| `VHDPath` | String | *(auto)* | Path of the VHDX to delete. Defaults to `C:\Hyper-V\VMs\<VMName>\<VMName>.vhdx` |
+| `UninstallGuest` | Switch | Off | SSH into the running VM and run `tak-uninstall.sh` before destroying it. Requires `-Credential` |
+| `Credential` | PSCredential | *(none)* | Linux admin SSH credential. Required when `-UninstallGuest` is set |
+| `Organization` | String | `TAK` | Organisation string for Windows cert store scoping. Must match the value used during deployment |
+| `CAName` | String | `TAK-CA` | Root CA name used during deployment. Used to identify root CA, intermediate CA, and admin certs in the Windows store |
+| `DeploymentRoot` | String | *(cwd)* | Root folder of the DigitalTAK repo. Used to locate `certs\`, `dist\`, and `InstallShellScripts\` |
+
+**Notes:**
+- Requires elevated (Administrator) PowerShell for Hyper-V and Windows cert store operations.
+- Supports `-WhatIf` / `-Confirm` (`ConfirmImpact = High`).
+
+**Examples:**
+```powershell
+# Full teardown with all defaults
+Remove-TAKDeployment
+
+# Custom org/CA name matching deployment parameters
+Remove-TAKDeployment -Organization 'LEIGH-SERVICES' -CAName 'TAK-CA'
+
+# Clean uninstall from guest before VM destruction
+$cred = Get-Credential -UserName 'atak'
+Remove-TAKDeployment -UninstallGuest -Credential $cred
+```
+
+---
+
+### `Invoke-TAKRollback`
+
+**Synopsis:** Rolls back a CivTAK Hyper-V deployment to a known-good Phase snapshot.
+
+Lists all Phase snapshots for the target VM (created by `Start-TAKDeployment`) and restores either the specified snapshot or the most recent one. After rollback, the VM is started and SSH connectivity is confirmed.
+
+Available snapshots:
+
+| Snapshot | Description |
+|----------|-------------|
+| `Phase0-RockyInstalled` | Rocky Linux OS installed, SSH working |
+| `Phase2-TAKInstalled` | TAK Server RPM installed and running |
+| `Phase4-CertsAndAdmin` | Certificates created, admin promoted |
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `VMName` | String | `CivTAK` | Name of the Hyper-V VM to roll back |
+| `SnapshotName` | String | *(most recent)* | Exact snapshot name to restore. If omitted, uses the most recent deployment snapshot |
+| `ListOnly` | Switch | Off | List available deployment snapshots without restoring any |
+| `SSHTimeoutSeconds` | Int | `120` | Seconds to wait for SSH after restore |
+
+**Examples:**
+```powershell
+# Restore the most recent deployment snapshot
+Invoke-TAKRollback
+
+# List available snapshots without restoring
+Invoke-TAKRollback -ListOnly
+
+# Roll back to a specific phase
+Invoke-TAKRollback -SnapshotName 'Phase0-RockyInstalled'
 ```
 
 ---
@@ -409,6 +484,98 @@ Update-TAKLetsEncryptCertificate -SshSession $sess
 # Explicit values
 $pass = Read-Host -AsSecureString 'Keystore password'
 Update-TAKLetsEncryptCertificate -SshSession $sess -DomainName 'tak.example.com' -KeystorePassword $pass
+```
+
+---
+
+## TAKOnboarding Module
+
+Team onboarding module — one-command pipeline from certificate generation through user provisioning to ATAK data package build. See the [TAKOnboarding Module page](modules/TAKOnboarding/) for full documentation.
+
+**Import:**
+```powershell
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
+```
+
+**Prerequisites:** `Posh-SSH` module · Running TAK Server · `admin.p12` · JDK 11+ with `keytool` (unless using `-SkipDataPackages`)
+
+---
+
+### `Invoke-TAKOnboarding`
+
+**Synopsis:** One-command TAK Server team onboarding — certificates, user accounts, and ATAK data packages.
+
+Handles the complete pipeline: SSH cert generation on the TAK Server, SFTP download, server-side cleanup, user account creation via `UserManager.jar`, group assignment, and ATAK data package build. No Linux experience required.
+
+**Key parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `ServerHost` | String | *(required)* | TAK Server hostname or IP |
+| `TeamName` | String | *(required)* | Team name (lowercase letters/digits/hyphens) |
+| `TeamSize` | String | *(required\*)* | `10` or `20`. Mutually exclusive with `-RosterPath` |
+| `RosterPath` | String | *(optional)* | Path to a CSV or JSON custom roster file |
+| `AdminPfxPath` | String | *(prompted)* | Path to `admin.p12` |
+| `KeystorePassword` | SecureString | *(prompted)* | TAK Server certificate keystore password |
+| `SkipCertGeneration` | Switch | Off | Skip cert generation (requires existing `manifest.json`) |
+| `SkipUserCreation` | Switch | Off | Skip user account creation |
+| `SkipDataPackages` | Switch | Off | Skip ATAK data package build (no JDK required) |
+
+**Examples:**
+```powershell
+# Minimal — prompts for all credentials
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Custom roster from CSV
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName bravo `
+    -RosterPath .\onboarding\rosters\sample-roster-10.csv `
+    -AdminPfxPath .\certs\admin.p12
+```
+
+---
+
+### `New-TAKDataPackage`
+
+**Synopsis:** Builds per-user ATAK data packages from TAK Server team certificates.
+
+Creates an ATAK Mission Package ZIP per user containing the user `.p12`, server CA truststore, and connection preferences. Output ZIPs are written to `<OutputDir>\<username>.zip`.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `ManifestPath` | String | *(required)* | Path to `manifest.json` from `tak-team-certs.sh` |
+| `ServerHostname` | String | *(required)* | TAK Server hostname or IP clients will connect to |
+| `ServerPort` | Int | `8089` | TAK Server SSL (CoT) port |
+| `CertPassphrase` | SecureString | *(prompted)* | PKCS12 passphrase for user certificates |
+| `TrustStorePassphrase` | SecureString | *(prompted)* | Passphrase for the intermediate-CA truststore |
+| `OutputDir` | String | `.\dist\<TeamName>` | Output directory for `.zip` packages |
+
+**Examples:**
+```powershell
+New-TAKDataPackage `
+    -ManifestPath .\certs\alpha\manifest.json `
+    -ServerHostname tak.example.com `
+    -CertPassphrase (Read-Host -AsSecureString 'Cert pass')
+```
+
+---
+
+### `New-TAKTeamRoster`
+
+**Synopsis:** Provisions TAK Server users for a 10- or 20-person team.
+
+Creates user accounts and group assignments via `UserManager.jar` over SSH. Idempotent — HTTP 409 (user already exists) is treated as a skip.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `ManifestPath` | String | *(required\*)* | Path to `manifest.json`. Required for `Manifest` parameter set |
+| `TeamName` | String | *(required\*)* | Team name when used without a manifest. Required for `Manual` parameter set |
+| `TeamSize` | String | *(required\*)* | `10` or `20`. Required for `Manual` parameter set |
+| `PasswordCredential` | PSCredential | *(prompted)* | Shared initial password for all created users |
+
+**Examples:**
+```powershell
+Connect-TAKServer -HostName tak.example.com -PfxPath .\certs\admin.p12 -PfxPassword $adminPass
+New-TAKTeamRoster -ManifestPath .\certs\alpha\manifest.json
 ```
 
 ---
@@ -1024,13 +1191,15 @@ Get-TAKDeviceProfile
 
 ## Cmdlet Quick Reference
 
-### TAKDeploy (3 cmdlets)
+### TAKDeploy (5 cmdlets)
 
 | Cmdlet | Purpose |
 |--------|---------|
 | `Start-TAKDeployment` | Interactive end-to-end deployment orchestrator |
 | `New-TAKVirtualMachine` | Create a Hyper-V Gen 2 VM for Rocky Linux 9 |
 | `Wait-TAKLinuxInstall` | Wait for OS install; establish SSH session |
+| `Remove-TAKDeployment` | Full teardown: VM, VHDX, certs, dist, Windows cert store |
+| `Invoke-TAKRollback` | Roll back to a deployment Phase snapshot |
 
 ### TAKInstall (6 cmdlets)
 
@@ -1042,6 +1211,14 @@ Get-TAKDeviceProfile
 | `Install-TAKOpenfire` | Install Openfire XMPP server |
 | `New-TAKLetsEncryptCertificate` | Issue Let's Encrypt TLS cert |
 | `Update-TAKLetsEncryptCertificate` | Renew Let's Encrypt TLS cert |
+
+### TAKOnboarding (3 cmdlets)
+
+| Cmdlet | Purpose |
+|--------|---------|
+| `Invoke-TAKOnboarding` | One-command team onboarding: certs → users → ATAK data packages |
+| `New-TAKDataPackage` | Build per-user ATAK Mission Package ZIPs from team certs |
+| `New-TAKTeamRoster` | Provision TAK Server user accounts and group memberships |
 
 ### TAKServerPS (44 cmdlets) — 39/46 Tests Passed
 

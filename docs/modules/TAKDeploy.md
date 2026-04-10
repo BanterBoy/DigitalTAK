@@ -6,7 +6,7 @@ nav_title: TAKDeploy
 
 # TAKDeploy Module
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **PowerShell:** 7.0+
 **Required modules:** `Posh-SSH`, `Hyper-V`
 
@@ -133,6 +133,103 @@ Install-TAKServer -SshSession $session -RpmPath '.\takserver-5.7-RELEASE8.noarch
 
 # Use a 10-minute SSH retry timeout
 $session = Wait-TAKLinuxInstall -VMName 'TAK-Lab' -TimeoutSeconds 600
+```
+
+---
+
+---
+
+### `Remove-TAKDeployment`
+
+**Synopsis:** Fully removes a CivTAK deployment from Hyper-V and the local machine.
+
+Performs a complete teardown in six steps:
+
+1. *(optional)* SSH into the VM and run `tak-uninstall.sh` to cleanly uninstall TAK Server from the guest OS (`-UninstallGuest`)
+2. Stop and remove the Hyper-V VM and all its snapshots
+3. Delete the VHDX disk file
+4. Remove all cert/key files from `certs\` (recursive, covers team subdirectories)
+5. Remove ATAK data packages from `dist\`
+6. Remove imported TAK certificates from the Windows certificate store
+
+This cmdlet is **idempotent** — re-running on an already-cleaned deployment is safe.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `VMName` | String | `CivTAK` | Name of the Hyper-V VM to remove |
+| `VHDPath` | String | *(auto)* | Path of the VHDX to delete. Defaults to `C:\Hyper-V\VMs\<VMName>\<VMName>.vhdx` |
+| `UninstallGuest` | Switch | Off | SSH into the running VM and run `tak-uninstall.sh` before destroying it. Requires `-Credential` |
+| `Credential` | PSCredential | *(none)* | Linux admin SSH credential. Required when `-UninstallGuest` is set |
+| `Organization` | String | `TAK` | Organisation string used to scope Windows cert store cleanup. Must match the value used during deployment |
+| `CAName` | String | `TAK-CA` | Root CA name used during deployment. Used to identify and remove root CA, intermediate CA, and admin certs from the Windows store |
+| `DeploymentRoot` | String | *(cwd)* | Root folder of the DigitalTAK repo. Used to locate `certs\`, `dist\`, and `InstallShellScripts\tak-uninstall.sh` |
+
+**Notes:**
+- Requires an elevated (Administrator) PowerShell session for Hyper-V and Windows cert store operations.
+- Supports `-WhatIf` / `-Confirm` (`ConfirmImpact = High`).
+
+**Examples:**
+
+```powershell
+# Full teardown with all defaults
+Remove-TAKDeployment
+
+# Custom org/CA name matching deployment parameters
+Remove-TAKDeployment -Organization 'LEIGH-SERVICES' -CAName 'TAK-CA'
+
+# Clean uninstall from guest before VM destruction
+$cred = Get-Credential -UserName 'atak'
+Remove-TAKDeployment -UninstallGuest -Credential $cred
+
+# Remove a named VM with an explicit VHDX path
+Remove-TAKDeployment -VMName 'CivTAK-Prod' -VHDPath 'D:\VMs\CivTAK-Prod\CivTAK-Prod.vhdx'
+```
+
+---
+
+### `Invoke-TAKRollback`
+
+**Synopsis:** Rolls back a CivTAK Hyper-V deployment to a known-good Phase snapshot.
+
+Lists all deployment Phase snapshots for the target VM (created by `Start-TAKDeployment`) and restores either the specified snapshot or the most recent one. After rollback, the VM is started and SSH connectivity is confirmed.
+
+Available snapshots (created automatically by `Start-TAKDeployment`):
+
+| Snapshot | Description |
+|----------|-------------|
+| `Phase0-RockyInstalled` | Rocky Linux OS installed, SSH working |
+| `Phase2-TAKInstalled` | TAK Server RPM installed and running |
+| `Phase4-CertsAndAdmin` | Certificates created, admin promoted |
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `VMName` | String | `CivTAK` | Name of the Hyper-V VM to roll back |
+| `SnapshotName` | String | *(most recent)* | Exact snapshot name to restore (e.g. `Phase0-RockyInstalled`). If omitted, the most recent deployment snapshot is used |
+| `ListOnly` | Switch | Off | List available deployment snapshots without restoring any |
+| `SSHTimeoutSeconds` | Int | `120` | Seconds to wait for SSH after restore |
+
+**Notes:**
+- Supports `-WhatIf` / `-Confirm`.
+- After rollback, `Start-TAKDeployment` re-run will resume from the appropriate phase.
+
+**Examples:**
+
+```powershell
+# Restore the most recent deployment snapshot
+Invoke-TAKRollback
+
+# List available snapshots without restoring
+Invoke-TAKRollback -ListOnly
+
+# Roll back to a specific phase
+Invoke-TAKRollback -SnapshotName 'Phase0-RockyInstalled'
+
+# Roll back a named VM to a specific phase
+Invoke-TAKRollback -VMName 'CivTAK-Prod' -SnapshotName 'Phase2-TAKInstalled'
 ```
 
 ---

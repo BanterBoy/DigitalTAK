@@ -21,27 +21,33 @@ How to generate client certificates, create user accounts, and distribute ATAK d
 {: .note }
 **TAKServerPS validated — April 2026.** `Connect-TAKServer`, user creation (`New-TAKUser` via SSH workaround), password management, mission lifecycle, and `Remove-TAKUser` all pass. `Set-TAKUserGroup` fails with HTTP 500 due to a server-side ESAPI bug — the WebTAK admin console remains the workaround for group assignment. See the [Validation Report](../validation-report/) for full test results.
 
-## Recommended approach — `Invoke-TAKOnboarding.ps1`
+## Recommended approach — `Invoke-TAKOnboarding`
 
-For most operators, **`Invoke-TAKOnboarding.ps1`** at the repo root provides one-command onboarding. It automates the complete pipeline end-to-end with no Linux knowledge required: cert generation over SSH, download via SFTP, server-side cleanup, user account creation, group assignment, and ATAK data package build.
+For most operators, **`Invoke-TAKOnboarding`** from the TAKOnboarding module provides one-command onboarding. It automates the complete pipeline end-to-end with no Linux knowledge required: cert generation over SSH, download via SFTP, server-side cleanup, user account creation, group assignment, and ATAK data package build.
 
 ```powershell
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
+
 # Auto-roster — 10-person template
-.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
 
 # Custom roster from CSV (see onboarding/rosters/sample-roster-10.csv for format)
-.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName bravo `
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName bravo `
     -RosterPath .\onboarding\rosters\sample-roster-10.csv `
     -AdminPfxPath .\certs\admin.p12
 
 # Skip data package build (no JDK required)
-.\Invoke-TAKOnboarding.ps1 -ServerHost 10.10.0.154 -TeamName charlie -TeamSize 10 -SkipDataPackages
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName charlie -TeamSize 10 -SkipDataPackages
 ```
 
-**Prerequisites for `Invoke-TAKOnboarding.ps1`:**
+The root script `Invoke-TAKOnboarding.ps1` is a thin wrapper around this cmdlet and is retained for backwards compatibility.
+
+**Prerequisites:**
 - PowerShell 7.0+, Posh-SSH (`Install-Module Posh-SSH`)
 - JDK 11+ with `keytool` on PATH — [Eclipse Temurin](https://adoptium.net) recommended (skip with `-SkipDataPackages`)
 - `admin.p12` downloaded from the TAK Server
+
+For the full parameter reference, see the [TAKOnboarding Module](modules/TAKOnboarding/) page.
 
 The manual steps below are retained for operators who need partial automation or custom workflows.
 
@@ -52,12 +58,12 @@ The manual steps below are retained for operators who need partial automation or
 Once TAK Server is deployed you need to provision certificates and accounts for each team member. The full pipeline has four stages.
 
 ```
-Invoke-TAKOnboarding.ps1 (automated entry point)
+Invoke-TAKOnboarding (TAKOnboarding module — automated entry point)
 │
 ├── TAK Server (Rocky Linux)          Windows Workstation
 │   ──────────────────────────        ────────────────────────────────
-│   tak-team-certs.sh                 New-TAKTeamRoster.ps1
-│     └─ generates per-user .p12  ──► New-TAKDataPackage.ps1
+│   tak-team-certs.sh                 New-TAKTeamRoster
+│     └─ generates per-user .p12  ──► New-TAKDataPackage
 │                                       └─ builds per-user .zip to distribute
 └── dist\<team>\<username>.zip  ──► distribute to team
 ```
@@ -154,13 +160,14 @@ The `.p12` files are sensitive. Treat them like passwords. Delete them from the 
 ## Step 3 — Create User Accounts (on Windows)
 
 {: .warning }
-**Server-side ESAPI bug — `New-TAKUser` REST returns HTTP 500.** `POST /Marti/api/users/` throws NullPointerException on TAK Server 5.7-RELEASE8 due to a missing `ESAPI.properties` file. The cmdlet is correct. Use `New-TAKTeamRoster.ps1` with the `-SshCredential` parameter (which falls back to `UserManager.jar` over SSH) or create users manually in the WebTAK admin console at `https://<server>:8443`. See [Troubleshooting](../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception).
+**Server-side ESAPI bug — `New-TAKUser` REST returns HTTP 500.** `POST /Marti/api/users/` throws NullPointerException on TAK Server 5.7-RELEASE8 due to a missing `ESAPI.properties` file. The cmdlet is correct. Use `New-TAKTeamRoster` from the TAKOnboarding module (which uses `UserManager.jar` over SSH) or create users manually in the WebTAK admin console at `https://<server>:8443`. See [Troubleshooting](../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception).
 
 ```powershell
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
 Import-Module .\TAKServerPS\TAKServer.psd1
 Connect-TAKServer -HostName tak.example.com -PfxPath .\certs\admin.p12 -PfxPassword $adminPass
 
-.\onboarding\New-TAKTeamRoster.ps1 -ManifestPath .\alpha\manifest.json
+New-TAKTeamRoster -ManifestPath .\alpha\manifest.json
 # Enter the shared initial password when prompted
 ```
 
@@ -175,17 +182,18 @@ HTTP 409 responses (user already exists) are treated as a skip — safe to re-ru
 
 ## Step 4 — Build ATAK Data Packages (on Windows)
 
-{: .note }
-**No `New-TAKDataPackage` cmdlet in TAKServerPS.** `New-TAKDataPackage.ps1` is a standalone onboarding helper script. TAKServerPS does not include a data-package cmdlet. The cert enrollment endpoint at `https://<server>:8446` is the reliable alternative for distributing client certificates to ATAK and WinTAK.
-
 ```powershell
-.\onboarding\New-TAKDataPackage.ps1 `
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
+
+New-TAKDataPackage `
     -ManifestPath         .\alpha\manifest.json `
     -CertDir              .\alpha `
     -ServerHostname       tak.example.com `
     -CertPassphrase       (Read-Host -AsSecureString 'Cert passphrase') `
     -TrustStorePassphrase (Read-Host -AsSecureString 'Truststore passphrase')
 ```
+
+The cert enrollment endpoint at `https://<server>:8446` is an alternative for distributing client certificates directly to ATAK and WinTAK without building data packages.
 
 Output: `.\dist\alpha\<username>.zip` — one `.zip` per team member.
 
@@ -272,7 +280,7 @@ The root `.gitignore` comprehensively blocks all certificate and key material:
 - `dist/`, `certs/*/` — generated output directories
 - `*.zip` — assembled data packages
 
-`Remove-CivTAK.ps1` handles cleanup automatically — Steps 4, 4b, and 5 recursively remove all cert files from `certs\`, all data packages from `dist\`, and imported TAK certificates from the Windows certificate store.
+`Remove-TAKDeployment` (TAKDeploy module) handles cleanup automatically — recursively removes all cert files from `certs\`, all data packages from `dist\`, and imported TAK certificates from the Windows certificate store. The root script `Remove-CivTAK.ps1` is a thin wrapper around this cmdlet.
 
 If you accidentally stage key material:
 
