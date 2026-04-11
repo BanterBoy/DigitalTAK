@@ -8,7 +8,7 @@ nav_title: TAKDeploy
 
 **Version:** 1.1.0
 **PowerShell:** 7.0+
-**Required modules:** `Posh-SSH`, `Hyper-V`
+**Required modules:** `Posh-SSH`
 
 ## Purpose
 
