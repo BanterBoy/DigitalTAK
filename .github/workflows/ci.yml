@@ -101,6 +101,18 @@ jobs:
           $config.TestResult.OutputFormat = 'NUnit2.5'
           Invoke-Pester -Configuration $config
 
+      - name: Run DigitalTAKService tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './Modules/DigitalTAKService/Tests'
+          $config.Run.Exit      = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-DigitalTAKService.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
       - name: Run integration tests (skip without live host)
         shell: pwsh
         run: |
