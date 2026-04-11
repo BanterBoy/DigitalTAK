@@ -27,3 +27,11 @@ Get-ChildItem -Path "$PSScriptRoot\Private\*.ps1" -ErrorAction SilentlyContinue 
 # Dot-source all public cmdlets.
 Get-ChildItem -Path "$PSScriptRoot\Public\*.ps1" -ErrorAction SilentlyContinue |
     ForEach-Object { . $_.FullName }
+
+Export-ModuleMember -Function @(
+    'New-TAKVirtualMachine',
+    'Wait-TAKLinuxInstall',
+    'Start-TAKDeployment',
+    'Remove-TAKDeployment',
+    'Invoke-TAKRollback'
+)

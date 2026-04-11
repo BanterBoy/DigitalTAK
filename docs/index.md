@@ -45,6 +45,7 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 | [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, TAKOnboarding, and TAKServerPS |
 | [Validation Report](validation-report/) | TAKServerPS end-to-end test results — 39/46 tests pass (April 2026) |
 | [Troubleshooting](troubleshooting/) | Diagnosis and fixes for common failures |
+| [Runbook: Machine Rebuild](runbook-machine-rebuild/) | Restore Paperclip on a rebuilt or new Windows machine |
 | [Configuration Reference](config/baseline/) | CoreConfig.xml settings, certificate layout, port inventory |
 | [Agent Configuration](agent-configuration/) | Managing deployments with AI agents |
 

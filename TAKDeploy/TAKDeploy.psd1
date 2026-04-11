@@ -21,8 +21,6 @@
         'New-TAKVirtualMachine'
         'Wait-TAKLinuxInstall'
         'Start-TAKDeployment'
-        'Remove-TAKDeployment'
-        'Invoke-TAKRollback'
     )
 
     CmdletsToExport   = @()
