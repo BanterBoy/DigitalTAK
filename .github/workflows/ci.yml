@@ -113,6 +113,18 @@ jobs:
           $config.TestResult.OutputFormat = 'NUnit2.5'
           Invoke-Pester -Configuration $config
 
+      - name: Run PaperclipControl tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './Modules/PaperclipControl/Tests'
+          $config.Run.Exit      = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-PaperclipControl.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
       - name: Run integration tests (skip without live host)
         shell: pwsh
         run: |
