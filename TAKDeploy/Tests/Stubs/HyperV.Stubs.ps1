@@ -101,6 +101,7 @@ function global:Enable-VMIntegrationService {
 function global:Start-VM {
     [CmdletBinding()]
     param(
+        [Parameter()] [string] $Name,
         [Parameter()] [string] $VMName,
         [Parameter()] [string] $ErrorAction
     )
@@ -118,5 +119,76 @@ function global:Get-NetAdapter {
     param(
         [Parameter()] [string] $Name,
         [Parameter()] [string] $InterfaceDescription
+    )
+}
+
+function global:Get-VM {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $Name,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Stop-VM {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $Name,
+        [Parameter()] [switch] $TurnOff,
+        [Parameter()] [switch] $Force,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Get-VMSnapshot {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $VMName,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Remove-VMSnapshot {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline)] [object] $VMSnapshot,
+        [Parameter()] [switch] $Confirm,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Remove-VM {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $Name,
+        [Parameter()] [switch] $Force,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Dismount-VHD {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $Path,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Restore-VMSnapshot {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [object] $VMSnapshot,
+        [Parameter()] [switch] $Confirm,
+        [Parameter()] [string] $ErrorAction
+    )
+}
+
+function global:Test-NetConnection {
+    [CmdletBinding()]
+    param(
+        [Parameter()] [string] $ComputerName,
+        [Parameter()] [int]    $Port,
+        [Parameter()] [string] $WarningAction,
+        [Parameter()] [string] $ErrorAction
     )
 }
