@@ -31,5 +31,7 @@ Get-ChildItem -Path "$PSScriptRoot\Public\*.ps1" -ErrorAction SilentlyContinue |
 Export-ModuleMember -Function @(
     'New-TAKVirtualMachine',
     'Wait-TAKLinuxInstall',
-    'Start-TAKDeployment'
+    'Start-TAKDeployment',
+    'Remove-TAKDeployment',
+    'Invoke-TAKRollback'
 )
