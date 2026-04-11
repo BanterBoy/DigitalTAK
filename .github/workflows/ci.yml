@@ -89,6 +89,18 @@ jobs:
           $config.TestResult.OutputFormat = 'NUnit2.5'
           Invoke-Pester -Configuration $config
 
+      - name: Run TAKOnboarding tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path      = './TAKOnboarding/Tests'
+          $config.Run.Exit      = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled      = $true
+          $config.TestResult.OutputPath   = 'TestResults-TAKOnboarding.xml'
+          $config.TestResult.OutputFormat = 'NUnit2.5'
+          Invoke-Pester -Configuration $config
+
       - name: Run integration tests (skip without live host)
         shell: pwsh
         run: |

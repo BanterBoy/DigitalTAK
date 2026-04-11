@@ -14,7 +14,9 @@ BeforeAll {
     $script:ExpectedFunctions = @(
         'New-TAKVirtualMachine',
         'Wait-TAKLinuxInstall',
-        'Start-TAKDeployment'
+        'Start-TAKDeployment',
+        'Remove-TAKDeployment',
+        'Invoke-TAKRollback'
     )
 }
 
@@ -37,9 +39,9 @@ Describe 'TAKDeploy — Module Manifest' {
         $m.RootModule | Should -Be 'TAKDeploy.psm1'
     }
 
-    It 'exports exactly 3 functions in the manifest' {
+    It 'exports exactly 5 functions in the manifest' {
         $m = Test-ModuleManifest -Path $script:ManifestPath -ErrorAction Stop
-        $m.ExportedFunctions.Count | Should -Be 3
+        $m.ExportedFunctions.Count | Should -Be 5
     }
 
     It 'requires the Posh-SSH module' {
@@ -83,14 +85,16 @@ Describe 'TAKDeploy — Module Import and Exports' {
         Get-Module -Name 'TAKDeploy' | Should -Not -BeNullOrEmpty
     }
 
-    It 'exports exactly 3 commands at runtime' {
-        (Get-Command -Module 'TAKDeploy').Count | Should -Be 3
+    It 'exports exactly 5 commands at runtime' {
+        (Get-Command -Module 'TAKDeploy').Count | Should -Be 5
     }
 
     It 'exports <_>' -ForEach @(
         'New-TAKVirtualMachine',
         'Wait-TAKLinuxInstall',
-        'Start-TAKDeployment'
+        'Start-TAKDeployment',
+        'Remove-TAKDeployment',
+        'Invoke-TAKRollback'
     ) {
         Get-Command -Name $_ -Module 'TAKDeploy' -ErrorAction SilentlyContinue |
             Should -Not -BeNullOrEmpty
@@ -125,7 +129,9 @@ Describe 'TAKDeploy — Function Metadata' {
 
     It '<_> supports -WhatIf and -Confirm (ShouldProcess)' -ForEach @(
         'New-TAKVirtualMachine',
-        'Start-TAKDeployment'
+        'Start-TAKDeployment',
+        'Remove-TAKDeployment',
+        'Invoke-TAKRollback'
     ) {
         $cmd = Get-Command -Name $_ -Module 'TAKDeploy'
         $cmd.Parameters.ContainsKey('WhatIf')  | Should -Be $true -Because "$_ must support ShouldProcess"
