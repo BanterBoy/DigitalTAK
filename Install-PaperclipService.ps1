@@ -1,23 +1,23 @@
 #Requires -RunAsAdministrator
 <#
 .SYNOPSIS
-    Migrates Paperclip from PM2 to a Windows Service via NSSM.
+    Migrates Paperclip from PM2/NSSM to a Windows Scheduled Task.
 
 .DESCRIPTION
     Run once as Administrator. Performs the following:
-      1. Kills the PM2-managed paperclip process and uninstalls PM2
-      2. Removes PM2 data directories
-      3. Locates or downloads NSSM (Non-Sucking Service Manager)
-      4. Registers Paperclip as a Windows service running as the current user
-      5. Starts the service
+      1. Removes any existing PM2 process and data
+      2. Removes any existing NSSM Paperclip service
+      3. Installs paperclipai globally via npm
+      4. Creates a Windows Scheduled Task that starts paperclipai at system
+         startup, running as the current user
 
-    The service runs as YOUR user account (not LocalSystem) so it can access
-    your Paperclip config at ~/.paperclip. You will be prompted for your
-    Windows password during installation.
+    Windows Scheduled Tasks handle Azure AD accounts reliably — unlike NSSM
+    services which fail with error 1068 on AzureAD-joined machines.
 
-    After running, manage the service with standard Windows tools:
-      sc start Paperclip    / sc stop Paperclip
-      nssm status Paperclip / nssm edit Paperclip   (opens settings GUI)
+    After running, manage with:
+      Get-ScheduledTask -TaskName Paperclip
+      Start-ScheduledTask -TaskName Paperclip
+      Stop-ScheduledTask  -TaskName Paperclip
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
@@ -25,14 +25,12 @@ param()
 
 $ErrorActionPreference = 'Stop'
 
-$ServiceName = 'Paperclip'
-$WorkDir     = 'C:\Users\LukeLeigh\DigitalTAK'
-$LogDir      = "$WorkDir\logs"
-$ToolsDir    = "$WorkDir\tools"
-$NssmExe     = "$ToolsDir\nssm.exe"
+$TaskName = 'Paperclip'
+$WorkDir  = 'C:\Users\LukeLeigh\DigitalTAK'
+$LogDir   = "$WorkDir\logs"
 
-# ── 1. Stop and remove PM2 ────────────────────────────────────────────────────
-Write-Host '1. Removing PM2 paperclip process...' -ForegroundColor Cyan
+# ── 1. Stop and remove PM2 ──────────────────────────────────────────────────
+Write-Host '1. Removing PM2 (if present)...' -ForegroundColor Cyan
 
 $pm2Cmd = Get-Command pm2 -ErrorAction SilentlyContinue
 if ($pm2Cmd) {
@@ -45,7 +43,6 @@ if ($pm2Cmd) {
     Write-Host '   PM2 not found — skipping.' -ForegroundColor DarkGray
 }
 
-Write-Host '   Removing PM2 data directories...' -ForegroundColor DarkGray
 @("$env:USERPROFILE\.pm2", "$env:APPDATA\pm2") | ForEach-Object {
     if (Test-Path $_) {
         Remove-Item -Path $_ -Recurse -Force
@@ -53,115 +50,126 @@ Write-Host '   Removing PM2 data directories...' -ForegroundColor DarkGray
     }
 }
 
-# ── 2. Locate or download NSSM ────────────────────────────────────────────────
-Write-Host '2. Locating NSSM...' -ForegroundColor Cyan
+# ── 2. Remove existing NSSM service (if present) ────────────────────────────
+Write-Host '2. Removing NSSM service (if present)...' -ForegroundColor Cyan
 
-$nssmOnPath = Get-Command nssm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
-if ($nssmOnPath) {
-    $NssmExe = $nssmOnPath
-    Write-Host "   Found on PATH: $NssmExe" -ForegroundColor DarkGray
-} elseif (Test-Path $NssmExe) {
-    Write-Host "   Found in tools/: $NssmExe" -ForegroundColor DarkGray
+$NssmExe = "$WorkDir\tools\nssm.exe"
+$existingSvc = & sc.exe query $TaskName 2>&1
+if ($existingSvc -match 'SERVICE_NAME') {
+    if (Test-Path $NssmExe) {
+        & $NssmExe stop   $TaskName 2>&1 | Out-Null
+        & $NssmExe remove $TaskName confirm 2>&1 | Out-Null
+        Write-Host '   NSSM service removed.' -ForegroundColor DarkGray
+    } else {
+        & sc.exe stop $TaskName   2>&1 | Out-Null
+        & sc.exe delete $TaskName 2>&1 | Out-Null
+        Write-Host '   Service removed via sc.exe.' -ForegroundColor DarkGray
+    }
 } else {
-    Write-Host '   Downloading NSSM 2.25...' -ForegroundColor DarkGray
-    New-Item -ItemType Directory -Path $ToolsDir -Force | Out-Null
-    $zip = Join-Path $env:TEMP 'nssm-2.25.zip'
-    Invoke-WebRequest -Uri 'https://github.com/dkxce/NSSM/releases/download/v2.25/NSSM_v2.25.zip' -OutFile $zip -UseBasicParsing
-    $extractDir = Join-Path $env:TEMP 'nssm-extract'
-    Expand-Archive -Path $zip -DestinationPath $extractDir -Force
-    Copy-Item (Join-Path $extractDir 'win64\nssm.exe') -Destination $NssmExe
-    Remove-Item $zip, $extractDir -Recurse -Force
-    Write-Host "   Saved to: $NssmExe" -ForegroundColor DarkGray
+    Write-Host '   No existing service found.' -ForegroundColor DarkGray
 }
 
-# ── 3. Remove existing service if present ─────────────────────────────────────
-Write-Host "3. Checking for existing '$ServiceName' service..." -ForegroundColor Cyan
-$existing = & sc.exe query $ServiceName 2>&1
-if ($existing -match 'SERVICE_NAME') {
-    Write-Host '   Removing existing service...' -ForegroundColor DarkGray
-    & $NssmExe stop   $ServiceName 2>&1 | Out-Null
-    & $NssmExe remove $ServiceName confirm
-}
+# ── 3. Install paperclipai globally ──────────────────────────────────────────
+Write-Host '3. Installing paperclipai globally...' -ForegroundColor Cyan
 
-# ── 4. Create log directory ───────────────────────────────────────────────────
-New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
-
-# ── 5. Verify Node.js and install paperclipai globally ─────────────────────────
-Write-Host '4. Verifying Node.js and installing paperclipai...' -ForegroundColor Cyan
 $nodeExe = Get-Command node -ErrorAction Stop
 Write-Host "   Node.js: $($nodeExe.Source)" -ForegroundColor DarkGray
 
-# Install/update paperclipai globally so the service can invoke it without npx.
-# npx downloads on every run and prompts in non-interactive service contexts.
-Write-Host '   Installing paperclipai globally...' -ForegroundColor DarkGray
 & npm install -g paperclipai 2>&1 | Out-Null
 $paperclipCmd = Get-Command paperclipai -ErrorAction SilentlyContinue
 if (-not $paperclipCmd) {
-    throw 'npm install -g paperclipai succeeded but the command is not on PATH. Check npm prefix -g.'
+    throw 'npm install -g paperclipai succeeded but the command is not on PATH. Check: npm prefix -g'
 }
-$PaperclipBin = $paperclipCmd.Source
-Write-Host "   paperclipai: $PaperclipBin" -ForegroundColor DarkGray
+Write-Host "   paperclipai: $($paperclipCmd.Source)" -ForegroundColor DarkGray
 
-# ── 6. Get credentials for service account ────────────────────────────────────
-Write-Host '5. Service account setup...' -ForegroundColor Cyan
-Write-Host "   The service must run as your user account to access ~/.paperclip config." -ForegroundColor DarkGray
-Write-Host "   Enter your Windows password when prompted." -ForegroundColor DarkGray
-$cred = Get-Credential -UserName "$env:USERDOMAIN\$env:USERNAME" -Message 'Enter your Windows password for the Paperclip service'
+# ── 4. Create log directory ──────────────────────────────────────────────────
+New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 
-# ── 7. Install the NSSM service ───────────────────────────────────────────────
-Write-Host "6. Installing '$ServiceName' Windows service..." -ForegroundColor Cyan
+# ── 5. Remove existing scheduled task (if present) ───────────────────────────
+Write-Host '4. Configuring scheduled task...' -ForegroundColor Cyan
 
-# Use node.exe running the global paperclipai entry point directly.
-# Avoids cmd.exe wrapper (Terminate batch job prompt) and npx (install prompt in non-interactive context).
-$nodePath   = $nodeExe.Source
-$entryPoint = Join-Path (Split-Path $PaperclipBin) 'node_modules\paperclipai\dist\index.js'
+$existingTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+if ($existingTask) {
+    Stop-ScheduledTask  -TaskName $TaskName -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
+    Write-Host '   Removed existing scheduled task.' -ForegroundColor DarkGray
+}
+
+# ── 6. Build the scheduled task ──────────────────────────────────────────────
+Write-Host '5. Creating scheduled task...' -ForegroundColor Cyan
+
+# Resolve the global paperclipai entry point for node.exe
+$npmPrefix  = (& npm prefix -g).Trim()
+$entryPoint = Join-Path $npmPrefix 'node_modules\paperclipai\dist\index.js'
 if (-not (Test-Path $entryPoint)) {
-    # Fallback: the global bin is a .cmd shim; use the npm prefix to find the package
-    $npmPrefix  = (& npm prefix -g).Trim()
-    $entryPoint = Join-Path $npmPrefix 'node_modules\paperclipai\dist\index.js'
-}
-if (-not (Test-Path $entryPoint)) {
-    throw "Cannot locate paperclipai entry point. Expected at: $entryPoint"
+    throw "Cannot locate paperclipai entry point. Expected: $entryPoint"
 }
 
-& $NssmExe install $ServiceName $nodePath
-& $NssmExe set $ServiceName AppParameters    "`"$entryPoint`" run"
-& $NssmExe set $ServiceName AppDirectory     $WorkDir
-& $NssmExe set $ServiceName DisplayName      'Paperclip AI Service'
-& $NssmExe set $ServiceName Description      'Paperclip AI agent runner (DigitalTAK)'
-& $NssmExe set $ServiceName Start            SERVICE_AUTO_START
-& $NssmExe set $ServiceName AppStdout        "$LogDir\paperclip-stdout.log"
-& $NssmExe set $ServiceName AppStderr        "$LogDir\paperclip-stderr.log"
-& $NssmExe set $ServiceName AppRotateFiles   1
-& $NssmExe set $ServiceName AppRotateSeconds 86400
+$nodePath = $nodeExe.Source
+Write-Host "   Entry point: $entryPoint" -ForegroundColor DarkGray
 
-# Inject Node.js and npm global bin directories into the service PATH so any
-# child processes (e.g. claude-code spawned by paperclipai) can resolve node/npm.
-$nodeDir    = Split-Path $nodePath
-$npmGlobBin = (& npm prefix -g).Trim()
-& $NssmExe set $ServiceName AppEnvironmentExtra "PATH=$nodeDir;$npmGlobBin;$env:PATH"
+# The task runs node.exe directly with the paperclipai entry point.
+# Output is redirected to log files. The >> append ensures logs accumulate.
+$action = New-ScheduledTaskAction `
+    -Execute 'cmd.exe' `
+    -Argument "/c `"$nodePath`" `"$entryPoint`" run >> `"$LogDir\paperclip-stdout.log`" 2>> `"$LogDir\paperclip-stderr.log`"" `
+    -WorkingDirectory $WorkDir
 
-# Run as the current user so the service can access ~/.paperclip config and npm cache.
-& $NssmExe set $ServiceName ObjectName $cred.UserName $cred.GetNetworkCredential().Password
-Write-Host "   Service will run as: $($cred.UserName)" -ForegroundColor DarkGray
+# Trigger: at system startup (runs even before user logs in if "run whether
+# logged on or not" is set, but we use AtLogOn for the current user to avoid
+# credential prompts — Azure AD accounts work natively with AtLogOn).
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
 
-# ── 8. Start the service ──────────────────────────────────────────────────────
-Write-Host "7. Starting '$ServiceName' service..." -ForegroundColor Cyan
-& $NssmExe start $ServiceName
+# Also add a startup trigger so it runs if the machine reboots unattended.
+$startupTrigger = New-ScheduledTaskTrigger -AtStartup
+
+# Principal: run as the current user, highest privileges not needed.
+$principal = New-ScheduledTaskPrincipal `
+    -UserId "$env:USERDOMAIN\$env:USERNAME" `
+    -LogonType S4U `
+    -RunLevel Limited
+
+# Settings: restart on failure, don't stop after 3 days, allow parallel.
+$settings = New-ScheduledTaskSettingsSet `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable `
+    -RestartCount 3 `
+    -RestartInterval (New-TimeSpan -Minutes 1) `
+    -ExecutionTimeLimit (New-TimeSpan -Days 0)
+
+Register-ScheduledTask `
+    -TaskName $TaskName `
+    -Action $action `
+    -Trigger $trigger, $startupTrigger `
+    -Principal $principal `
+    -Settings $settings `
+    -Description 'Paperclip AI agent runner (DigitalTAK)' `
+    -Force | Out-Null
+
+Write-Host "   Task registered as: $env:USERDOMAIN\$env:USERNAME" -ForegroundColor DarkGray
+
+# ── 7. Start the task now ────────────────────────────────────────────────────
+Write-Host '6. Starting task...' -ForegroundColor Cyan
+Start-ScheduledTask -TaskName $TaskName
 Start-Sleep -Seconds 4
 
-$status = & sc.exe query $ServiceName
-if ($status -match 'RUNNING') {
-    Write-Host "[OK] $ServiceName service is running." -ForegroundColor Green
+$taskInfo = Get-ScheduledTask -TaskName $TaskName
+$taskStatus = $taskInfo.State
+if ($taskStatus -eq 'Running') {
+    Write-Host "[OK] $TaskName task is running." -ForegroundColor Green
 } else {
-    Write-Warning "$ServiceName may not be running yet — inspect with: nssm status $ServiceName"
-    Write-Host "     Logs: $LogDir" -ForegroundColor DarkGray
+    Write-Warning "$TaskName state: $taskStatus — check logs: $LogDir"
+    # Show last run result for debugging
+    $lastResult = (Get-ScheduledTaskInfo -TaskName $TaskName).LastTaskResult
+    Write-Host "   Last result code: $lastResult" -ForegroundColor DarkGray
 }
 
 Write-Host ''
 Write-Host 'Migration complete.' -ForegroundColor Green
-Write-Host 'Service management:' -ForegroundColor DarkGray
-Write-Host "  sc start $ServiceName" -ForegroundColor DarkGray
-Write-Host "  sc stop $ServiceName" -ForegroundColor DarkGray
-Write-Host "  nssm status $ServiceName" -ForegroundColor DarkGray
-Write-Host "  nssm edit $ServiceName    (settings GUI)" -ForegroundColor DarkGray
+Write-Host 'Task management:' -ForegroundColor DarkGray
+Write-Host "  Start-ScheduledTask -TaskName $TaskName" -ForegroundColor DarkGray
+Write-Host "  Stop-ScheduledTask  -TaskName $TaskName" -ForegroundColor DarkGray
+Write-Host "  Get-ScheduledTask   -TaskName $TaskName" -ForegroundColor DarkGray
+Write-Host "  Get-ScheduledTaskInfo -TaskName $TaskName   (last run result)" -ForegroundColor DarkGray
+Write-Host "  Logs: $LogDir" -ForegroundColor DarkGray
