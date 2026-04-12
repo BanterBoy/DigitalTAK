@@ -20,12 +20,12 @@ Step-by-step procedure to restore a fully operational Paperclip company on a reb
 
 ## Overview
 
-Paperclip runs as a Windows Service managed by NSSM (Non-Sucking Service Manager). All company state — agents, tasks, issues, API keys, and secrets — lives in `~\.paperclip\instances\default\`. A full restore requires:
+Paperclip runs as a Windows Scheduled Task under the current user account. All company state — agents, tasks, issues, API keys, and secrets — lives in `~\.paperclip\instances\default\`. A full restore requires:
 
 1. Reinstalling prerequisites (Node.js, paperclipai CLI)
 2. Restoring the DigitalTAK repo
 3. Restoring the Paperclip data directory from backup
-4. Running `Install-PaperclipService.ps1` to register and start the Windows service
+4. Running `Install-PaperclipService.ps1` to register and start the scheduled task
 5. Verifying the company is operational
 
 **Time estimate:** 30–45 minutes on a clean machine with backups available.
@@ -52,7 +52,7 @@ Without `master.key` the embedded secrets (API keys, agent tokens) cannot be dec
 
 | What | Path | Notes |
 |------|------|-------|
-| NSSM binary | `%USERPROFILE%\DigitalTAK\tools\nssm.exe` | Re-downloaded by `Install-PaperclipService.ps1` |
+| *(none — no external binaries required)* | | Scheduled Task uses built-in Windows APIs |
 
 ### Automated hourly backups
 
@@ -170,9 +170,10 @@ cd C:\Users\$env:USERNAME\DigitalTAK
 ```
 
 The script:
-1. Downloads NSSM to `tools\nssm.exe` if not already present
-2. Registers `Paperclip` as a Windows service (auto-start, runs as SYSTEM)
-3. Starts the service immediately
+1. Removes any leftover PM2 or NSSM service
+2. Installs `paperclipai` globally via npm
+3. Creates a `Paperclip` scheduled task (triggers: AtLogOn + AtStartup)
+4. Starts the task immediately
 
 Wait 10–15 seconds for the server to initialise (embedded PostgreSQL takes a moment on first boot).
 
@@ -260,18 +261,15 @@ npx paperclipai company export a832df07-8917-46e7-8e01-4c1d2c627b78 --out .\pape
 ## Quick-Reference Command Sheet
 
 ```powershell
-# Install / reinstall the Windows service (run as Administrator)
+# Install / reinstall the scheduled task (run as Administrator)
 cd C:\Users\$env:USERNAME\DigitalTAK
 .\Install-PaperclipService.ps1
 
-# Service control (no elevation required for start/stop)
-sc start Paperclip
-sc stop Paperclip
-sc query Paperclip
-
-# NSSM management
-nssm status Paperclip
-nssm edit Paperclip       # opens settings GUI (requires elevation)
+# Task control
+Start-ScheduledTask -TaskName Paperclip
+Stop-ScheduledTask  -TaskName Paperclip
+Get-ScheduledTask   -TaskName Paperclip
+Get-ScheduledTaskInfo -TaskName Paperclip   # last run result
 
 # Run diagnostics
 npx paperclipai doctor
@@ -287,12 +285,11 @@ npx paperclipai db:backup
 
 ## Troubleshooting
 
-### Port 3100 not listening after service start
+### Port 3100 not listening after task start
 
 1. Check service logs: `Get-Content .\logs\paperclip-stderr.log -Tail 100`
 2. Check if `npx paperclipai run` resolves: run it directly in a terminal to see startup errors.
-3. Verify Node.js is on PATH for the SYSTEM account: `nssm edit Paperclip` → Environment tab.
-4. Inspect with NSSM: `nssm status Paperclip`
+3. Check task status: `Get-ScheduledTask -TaskName Paperclip` and `Get-ScheduledTaskInfo -TaskName Paperclip`
 
 ### Database restore does not apply automatically
 
@@ -311,23 +308,23 @@ The `master.key` likely does not match the backup. All agent API tokens must be 
 1. In the Paperclip web UI, navigate to each agent and regenerate the API key.
 2. Update the adapter config for each affected agent with the new key.
 
-### Service shows status `stopped` immediately after start
+### Task stops immediately after start
 
 ```powershell
 # Check the error logs
 Get-Content .\logs\paperclip-stderr.log -Tail 100
-# Check Windows Event Log
-Get-EventLog -LogName System -Source 'Service Control Manager' -Newest 20
+# Check last task result code
+Get-ScheduledTaskInfo -TaskName Paperclip
 ```
 
 Common causes:
-- `npx` not resolving — verify PATH is set in NSSM (`nssm edit Paperclip` → Environment)
 - Port 3100 already in use by another process
 - Corrupt config.json
+- Node.js not on PATH — reinstall Node.js and re-run the install script
 
 ### Re-running Install-PaperclipService.ps1
 
-The script is idempotent — it removes and reinstalls the service cleanly. Run it again any time to reset the service configuration.
+The script is idempotent — it removes and reinstalls the task cleanly. Run it again any time to reset the configuration.
 
 ---
 
@@ -342,5 +339,4 @@ The script is idempotent — it removes and reinstalls the service cleanly. Run 
 | Agent instructions | `%USERPROFILE%\.paperclip\instances\default\companies\<company-id>\agents\<agent-id>\instructions\` |
 | Server logs | `%USERPROFILE%\.paperclip\instances\default\logs\` |
 | Service logs | `%USERPROFILE%\DigitalTAK\logs\paperclip-stdout.log` / `paperclip-stderr.log` |
-| NSSM binary | `%USERPROFILE%\DigitalTAK\tools\nssm.exe` |
-| Service installer | `%USERPROFILE%\DigitalTAK\Install-PaperclipService.ps1` |
+| Task installer | `%USERPROFILE%\DigitalTAK\Install-PaperclipService.ps1` |
