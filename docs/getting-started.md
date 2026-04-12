@@ -33,7 +33,7 @@ Before cloning and running the project, ensure your host machine meets these req
 
 You must download these separately before running a deployment. **They are not included in this repository and must not be committed.**
 
-1. **Rocky Linux 9.5 ISO** — from [rockylinux.org](https://rockylinux.org/download)
+1. **Rocky Linux 9.7 ISO** — from [rockylinux.org](https://rockylinux.org/download)
 2. **TAK Server 5.7 RPM** (`takserver-5.7-RELEASE8.noarch.rpm`) — from [tak.gov](https://tak.gov)
    - A free TAK.gov account is required
    - **MFA is enforced** on the downloads portal — enrol a second factor before attempting to download
@@ -71,10 +71,13 @@ cd DigitalTAK
 ```
 DigitalTAK/
 ├── Deploy-TAKServer.ps1        # Main entry point — full automated deployment
+├── Deploy-TAKTestServer.ps1    # Backward-compat wrapper → Deploy-TAKServer.ps1
 ├── Invoke-TAKOnboarding.ps1    # Thin wrapper → TAKOnboarding\Invoke-TAKOnboarding
 ├── Invoke-TAKRollback.ps1      # Thin wrapper → TAKDeploy\Invoke-TAKRollback
 ├── Remove-CivTAK.ps1           # Thin wrapper → TAKDeploy\Remove-TAKDeployment
-├── Invoke-IntegrationTests.ps1 # Run end-to-end integration tests
+├── Invoke-UnitTests.ps1        # Run all Pester unit tests
+├── Invoke-IntegrationTests.ps1 # Run integration tests (no live server required)
+├── Invoke-E2ETests.ps1         # Run E2E tests against a live TAK Server
 │
 ├── TAKServerPS/                # PowerShell REST API wrapper (44 cmdlets)
 ├── TAKInstall/                 # PowerShell SSH provisioning module (6 cmdlets)
@@ -88,6 +91,7 @@ DigitalTAK/
 │
 ├── InstallShellScripts/        # Bash scripts executed on the Rocky Linux guest
 ├── tests/integration/          # Pester 5 integration tests (no live server required)
+├── tests/e2e/                  # E2E tests requiring a live TAK Server instance
 │
 ├── Documentation/              # TAK Server PDF and Markdown guides
 ├── docs/                       # This documentation site
@@ -121,6 +125,21 @@ Expected: **45 integration tests pass**. Tests that require Administrator (Windo
 
 Total across all test suites: **224 tests, all passing**.
 
+### E2E tests (live server required)
+
+A separate E2E suite validates the full request/response cycle against a running TAK Server:
+
+```powershell
+# Set required environment variables
+$env:TAK_INTEGRATION_HOST = '192.168.1.50'
+$env:TAK_CERT_PASS        = 'YourCertPassword'
+
+# Run the full E2E suite
+.\Invoke-E2ETests.ps1
+```
+
+E2E tests require `certs/admin.p12` and a reachable TAK Server. See [tests/e2e/README.md](https://github.com/BanterBoy/DigitalTAK/blob/prod/tests/e2e/README.md) for full details.
+
 ### What the tests cover
 
 | Module | Tests | Coverage |
@@ -130,6 +149,7 @@ Total across all test suites: **224 tests, all passing**.
 | Integration (09) | — | `Remove-CivTAK.ps1` Windows cert store cleanup (skipped without elevation) |
 | Integration (10) | — | `New-TAKDataPackage.ps1` truststore lookup — `.jks` and `.p12` paths |
 | Integration (11) | — | `Remove-CivTAK.ps1` filesystem teardown (Steps 4 / 4b) |
+| E2E (01–06) | — | Server status, cert auth, CoT tracking, GeoChat, mission packages, negative/security cases |
 
 ---
 

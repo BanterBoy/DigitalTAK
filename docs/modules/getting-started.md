@@ -97,7 +97,7 @@ Import-Module .\TAKDeploy\TAKDeploy.psd1
 
 New-TAKVirtualMachine `
     -VMName 'TAKServer' `
-    -IsoPath 'C:\Hyper-V\ISO\Rocky-9.5-x86_64-dvd.iso' `
+    -IsoPath 'C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso' `
     -VHDSizeGB 80 `
     -MemoryStartupBytes 8GB `
     -ProcessorCount 4

@@ -45,7 +45,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('TAKDeploy', 'TAKInstall', 'TAKServerPS')]
+    [ValidateSet('TAKDeploy', 'TAKInstall', 'TAKServerPS', 'TAKOnboarding')]
     [string[]] $Modules,
 
     [Parameter()]
@@ -77,7 +77,7 @@ if (-not (Test-Path $reportsDir)) {
 }
 
 # ── Discover test directories ─────────────────────────────────────────────────
-$allModules = @('TAKDeploy', 'TAKInstall', 'TAKServerPS')
+$allModules = @('TAKDeploy', 'TAKInstall', 'TAKServerPS', 'TAKOnboarding')
 $targetModules = if ($Modules) { $Modules } else { $allModules }
 
 $testPaths = @()

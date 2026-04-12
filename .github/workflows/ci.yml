@@ -130,7 +130,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y powershell
 
-      - name: Lint TAKServerPS, TAKInstall, TAKDeploy and root scripts
+      - name: Lint TAKServerPS, TAKInstall, TAKDeploy, TAKOnboarding and root scripts
         shell: pwsh
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -152,10 +152,11 @@ jobs:
           $settings3 = './TAKDeploy/PSScriptAnalyzerSettings.psd1'
           $r3 = Invoke-ModuleLint -ModulePath ./TAKDeploy   -Settings $settings3
           $settings4 = './PSScriptAnalyzerSettings.psd1'
-          $r4 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1     -Settings $settings4
-          $r5 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKTestServer.ps1 -Settings $settings4
+          $r4 = Invoke-ModuleLint -ModulePath ./TAKOnboarding -Settings $settings4
+          $r5 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKServer.ps1     -Settings $settings4
+          $r6 = Invoke-ScriptAnalyzer -Path ./Deploy-TAKTestServer.ps1 -Settings $settings4
 
-          $all = @($r1) + @($r2) + @($r3) + @($r4) + @($r5)
+          $all = @($r1) + @($r2) + @($r3) + @($r4) + @($r5) + @($r6)
           if ($all) {
               $all | Format-Table RuleName, Severity, ScriptName, Line, Message -AutoSize
               Write-Error "PSScriptAnalyzer reported $($all.Count) violation(s)."
