@@ -525,7 +525,7 @@ function Invoke-TAKOnboarding {
     finally {
         if ($sftpSession) { Remove-SFTPSession -SessionId $sftpSession.SessionId -ErrorAction SilentlyContinue | Out-Null }
         if ($sshSession)  { Remove-SSHSession  -SessionId $sshSession.SessionId  -ErrorAction SilentlyContinue | Out-Null }
-        try { Disconnect-TAKServer -ErrorAction SilentlyContinue } catch {}
+        try { Disconnect-TAKServer -ErrorAction SilentlyContinue } catch { $null = $_ }
     }
 
     # ── Step 8: Summary ───────────────────────────────────────────────────────────
