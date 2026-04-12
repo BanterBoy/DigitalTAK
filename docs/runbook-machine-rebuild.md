@@ -20,15 +20,12 @@ Step-by-step procedure to restore a fully operational Paperclip company on a reb
 
 ## Overview
 
-Paperclip runs as a Windows Scheduled Task under the current user account. All company state — agents, tasks, issues, API keys, and secrets — lives in `~\.paperclip\instances\default\`. A full restore requires:
+Paperclip runs as a local server process started manually via `npx paperclipai run`. All company state — agents, tasks, issues, API keys, and secrets — lives in `~\.paperclip\instances\default\`. A full restore requires:
 
 1. Reinstalling prerequisites (Node.js, paperclipai CLI)
 2. Restoring the DigitalTAK repo
 3. Restoring the Paperclip data directory from backup
-4. Running `Install-PaperclipService.ps1` to register and start the scheduled task
-5. Verifying the company is operational
-
-**Time estimate:** 30–45 minutes on a clean machine with backups available.
+4. Starting the server manually and confirming it is operational
 
 ---
 
@@ -47,12 +44,6 @@ Run this checklist before wiping the machine. If you are restoring from an exist
 
 {: .warning }
 Without `master.key` the embedded secrets (API keys, agent tokens) cannot be decrypted. **Back up this file separately** — store it in a password manager or encrypted vault, not alongside the SQL backup.
-
-### Optional — can be regenerated
-
-| What | Path | Notes |
-|------|------|-------|
-| *(none — no external binaries required)* | | Scheduled Task uses built-in Windows APIs |
 
 ### Automated hourly backups
 
@@ -98,13 +89,6 @@ npx paperclipai --version   # 2026.403.0 or later
 ```powershell
 cd C:\Users\$env:USERNAME
 git clone https://github.com/BanterBoy/DigitalTAK.git
-```
-
-Confirm the service installer is present:
-
-```powershell
-Test-Path C:\Users\$env:USERNAME\DigitalTAK\Install-PaperclipService.ps1
-# Expected: True
 ```
 
 ---
@@ -160,38 +144,28 @@ Paperclip will detect and restore from this file automatically on first run. Alt
 
 ---
 
-## Step 4 — Install and Start the Paperclip Windows Service
+## Step 4 — Start Paperclip
 
-Run `Install-PaperclipService.ps1` from an **elevated (Administrator) PowerShell** prompt:
+From the DigitalTAK repo directory:
 
 ```powershell
 cd C:\Users\$env:USERNAME\DigitalTAK
-.\Install-PaperclipService.ps1
+npx paperclipai run
 ```
-
-The script:
-1. Removes any leftover PM2 or NSSM service
-2. Installs `paperclipai` globally via npm
-3. Creates a `Paperclip` scheduled task (triggers: AtLogOn + AtStartup)
-4. Starts the task immediately
 
 Wait 10–15 seconds for the server to initialise (embedded PostgreSQL takes a moment on first boot).
 
-Confirm the server is listening:
+Confirm the server is listening (in a separate terminal):
 
 ```powershell
 netstat -ano | Select-String ':3100.*LISTENING'
 ```
-
-Expected: one line showing a process listening on port 3100.
 
 Run the diagnostic check:
 
 ```powershell
 npx paperclipai doctor
 ```
-
-Expected output: `8 passed, 1 warning` (the warning about port 3100 in use is expected — it means the server is running).
 
 Open the web UI to confirm:
 
@@ -225,15 +199,6 @@ npx paperclipai heartbeat run --agent-id <any-agent-id>
 
 If the heartbeat runs and posts a comment, API keys and secrets have been restored correctly.
 
-### 5c. Check service logs
-
-```powershell
-Get-Content "C:\Users\$env:USERNAME\DigitalTAK\logs\paperclip-stderr.log" -Tail 50
-Get-Content "C:\Users\$env:USERNAME\DigitalTAK\logs\paperclip-stdout.log" -Tail 50
-```
-
-Look for successful startup messages. Errors here typically indicate a `master.key` mismatch or a database restore issue.
-
 ---
 
 ## Restoring from a Company Export (Alternative / Lightweight Restore)
@@ -261,35 +226,29 @@ npx paperclipai company export a832df07-8917-46e7-8e01-4c1d2c627b78 --out .\pape
 ## Quick-Reference Command Sheet
 
 ```powershell
-# Install / reinstall the scheduled task (run as Administrator)
+# Start Paperclip
 cd C:\Users\$env:USERNAME\DigitalTAK
-.\Install-PaperclipService.ps1
-
-# Task control
-Start-ScheduledTask -TaskName Paperclip
-Stop-ScheduledTask  -TaskName Paperclip
-Get-ScheduledTask   -TaskName Paperclip
-Get-ScheduledTaskInfo -TaskName Paperclip   # last run result
+npx paperclipai run
 
 # Run diagnostics
 npx paperclipai doctor
 
-# Trigger a heartbeat manually
-npx paperclipai heartbeat run --agent-id <agent-id>
-
 # Manual backup
 npx paperclipai db:backup
+
+# Trigger a heartbeat manually
+npx paperclipai heartbeat run --agent-id <agent-id>
 ```
 
 ---
 
 ## Troubleshooting
 
-### Port 3100 not listening after task start
+### Port 3100 not listening after starting
 
-1. Check service logs: `Get-Content .\logs\paperclip-stderr.log -Tail 100`
-2. Check if `npx paperclipai run` resolves: run it directly in a terminal to see startup errors.
-3. Check task status: `Get-ScheduledTask -TaskName Paperclip` and `Get-ScheduledTaskInfo -TaskName Paperclip`
+1. Check the terminal output for errors.
+2. Ensure Node.js is on PATH for the current user.
+3. Ensure no other process is using port 3100.
 
 ### Database restore does not apply automatically
 
@@ -308,24 +267,6 @@ The `master.key` likely does not match the backup. All agent API tokens must be 
 1. In the Paperclip web UI, navigate to each agent and regenerate the API key.
 2. Update the adapter config for each affected agent with the new key.
 
-### Task stops immediately after start
-
-```powershell
-# Check the error logs
-Get-Content .\logs\paperclip-stderr.log -Tail 100
-# Check last task result code
-Get-ScheduledTaskInfo -TaskName Paperclip
-```
-
-Common causes:
-- Port 3100 already in use by another process
-- Corrupt config.json
-- Node.js not on PATH — reinstall Node.js and re-run the install script
-
-### Re-running Install-PaperclipService.ps1
-
-The script is idempotent — it removes and reinstalls the task cleanly. Run it again any time to reset the configuration.
-
 ---
 
 ## Key Paths Reference
@@ -338,5 +279,3 @@ The script is idempotent — it removes and reinstalls the task cleanly. Run it 
 | Master key | `%USERPROFILE%\.paperclip\instances\default\secrets\master.key` |
 | Agent instructions | `%USERPROFILE%\.paperclip\instances\default\companies\<company-id>\agents\<agent-id>\instructions\` |
 | Server logs | `%USERPROFILE%\.paperclip\instances\default\logs\` |
-| Service logs | `%USERPROFILE%\DigitalTAK\logs\paperclip-stdout.log` / `paperclip-stderr.log` |
-| Task installer | `%USERPROFILE%\DigitalTAK\Install-PaperclipService.ps1` |
