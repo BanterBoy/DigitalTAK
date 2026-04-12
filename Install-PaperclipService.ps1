@@ -8,8 +8,12 @@
       1. Kills the PM2-managed paperclip process and uninstalls PM2
       2. Removes PM2 data directories
       3. Locates or downloads NSSM (Non-Sucking Service Manager)
-      4. Registers Paperclip as a Windows service with auto-start
+      4. Registers Paperclip as a Windows service running as the current user
       5. Starts the service
+
+    The service runs as YOUR user account (not LocalSystem) so it can access
+    your Paperclip config at ~/.paperclip. You will be prompted for your
+    Windows password during installation.
 
     After running, manage the service with standard Windows tools:
       sc start Paperclip    / sc stop Paperclip
@@ -59,13 +63,13 @@ if ($nssmOnPath) {
 } elseif (Test-Path $NssmExe) {
     Write-Host "   Found in tools/: $NssmExe" -ForegroundColor DarkGray
 } else {
-    Write-Host '   Downloading NSSM 2.24...' -ForegroundColor DarkGray
+    Write-Host '   Downloading NSSM 2.25...' -ForegroundColor DarkGray
     New-Item -ItemType Directory -Path $ToolsDir -Force | Out-Null
-    $zip = Join-Path $env:TEMP 'nssm-2.24.zip'
-    Invoke-WebRequest -Uri 'https://nssm.cc/release/nssm-2.24.zip' -OutFile $zip -UseBasicParsing
+    $zip = Join-Path $env:TEMP 'nssm-2.25.zip'
+    Invoke-WebRequest -Uri 'https://github.com/dkxce/NSSM/releases/download/v2.25/NSSM_v2.25.zip' -OutFile $zip -UseBasicParsing
     $extractDir = Join-Path $env:TEMP 'nssm-extract'
     Expand-Archive -Path $zip -DestinationPath $extractDir -Force
-    Copy-Item (Join-Path $extractDir 'nssm-2.24\win64\nssm.exe') -Destination $NssmExe
+    Copy-Item (Join-Path $extractDir 'win64\nssm.exe') -Destination $NssmExe
     Remove-Item $zip, $extractDir -Recurse -Force
     Write-Host "   Saved to: $NssmExe" -ForegroundColor DarkGray
 }
@@ -82,17 +86,46 @@ if ($existing -match 'SERVICE_NAME') {
 # ── 4. Create log directory ───────────────────────────────────────────────────
 New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 
-# ── 5. Resolve Node.js location for PATH injection ────────────────────────────
-Write-Host '4. Resolving Node.js location...' -ForegroundColor Cyan
-$nodeExe  = Get-Command node -ErrorAction Stop
-$nodePath = Split-Path $nodeExe.Source
-Write-Host "   Node.js directory: $nodePath" -ForegroundColor DarkGray
+# ── 5. Verify Node.js and install paperclipai globally ─────────────────────────
+Write-Host '4. Verifying Node.js and installing paperclipai...' -ForegroundColor Cyan
+$nodeExe = Get-Command node -ErrorAction Stop
+Write-Host "   Node.js: $($nodeExe.Source)" -ForegroundColor DarkGray
 
-# ── 6. Install the NSSM service ───────────────────────────────────────────────
-Write-Host "5. Installing '$ServiceName' Windows service..." -ForegroundColor Cyan
+# Install/update paperclipai globally so the service can invoke it without npx.
+# npx downloads on every run and prompts in non-interactive service contexts.
+Write-Host '   Installing paperclipai globally...' -ForegroundColor DarkGray
+& npm install -g paperclipai 2>&1 | Out-Null
+$paperclipCmd = Get-Command paperclipai -ErrorAction SilentlyContinue
+if (-not $paperclipCmd) {
+    throw 'npm install -g paperclipai succeeded but the command is not on PATH. Check npm prefix -g.'
+}
+$PaperclipBin = $paperclipCmd.Source
+Write-Host "   paperclipai: $PaperclipBin" -ForegroundColor DarkGray
 
-& $NssmExe install $ServiceName 'C:\Windows\System32\cmd.exe'
-& $NssmExe set $ServiceName AppParameters    '/c npx paperclipai run'
+# ── 6. Get credentials for service account ────────────────────────────────────
+Write-Host '5. Service account setup...' -ForegroundColor Cyan
+Write-Host "   The service must run as your user account to access ~/.paperclip config." -ForegroundColor DarkGray
+Write-Host "   Enter your Windows password when prompted." -ForegroundColor DarkGray
+$cred = Get-Credential -UserName "$env:USERDOMAIN\$env:USERNAME" -Message 'Enter your Windows password for the Paperclip service'
+
+# ── 7. Install the NSSM service ───────────────────────────────────────────────
+Write-Host "6. Installing '$ServiceName' Windows service..." -ForegroundColor Cyan
+
+# Use node.exe running the global paperclipai entry point directly.
+# Avoids cmd.exe wrapper (Terminate batch job prompt) and npx (install prompt in non-interactive context).
+$nodePath   = $nodeExe.Source
+$entryPoint = Join-Path (Split-Path $PaperclipBin) 'node_modules\paperclipai\dist\index.js'
+if (-not (Test-Path $entryPoint)) {
+    # Fallback: the global bin is a .cmd shim; use the npm prefix to find the package
+    $npmPrefix  = (& npm prefix -g).Trim()
+    $entryPoint = Join-Path $npmPrefix 'node_modules\paperclipai\dist\index.js'
+}
+if (-not (Test-Path $entryPoint)) {
+    throw "Cannot locate paperclipai entry point. Expected at: $entryPoint"
+}
+
+& $NssmExe install $ServiceName $nodePath
+& $NssmExe set $ServiceName AppParameters    "`"$entryPoint`" run"
 & $NssmExe set $ServiceName AppDirectory     $WorkDir
 & $NssmExe set $ServiceName DisplayName      'Paperclip AI Service'
 & $NssmExe set $ServiceName Description      'Paperclip AI agent runner (DigitalTAK)'
@@ -101,11 +134,19 @@ Write-Host "5. Installing '$ServiceName' Windows service..." -ForegroundColor Cy
 & $NssmExe set $ServiceName AppStderr        "$LogDir\paperclip-stderr.log"
 & $NssmExe set $ServiceName AppRotateFiles   1
 & $NssmExe set $ServiceName AppRotateSeconds 86400
-# Inject Node.js directory into PATH so npx resolves correctly when running as SYSTEM.
-& $NssmExe set $ServiceName AppEnvironmentExtra "PATH=$nodePath;$env:PATH"
 
-# ── 7. Start the service ──────────────────────────────────────────────────────
-Write-Host "6. Starting '$ServiceName' service..." -ForegroundColor Cyan
+# Inject Node.js and npm global bin directories into the service PATH so any
+# child processes (e.g. claude-code spawned by paperclipai) can resolve node/npm.
+$nodeDir    = Split-Path $nodePath
+$npmGlobBin = (& npm prefix -g).Trim()
+& $NssmExe set $ServiceName AppEnvironmentExtra "PATH=$nodeDir;$npmGlobBin;$env:PATH"
+
+# Run as the current user so the service can access ~/.paperclip config and npm cache.
+& $NssmExe set $ServiceName ObjectName $cred.UserName $cred.GetNetworkCredential().Password
+Write-Host "   Service will run as: $($cred.UserName)" -ForegroundColor DarkGray
+
+# ── 8. Start the service ──────────────────────────────────────────────────────
+Write-Host "7. Starting '$ServiceName' service..." -ForegroundColor Cyan
 & $NssmExe start $ServiceName
 Start-Sleep -Seconds 4
 
