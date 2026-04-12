@@ -25,8 +25,9 @@
 #>
 
 BeforeAll {
-    $script:RepoRoot   = Resolve-Path (Join-Path $PSScriptRoot '..', '..')
-    $script:RemoveScript = Join-Path $script:RepoRoot 'Remove-CivTAK.ps1'
+    $script:RepoRoot       = Resolve-Path (Join-Path $PSScriptRoot '..', '..')
+    $script:RemoveScript   = Join-Path $script:RepoRoot 'Remove-CivTAK.ps1'
+    $script:RemoveImplFile = Join-Path $script:RepoRoot 'TAKDeploy' 'Public' 'Remove-TAKDeployment.ps1'
 
     # ── Inline mirror of Step 4 / 4b logic from Remove-CivTAK.ps1 ────────────
     # Parameterised by $RepoRoot so tests can point it at a temp fixture tree.
@@ -119,13 +120,13 @@ Describe 'Remove-CivTAK.ps1 — Cert & Dist Cleanup Structure' -Tag 'Removal', '
     }
 
     It 'source removes cert files recursively (not just top-level certs\)' {
-        $content = Get-Content $script:RemoveScript -Raw
+        $content = Get-Content $script:RemoveImplFile -Raw
         $content | Should -Match '-Recurse' `
             -Because 'team cert subdirs must be searched recursively'
     }
 
     It 'source targets all cert/key extensions, not only .p12' {
-        $content = Get-Content $script:RemoveScript -Raw
+        $content = Get-Content $script:RemoveImplFile -Raw
         foreach ($ext in '\.p12', '\.pfx', '\.jks', '\.pem', '\.key', '\.crt', '\.cer') {
             $content | Should -Match $ext `
                 -Because "extension $ext must be cleaned up — it may contain private key material"
@@ -133,14 +134,13 @@ Describe 'Remove-CivTAK.ps1 — Cert & Dist Cleanup Structure' -Tag 'Removal', '
     }
 
     It 'source removes team subdirectories after deleting cert files' {
-        $content = Get-Content $script:RemoveScript -Raw
-        # The team-dir removal block uses Get-ChildItem -Directory and Remove-Item -Recurse
+        $content = Get-Content $script:RemoveImplFile -Raw
         $content | Should -Match 'Get-ChildItem.+-Directory' `
             -Because 'team subdirs (certs\bravo\, certs\charlie\) must be removed, not just cert files'
     }
 
     It 'source removes the dist\ directory' {
-        $content = Get-Content $script:RemoveScript -Raw
+        $content = Get-Content $script:RemoveImplFile -Raw
         $content | Should -Match "localDistDir|'dist'" `
             -Because 'dist\ contains ATAK .zip packages that embed .p12 certs'
     }

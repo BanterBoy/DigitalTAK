@@ -54,8 +54,12 @@ BeforeAll {
 
     $script:RepoRoot       = Resolve-Path (Join-Path $PSScriptRoot '..', '..')
     $script:RemoveScript   = Join-Path $script:RepoRoot 'Remove-CivTAK.ps1'
+    $script:RemoveImplFile = Join-Path $script:RepoRoot 'TAKDeploy' 'Public' 'Remove-TAKDeployment.ps1'
     $script:TestCAName     = 'Pester-TestCA-REMOVE'
     $script:TestOrg        = 'Pester-Test-Org'
+
+    # Import TAKDeploy so we can inspect Remove-TAKDeployment parameters.
+    Import-Module (Join-Path $script:RepoRoot 'TAKDeploy' 'TAKDeploy.psd1') -Force
 
     # Tracking list for synthetic certs so AfterAll can clean them up
     $script:SyntheticThumbprints = [System.Collections.Generic.List[string]]::new()
@@ -86,41 +90,46 @@ Describe 'Remove-CivTAK.ps1 — Parameter Contract' -Tag 'Removal', 'Parameters'
         Test-Path $script:RemoveScript | Should -Be $true
     }
 
-    It 'Remove-CivTAK.ps1 declares -VMName parameter with a default' {
-        $cmd   = Get-Command $script:RemoveScript -ErrorAction Stop
+    It 'Remove-CivTAK.ps1 delegates to Remove-TAKDeployment (thin wrapper)' {
+        $content = Get-Content $script:RemoveScript -Raw
+        $content | Should -Match 'Remove-TAKDeployment' `
+            -Because 'the wrapper must delegate to the TAKDeploy module implementation'
+    }
+
+    # Parameter and ShouldProcess tests target the actual implementation cmdlet.
+    It 'Remove-TAKDeployment declares -VMName parameter with a default' {
+        $cmd   = Get-Command Remove-TAKDeployment -ErrorAction Stop
         $param = $cmd.Parameters['VMName']
         $param | Should -Not -BeNullOrEmpty -Because '-VMName must be declared'
     }
 
-    It 'Remove-CivTAK.ps1 declares -CAName parameter' {
-        $cmd   = Get-Command $script:RemoveScript -ErrorAction Stop
+    It 'Remove-TAKDeployment declares -CAName parameter' {
+        $cmd   = Get-Command Remove-TAKDeployment -ErrorAction Stop
         $param = $cmd.Parameters['CAName']
         $param | Should -Not -BeNullOrEmpty `
             -Because '-CAName must be declared so callers can match the CA used at deployment time'
     }
 
-    It 'Remove-CivTAK.ps1 declares -Organization parameter' {
-        $cmd   = Get-Command $script:RemoveScript -ErrorAction Stop
+    It 'Remove-TAKDeployment declares -Organization parameter' {
+        $cmd   = Get-Command Remove-TAKDeployment -ErrorAction Stop
         $param = $cmd.Parameters['Organization']
         $param | Should -Not -BeNullOrEmpty
     }
 
-    It 'Remove-CivTAK.ps1 supports ShouldProcess (-WhatIf)' {
-        $cmd = Get-Command $script:RemoveScript -ErrorAction Stop
+    It 'Remove-TAKDeployment supports ShouldProcess (-WhatIf)' {
+        $cmd = Get-Command Remove-TAKDeployment -ErrorAction Stop
         $cmd.Parameters.ContainsKey('WhatIf') | Should -Be $true `
-            -Because 'Remove-CivTAK is a high-impact destructive operation and must support -WhatIf'
+            -Because 'Remove-TAKDeployment is a high-impact destructive operation and must support -WhatIf'
     }
 
-    It 'Remove-CivTAK.ps1 source does not hard-code the default VM name in cert removal logic' {
-        # The cert removal step must use -CAName / -Organization, not assume 'CivTAK' in certificate subjects
-        $content = Get-Content $script:RemoveScript -Raw
-        # Cert removal should match on -CAName variable not the literal VM name
+    It 'Remove-TAKDeployment source does not hard-code the default VM name in cert removal logic' {
+        $content = Get-Content $script:RemoveImplFile -Raw
         $content | Should -Match '\$CAName' `
             -Because 'cert removal must use the -CAName parameter, not a hardcoded string'
     }
 
-    It 'Remove-CivTAK.ps1 source removes from both Root and My certificate stores' {
-        $content = Get-Content $script:RemoveScript -Raw
+    It 'Remove-TAKDeployment source removes from both Root and My certificate stores' {
+        $content = Get-Content $script:RemoveImplFile -Raw
         $content | Should -Match "'Root'" `
             -Because 'the root CA cert is imported into Cert:\CurrentUser\Root and must be removed'
         $content | Should -Match "'My'" `
