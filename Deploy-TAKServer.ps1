@@ -900,7 +900,9 @@ if ($resumePhase -le 4) {
     }
 
     $reportTimestamp = $endTime.ToString('yyyyMMddHHmmss')
-    $reportPath = Join-Path $PSScriptRoot 'reports' "DEPLOYMENT-REPORT-${reportTimestamp}.md"
+    $reportDir = Join-Path $PSScriptRoot 'reports'
+    if (-not (Test-Path $reportDir)) { New-Item -Path $reportDir -ItemType Directory -Force | Out-Null }
+    $reportPath = Join-Path $reportDir "DEPLOYMENT-REPORT-${reportTimestamp}.md"
     $reportLines -join "`n" | Set-Content -Path $reportPath -Encoding UTF8 -Force
     Write-Host "[OK] Report saved to: $reportPath" -ForegroundColor Green
 
