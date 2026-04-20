@@ -1,4 +1,4 @@
-![Alt](https://repobeats.axiom.co/api/embed/e23cc98f4b719b62c059a7e72e0ba71e36b36638.svg "Repobeats analytics image")
+![Repobeats repository analytics](https://repobeats.axiom.co/api/embed/e23cc98f4b719b62c059a7e72e0ba71e36b36638.svg "Repobeats analytics image")
 
 # DigitalTAK
 
