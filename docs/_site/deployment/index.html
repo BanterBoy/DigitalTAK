@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAK Server Deployment | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAK Server Deployment" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/deployment/" />
+<meta property="og:url" content="http://0.0.0.0:4000/deployment/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAK Server Deployment" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAK Server Deployment","url":"http://0.0.0.0:4000/deployment/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 class="no_toc" id="tak-server-deployment">TAK Server Deployment</h1>
+
+<p class="fs-6 fw-300">Step-by-step guide for deploying a CivTAK server using <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code>.</p>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#overview" id="markdown-toc-overview">Overview</a></li>
+  <li><a href="#prerequisites-checklist" id="markdown-toc-prerequisites-checklist">Prerequisites Checklist</a></li>
+  <li><a href="#minimal-invocation" id="markdown-toc-minimal-invocation">Minimal Invocation</a></li>
+  <li><a href="#fully-parameterised-invocation" id="markdown-toc-fully-parameterised-invocation">Fully Parameterised Invocation</a></li>
+  <li><a href="#deployment-phases" id="markdown-toc-deployment-phases">Deployment Phases</a></li>
+  <li><a href="#parameters-reference" id="markdown-toc-parameters-reference">Parameters Reference</a></li>
+  <li><a href="#resuming-a-failed-deployment" id="markdown-toc-resuming-a-failed-deployment">Resuming a Failed Deployment</a></li>
+  <li><a href="#rolling-back-to-a-previous-phase" id="markdown-toc-rolling-back-to-a-previous-phase">Rolling Back to a Previous Phase</a></li>
+  <li><a href="#optional-openfire-xmpp-chat" id="markdown-toc-optional-openfire-xmpp-chat">Optional: Openfire XMPP Chat</a></li>
+  <li><a href="#optional-lets-encrypt-tls" id="markdown-toc-optional-lets-encrypt-tls">Optional: Let’s Encrypt TLS</a></li>
+  <li><a href="#tearing-down-a-deployment" id="markdown-toc-tearing-down-a-deployment">Tearing Down a Deployment</a></li>
+  <li><a href="#post-deployment-access" id="markdown-toc-post-deployment-access">Post-Deployment Access</a></li>
+  <li><a href="#live-deployment-validation-dig-53-2026-04-03" id="markdown-toc-live-deployment-validation-dig-53-2026-04-03">Live Deployment Validation (DIG-53, 2026-04-03)</a>    <ol>
+      <li><a href="#validated-hardware-specs" id="markdown-toc-validated-hardware-specs">Validated Hardware Specs</a></li>
+      <li><a href="#deployment-timing" id="markdown-toc-deployment-timing">Deployment Timing</a></li>
+      <li><a href="#known-gotchas" id="markdown-toc-known-gotchas">Known Gotchas</a></li>
+      <li><a href="#test-infrastructure-fixes-applied" id="markdown-toc-test-infrastructure-fixes-applied">Test Infrastructure Fixes Applied</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<p><code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> is the canonical entry point for a complete, zero-touch CivTAK deployment. It:</p>
+
+<ul>
+  <li>Creates a Hyper-V Gen 2 VM and installs Rocky Linux 9 via kickstart</li>
+  <li>Installs and configures TAK Server 5.7 over SSH</li>
+  <li>Creates a full certificate authority, server certs, and client certs</li>
+  <li>Promotes the admin certificate</li>
+  <li>Runs 22 post-deployment validation tests (service health, ports, SELinux, firewall, certs)</li>
+  <li>Downloads <code class="language-plaintext highlighter-rouge">.p12</code> client certificates to your local machine</li>
+  <li>Generates a deployment report</li>
+</ul>
+
+<p><strong>Re-running is safe.</strong> The script detects existing phase snapshots and resumes from the latest checkpoint. You never need to start from scratch after a partial failure.</p>
+
+<hr />
+
+<h2 id="prerequisites-checklist">Prerequisites Checklist</h2>
+
+<p>Before running the deployment:</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Windows 10/11 Pro or Windows Server 2019+ with Hyper-V enabled</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />PowerShell 7.0+ running <strong>as Administrator</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">Posh-SSH</code> module installed: <code class="language-plaintext highlighter-rouge">Install-Module Posh-SSH -Scope CurrentUser -Force</code></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Hyper-V virtual switch named <code class="language-plaintext highlighter-rouge">TAK-External</code> (External type) — or supply <code class="language-plaintext highlighter-rouge">-SwitchName</code></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Rocky Linux 9 DVD ISO downloaded (default expected path: <code class="language-plaintext highlighter-rouge">C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso</code>)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />TAK Server 5.7 RPM downloaded from <a href="https://tak.gov">tak.gov</a> (requires a <strong>TAK.gov account with MFA</strong>; navigate to Downloads → TAK Server) — default path: <code class="language-plaintext highlighter-rouge">C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm</code></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />At least 40 GB free disk space for the VM VHDX (default: 80 GB dynamic)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />At least 8 GB RAM available for the VM</li>
+</ul>
+
+<hr />
+
+<h2 id="minimal-invocation">Minimal Invocation</h2>
+
+<p>The simplest deployment uses all defaults and prompts interactively for certificate subject fields:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Run from the repo root as Administrator</span><span class="w">
+</span><span class="nv">$cred</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'atak'</span><span class="w">
+</span><span class="nv">$rootPw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="s1">'Root password'</span><span class="w">
+</span><span class="nv">$ksPw</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="s1">'Keystore / certificate password'</span><span class="w">
+
+</span><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You will be prompted for:</p>
+<ul>
+  <li><strong>State</strong> — e.g., <code class="language-plaintext highlighter-rouge">ESSEX</code></li>
+  <li><strong>City</strong> — e.g., <code class="language-plaintext highlighter-rouge">SOUTHEND-ON-SEA</code></li>
+  <li><strong>Organization</strong> — e.g., <code class="language-plaintext highlighter-rouge">LEIGH-SERVICES</code></li>
+  <li><strong>Organizational Unit</strong> — e.g., <code class="language-plaintext highlighter-rouge">IT-DEPARTMENT</code></li>
+  <li><strong>CA Name</strong> — e.g., <code class="language-plaintext highlighter-rouge">TAK-CA</code></li>
+</ul>
+
+<hr />
+
+<h2 id="fully-parameterised-invocation">Fully Parameterised Invocation</h2>
+
+<p>For non-interactive / scripted deployments:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$cred</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">PSCredential</span><span class="p">]::</span><span class="n">new</span><span class="p">(</span><span class="s1">'atak'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'&lt;SshPassword&gt;'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="p">))</span><span class="w">
+</span><span class="nv">$rootPw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'&lt;RootPassword&gt;'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="nv">$ksPw</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'&lt;KeystorePassword&gt;'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+
+</span><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-VMName</span><span class="w">           </span><span class="s1">'TAK-Prod-01'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-VMBasePath</span><span class="w">       </span><span class="s1">'D:\Hyper-V\VMs'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SwitchName</span><span class="w">       </span><span class="s1">'External LAN'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RockyIsoPath</span><span class="w">     </span><span class="s1">'D:\ISO\Rocky-9.7-x86_64-dvd.iso'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RpmPath</span><span class="w">          </span><span class="s1">'D:\TAK\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Credential</span><span class="w">       </span><span class="nv">$cred</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RootPassword</span><span class="w">     </span><span class="nv">$rootPw</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-State</span><span class="w">            </span><span class="s1">'TX'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'AUSTIN'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Organization</span><span class="w">     </span><span class="s1">'ACME-OPS'</span><span class="w"> </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'TAK'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-CAName</span><span class="w">           </span><span class="s1">'ACME-TAK-CA'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><em>Chuck Norris doesn’t need <code class="language-plaintext highlighter-rouge">-Confirm:$false</code>. PowerShell never questions him.</em></p>
+</blockquote>
+
+<hr />
+
+<h2 id="deployment-phases">Deployment Phases</h2>
+
+<p>The script executes in 9 phases. A Hyper-V snapshot is taken after key phases so the deployment can be resumed safely.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Name</th>
+      <th>What Happens</th>
+      <th style="text-align: center">Snapshot Created?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Create VM</td>
+      <td>Hyper-V Gen 2 VM created, Rocky Linux kickstart delivered via OEMDRV VHDX</td>
+      <td style="text-align: center"><strong>Yes</strong> — <code class="language-plaintext highlighter-rouge">Phase0-RockyInstalled</code></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>SSH</td>
+      <td>Establishes SSH session to the new VM</td>
+      <td style="text-align: center">No</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>TAK Install</td>
+      <td>Installs TAK Server RPM, configures SELinux and firewalld</td>
+      <td style="text-align: center"><strong>Yes</strong> — <code class="language-plaintext highlighter-rouge">Phase2-TAKInstalled</code></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Create Certs</td>
+      <td>Creates CA, server certificates, client certificates, patches CoreConfig.xml</td>
+      <td style="text-align: center">No</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Promote Admin</td>
+      <td>Promotes admin.pem to TAK Server administrator</td>
+      <td style="text-align: center"><strong>Yes</strong> — <code class="language-plaintext highlighter-rouge">Phase4-CertsAndAdmin</code></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Validation</td>
+      <td>22 post-deployment tests (service, ports, firewall, certs, SELinux, OS)</td>
+      <td style="text-align: center">No</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Download Certs</td>
+      <td>Transfers <code class="language-plaintext highlighter-rouge">.p12</code> client certificates via SFTP</td>
+      <td style="text-align: center">No</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Report</td>
+      <td>Generates deployment report in <code class="language-plaintext highlighter-rouge">reports/</code></td>
+      <td style="text-align: center">No</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">Snapshot names are legacy labels; they do not correspond 1-to-1 to the phase numbers in the table above.</p>
+
+<hr />
+
+<h2 id="parameters-reference">Parameters Reference</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-VMName</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">TAKServer</code></td>
+      <td>Hyper-V VM name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-VMBasePath</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Hyper-V\VMs</code></td>
+      <td>Root folder for VM files. The OEMDRV VHDX and (if not specified) the OS VHDX are created under <code class="language-plaintext highlighter-rouge">$VMBasePath\$VMName\</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-SwitchName</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK-External</code></td>
+      <td>Hyper-V virtual switch. Must already exist</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-RockyIsoPath</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso</code></td>
+      <td>Path to Rocky Linux 9 DVD ISO</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-VHDPath</code></td>
+      <td>string</td>
+      <td><em>(auto: <code class="language-plaintext highlighter-rouge">$VMBasePath\$VMName\$VMName.vhdx</code>)</em></td>
+      <td>Override path for the OS VHDX. Auto-derived from <code class="language-plaintext highlighter-rouge">-VMBasePath</code> if omitted</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-VHDSizeBytes</code></td>
+      <td>int64</td>
+      <td><code class="language-plaintext highlighter-rouge">80 GB</code></td>
+      <td>Maximum VHDX size</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-MemoryBytes</code></td>
+      <td>int64</td>
+      <td><code class="language-plaintext highlighter-rouge">8 GB</code></td>
+      <td>Fixed RAM assigned to the VM</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-ProcessorCount</code></td>
+      <td>int</td>
+      <td><code class="language-plaintext highlighter-rouge">4</code></td>
+      <td>Number of virtual CPUs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Credential</code></td>
+      <td>PSCredential</td>
+      <td><strong>(mandatory)</strong></td>
+      <td>Linux admin account (username + password)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-RootPassword</code></td>
+      <td>SecureString</td>
+      <td><strong>(mandatory)</strong></td>
+      <td>Root account password</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-KeystorePassword</code></td>
+      <td>SecureString</td>
+      <td><strong>(mandatory)</strong></td>
+      <td>Unified password applied to CAPASS, all Java keystores, <code class="language-plaintext highlighter-rouge">.p12</code> exports, and <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> TLS connectors (min 6 chars)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-RpmPath</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Hyper-V\AtakCiv\takserver-5.7-RELEASE8.noarch.rpm</code></td>
+      <td>Path to TAK Server RPM</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-State</code></td>
+      <td>string</td>
+      <td><em>(prompted, default: ESSEX)</em></td>
+      <td>Certificate subject state</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-City</code></td>
+      <td>string</td>
+      <td><em>(prompted, default: SOUTHEND-ON-SEA)</em></td>
+      <td>Certificate subject city</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Organization</code></td>
+      <td>string</td>
+      <td><em>(prompted, default: LEIGH-SERVICES)</em></td>
+      <td>Certificate subject organisation</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-OrganizationalUnit</code></td>
+      <td>string</td>
+      <td><em>(prompted, default: IT-DEPARTMENT)</em></td>
+      <td>Certificate subject OU</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-CAName</code></td>
+      <td>string</td>
+      <td><em>(prompted, default: TAK-CA)</em></td>
+      <td>Certificate authority name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Timezone</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">Europe/London</code></td>
+      <td>Guest OS IANA timezone</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Hostname</code></td>
+      <td>string</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver</code></td>
+      <td>Guest OS hostname</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-SSHTimeoutSeconds</code></td>
+      <td>int</td>
+      <td><code class="language-plaintext highlighter-rouge">600</code></td>
+      <td>Max wait (seconds) for SSH after OS install</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-DisableSnapshotResume</code></td>
+      <td>switch</td>
+      <td><em>(off)</em></td>
+      <td>Force clean rebuild, ignore existing snapshots</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="resuming-a-failed-deployment">Resuming a Failed Deployment</h2>
+
+<p>If a deployment fails mid-way, simply re-run the same command. The script automatically detects the latest phase snapshot and resumes from that point:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Re-run with the same credentials — resumes from last checkpoint automatically</span><span class="w">
+</span><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To force a complete rebuild from scratch:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-DisableSnapshotResume</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="rolling-back-to-a-previous-phase">Rolling Back to a Previous Phase</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">Invoke-TAKRollback.ps1</code> to restore the VM to a known-good phase snapshot:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># List available snapshots</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-TAKRollback.ps1</span><span class="w"> </span><span class="nt">-ListOnly</span><span class="w">
+
+</span><span class="c"># Roll back to the most recent snapshot</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-TAKRollback.ps1</span><span class="w">
+
+</span><span class="c"># Roll back to a specific phase</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-TAKRollback.ps1</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Phase0-RockyInstalled'</span><span class="w">
+
+</span><span class="c"># Roll back a named VM to a specific phase</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-TAKRollback.ps1</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAK-Prod-01'</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Phase2-TAKInstalled'</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Available snapshot names:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Snapshot</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase0-RockyInstalled</code></td>
+      <td>Rocky Linux installed, SSH working</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase2-TAKInstalled</code></td>
+      <td>TAK Server RPM installed and running</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase4-CertsAndAdmin</code></td>
+      <td>Certificates created, admin promoted</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="optional-openfire-xmpp-chat">Optional: Openfire XMPP Chat</h2>
+
+<p>After deployment, you can add XMPP chat support via Openfire using the TAKInstall module:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKInstall\TAKInstall.psm1</span><span class="w">
+
+</span><span class="nv">$session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SSHSession</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">VM-IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-AcceptKey</span><span class="w">
+</span><span class="n">Install-TAKOpenfire</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w">
+</span><span class="n">Remove-SSHSession</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$session</span><span class="o">.</span><span class="nf">SessionId</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="optional-lets-encrypt-tls">Optional: Let’s Encrypt TLS</h2>
+
+<p>To replace the self-signed certificate with a publicly trusted cert:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKInstall\TAKInstall.psm1</span><span class="w">
+
+</span><span class="nv">$session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SSHSession</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">VM-IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-AcceptKey</span><span class="w">
+</span><span class="nv">$ksPw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+</span><span class="n">New-TAKLetsEncryptCertificate</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SshSession</span><span class="w">        </span><span class="nv">$session</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-DomainName</span><span class="w">        </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w">  </span><span class="nv">$ksPw</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RenewalScriptPath</span><span class="w"> </span><span class="s1">'.\InstallShellScripts\takserver_renewLECerts.sh'</span><span class="w">
+</span><span class="n">Remove-SSHSession</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$session</span><span class="o">.</span><span class="nf">SessionId</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="warning">Let’s Encrypt requires a <strong>public DNS record</strong> pointing to the VM and <strong>port 80 open</strong> for the ACME HTTP challenge. This is not required for a private network deployment.</p>
+
+<hr />
+
+<h2 id="tearing-down-a-deployment">Tearing Down a Deployment</h2>
+
+<p>To completely remove the VM, certificates, and Windows certificate store entries:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">.</span><span class="n">\Remove-CivTAK.ps1</span><span class="w">
+</span></code></pre></div></div>
+
+<p>By default this preserves the TAK Server install on the guest. To uninstall TAK from the guest before destroying the VM:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">.</span><span class="n">\Remove-CivTAK.ps1</span><span class="w"> </span><span class="nt">-UninstallGuest</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="warning"><code class="language-plaintext highlighter-rouge">Remove-CivTAK.ps1</code> is <strong>irreversible</strong>. The VM VHDX and all snapshots are deleted. Ensure you have exported any data you need before running this.</p>
+
+<hr />
+
+<h2 id="post-deployment-access">Post-Deployment Access</h2>
+
+<p>Once the deployment completes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>URL / Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>WebTAK UI</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;VM-IP&gt;:8443/webtak</code></td>
+    </tr>
+    <tr>
+      <td><strong>Admin Console</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;VM-IP&gt;:8443/</code></td>
+    </tr>
+    <tr>
+      <td><strong>REST API</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;VM-IP&gt;:8443/</code></td>
+    </tr>
+    <tr>
+      <td><strong>CoT (ATAK clients)</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;VM-IP&gt;:8089</code></td>
+    </tr>
+    <tr>
+      <td><strong>Client cert enrollment</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;VM-IP&gt;:8446</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Default admin credentials are set during the Promote Admin phase. Import the downloaded <code class="language-plaintext highlighter-rouge">.p12</code> certificate from <code class="language-plaintext highlighter-rouge">certs/</code> into your ATAK client.</p>
+
+<hr />
+
+<h2 id="live-deployment-validation-dig-53-2026-04-03">Live Deployment Validation (DIG-53, 2026-04-03)</h2>
+
+<p>The full end-to-end deployment was validated against a live Rocky Linux 9.7 Hyper-V VM (10.10.0.144).
+<strong>22 / 22 core health checks passed.</strong> Zero failures.</p>
+
+<h3 id="validated-hardware-specs">Validated Hardware Specs</h3>
+
+<p>These are the minimum-recommended specs confirmed to run a production deployment without issue:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Resource</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>vCPU</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>RAM</td>
+      <td>8 GB (fixed)</td>
+    </tr>
+    <tr>
+      <td>VHD</td>
+      <td>80 GB dynamic VHDX</td>
+    </tr>
+    <tr>
+      <td>Disk used at idle</td>
+      <td>~4 GB / 48 GB provisioned (9%)</td>
+    </tr>
+    <tr>
+      <td>OS</td>
+      <td>Rocky Linux 9.7 (Blue Onyx)</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>OpenJDK 17.0.18 LTS</td>
+    </tr>
+    <tr>
+      <td>TAK Server</td>
+      <td>takserver-5.7-RELEASE8.noarch</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="deployment-timing">Deployment Timing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Approx Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Total (all phases)</td>
+      <td>~14 minutes</td>
+    </tr>
+    <tr>
+      <td>Install TAK Server</td>
+      <td>~3m 28s</td>
+    </tr>
+    <tr>
+      <td>Create Certificates</td>
+      <td>~1m 55s</td>
+    </tr>
+    <tr>
+      <td>Promote Admin Cert</td>
+      <td>~1m 12s</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="known-gotchas">Known Gotchas</h3>
+
+<p><strong>Port 8443 returns connection failure during automated tests.</strong> TAK Server enforces mutual TLS (mTLS). A bare HTTPS request without a client certificate gets an SSL handshake rejection (HTTP 000). This is <em>correct behaviour</em>, not a service failure. To verify manually, import <code class="language-plaintext highlighter-rouge">admin.p12</code> into your browser and navigate to <code class="language-plaintext highlighter-rouge">https://&lt;VM-IP&gt;:8443</code>.</p>
+
+<p><strong>Port 8446 returns HTTP 403 for unauthenticated requests.</strong> This is also correct — the certificate enrollment endpoint requires a valid client identity. The 403 confirms the service is up and correctly gating access.</p>
+
+<p><strong>API management tests are skipped without <code class="language-plaintext highlighter-rouge">admin.p12</code> on the host.</strong> The <code class="language-plaintext highlighter-rouge">05-UserManagement</code> and <code class="language-plaintext highlighter-rouge">08-GroupManagement</code> integration test suites require <code class="language-plaintext highlighter-rouge">certs/admin.p12</code> to be present locally. These are skipped automatically when the file is absent. To run them, retrieve the file first:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scp</span><span class="w"> </span><span class="nx">atak</span><span class="err">@&lt;</span><span class="nx">VM-IP</span><span class="err">&gt;</span><span class="p">:</span><span class="nx">/home/atak/admin.p12</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>OpenSSL 3.x (Rocky Linux 9) and RC2-40-CBC PKCS#12 files.</strong> The upstream TAK Server cert tooling produces PKCS#12 files encrypted with the legacy RC2-40-CBC cipher. OpenSSL 3.x (included in Rocky Linux 9) requires the <code class="language-plaintext highlighter-rouge">-legacy</code> flag to read these directly on the guest. This is a server-side inspection issue only — the <code class="language-plaintext highlighter-rouge">.p12</code> files are valid and import correctly into Windows without any workaround.</p>
+
+<p><strong>PKCS#12 password.</strong> The generated <code class="language-plaintext highlighter-rouge">.p12</code> files (<code class="language-plaintext highlighter-rouge">admin.p12</code>, <code class="language-plaintext highlighter-rouge">user.p12</code>, <code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.p12</code>) use the value you supplied for <code class="language-plaintext highlighter-rouge">-KeystorePassword</code>. This same password is written to <code class="language-plaintext highlighter-rouge">CAPASS</code> in <code class="language-plaintext highlighter-rouge">cert-metadata.sh</code>, applied to all Java keystores generated by <code class="language-plaintext highlighter-rouge">makeCert.sh</code>, and patched into <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>. There is no separate <code class="language-plaintext highlighter-rouge">.p12</code> password — use your <code class="language-plaintext highlighter-rouge">-KeystorePassword</code> value when importing these files into a browser or ATAK client.</p>
+
+<h3 id="test-infrastructure-fixes-applied">Test Infrastructure Fixes Applied</h3>
+
+<p>Several test infrastructure issues were identified and fixed during DIG-53 validation. If you maintain a fork, ensure these changes are present:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Issue</th>
+      <th>Fix</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Test-TAKTCPPort -Host</code> shadows the PowerShell <code class="language-plaintext highlighter-rouge">$Host</code> automatic variable</td>
+      <td>Parameter renamed to <code class="language-plaintext highlighter-rouge">-HostName</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Invoke-IntegrationTests.ps1</code> / <code class="language-plaintext highlighter-rouge">Invoke-E2ETests.ps1</code> fail when run outside the repo root (<code class="language-plaintext highlighter-rouge">$PSScriptRoot</code> empty)</td>
+      <td>Default path resolution moved into script body</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Invoke-Pester -Configuration ... -Passthru</code> incompatible with Pester 5.7</td>
+      <td>Use <code class="language-plaintext highlighter-rouge">$config.Run.PassThru = $true</code> instead</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">05-UserManagement</code> / <code class="language-plaintext highlighter-rouge">08-GroupManagement</code>: Pester 5 evaluates <code class="language-plaintext highlighter-rouge">-Skip:</code> at discovery time, causing <code class="language-plaintext highlighter-rouge">CommandNotFoundException</code> when <code class="language-plaintext highlighter-rouge">admin.p12</code> is absent</td>
+      <td>Tests now use <code class="language-plaintext highlighter-rouge">Set-ItResult -Skipped</code> inside test bodies (runtime check)</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

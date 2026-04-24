@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAKOnboarding Module | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAKOnboarding Module" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/modules/TAKOnboarding/" />
+<meta property="og:url" content="http://0.0.0.0:4000/modules/TAKOnboarding/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAKOnboarding Module" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAKOnboarding Module","url":"http://0.0.0.0:4000/modules/TAKOnboarding/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="takonboarding-module">TAKOnboarding Module</h1>
+
+<p><strong>Version:</strong> 1.0.0
+<strong>PowerShell:</strong> 7.0+
+<strong>Required modules:</strong> <code class="language-plaintext highlighter-rouge">Posh-SSH</code></p>
+
+<h2 id="purpose">Purpose</h2>
+
+<p>TAKOnboarding provides cmdlets for the complete team onboarding workflow against an already-deployed TAK Server instance. It handles SSH-based certificate generation, SFTP download, user account creation, group assignment, and ATAK data package build — all without requiring any Linux knowledge from the operator.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>PowerShell 7.0 or later</li>
+  <li><code class="language-plaintext highlighter-rouge">Posh-SSH</code> module: <code class="language-plaintext highlighter-rouge">Install-Module Posh-SSH -Scope CurrentUser</code></li>
+  <li>JDK 11+ with <code class="language-plaintext highlighter-rouge">keytool</code> on PATH — <a href="https://adoptium.net">Eclipse Temurin</a> recommended (only required for <code class="language-plaintext highlighter-rouge">New-TAKDataPackage</code> / the <code class="language-plaintext highlighter-rouge">-SkipDataPackages</code> flag bypasses this)</li>
+  <li>TAK Server deployed and running with CA chain created</li>
+  <li><code class="language-plaintext highlighter-rouge">admin.p12</code> downloaded from the TAK Server</li>
+</ul>
+
+<h2 id="installing">Installing</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKOnboarding\TAKOnboarding.psd1</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="cmdlet-reference">Cmdlet Reference</h2>
+
+<hr />
+
+<h3 id="invoke-takonboarding"><code class="language-plaintext highlighter-rouge">Invoke-TAKOnboarding</code></h3>
+
+<p><strong>Synopsis:</strong> One-command TAK Server team onboarding — certificates, user accounts, and ATAK data packages.</p>
+
+<p>Performs the complete onboarding workflow for a new team against a running TAK Server. No Linux experience required; all SSH/SFTP operations are handled automatically.</p>
+
+<p><strong>Workflow:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Verify prerequisites (Posh-SSH, TAKServerPS, keytool, admin.p12)</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Generate per-user client certificates on the TAK Server via SSH</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Download the <code class="language-plaintext highlighter-rouge">.p12</code> files and manifest to this Windows workstation via SFTP</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Delete cert files from the server (security hygiene)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Create TAK Server user accounts via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Assign group memberships via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Build per-user ATAK data packages (<code class="language-plaintext highlighter-rouge">.zip</code>) ready to distribute</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Parameters — Connection:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServerHost</code></td>
+      <td>String</td>
+      <td><em>(required)</em></td>
+      <td>Hostname or IP address of the TAK Server</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TakPort</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">8443</code></td>
+      <td>TAK Server HTTPS / WebTAK port</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CotPort</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">8089</code></td>
+      <td>TAK Server Cursor-on-Target (CoT) SSL port</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshCredential</code></td>
+      <td>PSCredential</td>
+      <td><em>(prompted)</em></td>
+      <td>SSH credentials for the server (account with sudo rights)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshPort</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">22</code></td>
+      <td>SSH port on the TAK Server</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AdminPfxPath</code></td>
+      <td>String</td>
+      <td><em>(prompted)</em></td>
+      <td>Path to <code class="language-plaintext highlighter-rouge">admin.p12</code> — used to authenticate REST API calls via TAKServerPS</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AdminPfxPassword</code></td>
+      <td>SecureString</td>
+      <td><em>(prompted)</em></td>
+      <td>Password for <code class="language-plaintext highlighter-rouge">admin.p12</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">KeystorePassword</code></td>
+      <td>SecureString</td>
+      <td><em>(prompted)</em></td>
+      <td>TAK Server certificate keystore password (set during deployment)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Parameters — Team:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TeamName</code></td>
+      <td>String</td>
+      <td><em>(required)</em></td>
+      <td>Name of the team to onboard (lowercase letters/digits/hyphens, max 30 chars)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TeamSize</code></td>
+      <td>String</td>
+      <td><em>(required*)</em></td>
+      <td>Number of people: <code class="language-plaintext highlighter-rouge">10</code> or <code class="language-plaintext highlighter-rouge">20</code>. Mutually exclusive with <code class="language-plaintext highlighter-rouge">-RosterPath</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RosterPath</code></td>
+      <td>String</td>
+      <td><em>(optional)</em></td>
+      <td>Path to a CSV or JSON file defining a custom user roster. When provided, <code class="language-plaintext highlighter-rouge">-TeamSize</code> is not required</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UserPassword</code></td>
+      <td>SecureString</td>
+      <td><em>(prompted)</em></td>
+      <td>Initial password for all created accounts (min 15 chars, upper+lower+digit+special)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServerDescription</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK Server</code></td>
+      <td>Human-readable server name shown in the ATAK server list</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Parameters — Output:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OutputDir</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;DeploymentRoot&gt;\dist\&lt;TeamName&gt;</code></td>
+      <td>Directory for per-user <code class="language-plaintext highlighter-rouge">.zip</code> data packages</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LocalCertDir</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;DeploymentRoot&gt;\certs\&lt;TeamName&gt;</code></td>
+      <td>Directory for downloaded <code class="language-plaintext highlighter-rouge">.p12</code> and manifest files</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DeploymentRoot</code></td>
+      <td>String</td>
+      <td><em>(cwd)</em></td>
+      <td>Root folder of the DigitalTAK repository checkout</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Switches:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Switch</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-SkipCertGeneration</code></td>
+      <td>Skip cert generation and download. Requires an existing <code class="language-plaintext highlighter-rouge">manifest.json</code> in <code class="language-plaintext highlighter-rouge">LocalCertDir</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-SkipUserCreation</code></td>
+      <td>Skip user account creation and group assignment</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-SkipDataPackages</code></td>
+      <td>Skip ATAK data package build step (no JDK required)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-Force</code></td>
+      <td>Suppress confirmation prompts for destructive steps (cert deletion from server)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Roster CSV format:</strong></p>
+
+<pre><code class="language-csv">Username,Role,ExtraGroups
+john.doe,Team Lead,
+jane.smith,Operator,isr;recon
+</code></pre>
+
+<p>Recognised roles: <code class="language-plaintext highlighter-rouge">Team Lead</code>, <code class="language-plaintext highlighter-rouge">Assistant Lead</code>, <code class="language-plaintext highlighter-rouge">Operator</code>.</p>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Minimal — prompts for all credentials</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">alpha</span><span class="w"> </span><span class="nt">-TeamSize</span><span class="w"> </span><span class="nx">10</span><span class="w">
+
+</span><span class="c"># Fully scripted</span><span class="w">
+</span><span class="nv">$ssh</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">PSCredential</span><span class="p">]::</span><span class="n">new</span><span class="p">(</span><span class="s1">'atak'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'P@ssw0rd!'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="p">))</span><span class="w">
+</span><span class="nv">$pfxP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'P@ssw0rd!'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="nv">$ksP</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'P@ssw0rd!'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="nv">$uP</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="s1">'TeamAlpha!Secure2026'</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-SshCredential</span><span class="w"> </span><span class="nv">$ssh</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-AdminPfxPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w"> </span><span class="nt">-AdminPfxPassword</span><span class="w"> </span><span class="nv">$pfxP</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksP</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">alpha</span><span class="w"> </span><span class="nt">-TeamSize</span><span class="w"> </span><span class="nx">10</span><span class="w"> </span><span class="nt">-UserPassword</span><span class="w"> </span><span class="nv">$uP</span><span class="w">
+
+</span><span class="c"># Custom roster from CSV</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">bravo</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RosterPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\onboarding\rosters\sample-roster-10.csv</span><span class="w"> </span><span class="nt">-AdminPfxPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w">
+
+</span><span class="c"># Skip cert generation (certs already in .\certs\bravo)</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">bravo</span><span class="w"> </span><span class="nt">-TeamSize</span><span class="w"> </span><span class="nx">10</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SkipCertGeneration</span><span class="w"> </span><span class="nt">-LocalCertDir</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\bravo</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="new-takdatapackage"><code class="language-plaintext highlighter-rouge">New-TAKDataPackage</code></h3>
+
+<p><strong>Synopsis:</strong> Builds per-user ATAK data packages from TAK Server team certificates.</p>
+
+<p>For each user in a team manifest (produced by <code class="language-plaintext highlighter-rouge">tak-team-certs.sh</code> or by <code class="language-plaintext highlighter-rouge">Invoke-TAKOnboarding</code>), creates an ATAK-compatible Mission Package ZIP containing:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">MANIFEST/manifest.xml</code> — ATAK package manifest</li>
+  <li><code class="language-plaintext highlighter-rouge">MANIFEST/connection.pref</code> — server connection preferences</li>
+  <li><code class="language-plaintext highlighter-rouge">certs/&lt;username&gt;.p12</code> — user client certificate (PKCS12)</li>
+  <li><code class="language-plaintext highlighter-rouge">certs/truststore.p12</code> — server CA truststore (PKCS12, converted from JKS if needed)</li>
+</ul>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifestPath</code></td>
+      <td>String</td>
+      <td><em>(required)</em></td>
+      <td>Path to the <code class="language-plaintext highlighter-rouge">manifest.json</code> produced by <code class="language-plaintext highlighter-rouge">tak-team-certs.sh</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CertDir</code></td>
+      <td>String</td>
+      <td><em>(same as manifest)</em></td>
+      <td>Directory containing the per-user <code class="language-plaintext highlighter-rouge">.p12</code> files</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TrustStorePath</code></td>
+      <td>String</td>
+      <td><em>(auto-detected)</em></td>
+      <td>Path to <code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.jks</code>. If omitted, looks alongside <code class="language-plaintext highlighter-rouge">ManifestPath</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServerHostname</code></td>
+      <td>String</td>
+      <td><em>(required)</em></td>
+      <td>TAK Server hostname or IP that clients will connect to</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServerPort</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">8089</code></td>
+      <td>TAK Server SSL (CoT) port</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServerDescription</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK Server</code></td>
+      <td>Human-readable server name in the ATAK server list</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CertPassphrase</code></td>
+      <td>SecureString</td>
+      <td><em>(prompted)</em></td>
+      <td>PKCS12 passphrase for the user certificates</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TrustStorePassphrase</code></td>
+      <td>SecureString</td>
+      <td><em>(prompted)</em></td>
+      <td>Passphrase for the intermediate-CA JKS truststore</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OutputDir</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">.\dist\&lt;TeamName&gt;</code></td>
+      <td>Directory where per-user <code class="language-plaintext highlighter-rouge">.zip</code> packages are written</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>JDK 11+ with <code class="language-plaintext highlighter-rouge">keytool</code> on PATH is required for truststore conversion.</li>
+  <li>TAK Server 5.7-RELEASE8 stages a <code class="language-plaintext highlighter-rouge">.p12</code> truststore; earlier releases use <code class="language-plaintext highlighter-rouge">.jks</code>. Both are handled automatically.</li>
+  <li>Android ATAK: <strong>Files → Import Manager → Data Package</strong>. WinTAK: <strong>Tools → Data Package → Import</strong>. iOS/iTAK does not support Mission Packages — see the <a href="../../onboarding/#ios--itak">Onboarding Guide</a> for manual steps.</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Build packages for alpha team</span><span class="w">
+</span><span class="n">New-TAKDataPackage</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-ManifestPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\alpha\manifest.json</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-ServerHostname</span><span class="w"> </span><span class="nx">tak.example.com</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-CertPassphrase</span><span class="w"> </span><span class="p">(</span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="s1">'Cert pass'</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="new-takteamroster"><code class="language-plaintext highlighter-rouge">New-TAKTeamRoster</code></h3>
+
+<p><strong>Synopsis:</strong> Provisions TAK Server users for a 10- or 20-person team.</p>
+
+<p>Creates all users for a team via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH. Reads a manifest JSON produced by <code class="language-plaintext highlighter-rouge">tak-team-certs.sh</code> and creates one TAK user per entry, placing each user in the appropriate group:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">&lt;TeamName&gt;</code> — all users (bi-directional)</li>
+  <li><code class="language-plaintext highlighter-rouge">&lt;TeamName&gt;-Lead</code> — Team Lead and Assistant Lead only</li>
+</ul>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifestPath</code></td>
+      <td>String</td>
+      <td><em>(required*)</em></td>
+      <td>Path to the <code class="language-plaintext highlighter-rouge">manifest.json</code> written by <code class="language-plaintext highlighter-rouge">tak-team-certs.sh</code>. Required for <code class="language-plaintext highlighter-rouge">Manifest</code> parameter set</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TeamName</code></td>
+      <td>String</td>
+      <td><em>(required*)</em></td>
+      <td>Override team name or use without a manifest file. Required for <code class="language-plaintext highlighter-rouge">Manual</code> parameter set</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TeamSize</code></td>
+      <td>String</td>
+      <td><em>(required*)</em></td>
+      <td>Team size (<code class="language-plaintext highlighter-rouge">10</code> or <code class="language-plaintext highlighter-rouge">20</code>) when used without a manifest file. Required for <code class="language-plaintext highlighter-rouge">Manual</code> parameter set</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PasswordCredential</code></td>
+      <td>PSCredential</td>
+      <td><em>(prompted)</em></td>
+      <td>A single PSCredential whose password is used for all generated users</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>HTTP 409 responses (user already exists) are treated as a skip — safe to re-run on a partially provisioned team.</li>
+  <li>Passwords are never written to disk, logs, or pipeline output.</li>
+  <li>Requires an active TAKServerPS connection via <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code>.</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Provision alpha team from manifest</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="nx">tak.example.com</span><span class="w"> </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w"> </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="nv">$adminPass</span><span class="w">
+</span><span class="n">New-TAKTeamRoster</span><span class="w"> </span><span class="nt">-ManifestPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\alpha\manifest.json</span><span class="w">
+
+</span><span class="c"># Create a 20-person bravo team without a manifest</span><span class="w">
+</span><span class="n">New-TAKTeamRoster</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">bravo</span><span class="w"> </span><span class="nt">-TeamSize</span><span class="w"> </span><span class="nx">20</span><span class="w"> </span><span class="nt">-PasswordCredential</span><span class="w"> </span><span class="nv">$cred</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="gaps-and-known-issues">Gaps and Known Issues</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">New-TAKUser</code> REST endpoint has a server-side ESAPI bug in TAK Server 5.7-RELEASE8 (<code class="language-plaintext highlighter-rouge">POST /Marti/api/users/</code> returns HTTP 500). <code class="language-plaintext highlighter-rouge">Invoke-TAKOnboarding</code> and <code class="language-plaintext highlighter-rouge">New-TAKTeamRoster</code> work around this by using <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH. See <a href="../../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception">Troubleshooting</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> REST is similarly broken in 5.7-RELEASE8; group assignment is performed via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH.</li>
+  <li>iOS/iTAK does not support ATAK Mission Package data packages — manual cert distribution is required. See <a href="../../onboarding/#ios--itak">Onboarding Guide</a>.</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

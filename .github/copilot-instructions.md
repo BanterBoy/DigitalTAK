@@ -11,7 +11,8 @@ Two PowerShell modules + a set of Bash scripts provide the full install, cert, a
 |------|---------|
 | `TAKServerPS/` | PS module — 44-cmdlet REST API wrapper (PowerShell → TAK Server) |
 | `TAKInstall/` | PS module — remote provisioning over SSH via Posh-SSH |
-| `TAKDeploy/` | PS module — Hyper-V VM creation + deployment orchestration (3 cmdlets) |
+| `TAKDeploy/` | PS module — Hyper-V VM creation + deployment orchestration (5 cmdlets) |
+| `TAKOnboarding/` | PS module — zero-to-team onboarding wrapper (3 cmdlets: `Invoke-TAKOnboarding`, `New-TAKDataPackage`, `New-TAKTeamRoster`) |
 | `InstallShellScripts/` | Bash scripts run directly on the Rocky 9 server |
 | `onboarding/` | Team onboarding assets — cert batch script, roster helpers, data-package builder |
 | `scripts/` | Standalone PS scripts |
@@ -39,17 +40,20 @@ Each module follows the same layout:
 # Run tests (prefer single-file to avoid memory pressure)
 Invoke-Pester -Path .\TAKServerPS\Tests\TAKServerPS.Module.Tests.ps1 -Output Detailed
 Invoke-Pester -Path .\TAKInstall\Tests\TAKInstall.Module.Tests.ps1  -Output Detailed
-Invoke-Pester -Path .\TAKDeploy\Tests\TAKDeploy.Module.Tests.ps1    -Output Detailed
+Invoke-Pester -Path .\TAKDeploy\Tests\TAKDeploy.Module.Tests.ps1         -Output Detailed
+Invoke-Pester -Path .\TAKOnboarding\Tests\TAKOnboarding.Module.Tests.ps1  -Output Detailed
 
 # Run all tests for one module
-Invoke-Pester -Path .\TAKServerPS\Tests\ -Output Detailed
-Invoke-Pester -Path .\TAKInstall\Tests\  -Output Detailed
-Invoke-Pester -Path .\TAKDeploy\Tests\   -Output Detailed
+Invoke-Pester -Path .\TAKServerPS\Tests\   -Output Detailed
+Invoke-Pester -Path .\TAKInstall\Tests\    -Output Detailed
+Invoke-Pester -Path .\TAKDeploy\Tests\     -Output Detailed
+Invoke-Pester -Path .\TAKOnboarding\Tests\ -Output Detailed
 
 # Lint (PSScriptAnalyzer)
-Invoke-ScriptAnalyzer -Path .\TAKServerPS\ -Settings .\TAKServerPS\PSScriptAnalyzerSettings.psd1 -Recurse
-Invoke-ScriptAnalyzer -Path .\TAKInstall\  -Recurse
-Invoke-ScriptAnalyzer -Path .\TAKDeploy\   -Settings .\TAKDeploy\PSScriptAnalyzerSettings.psd1 -Recurse
+Invoke-ScriptAnalyzer -Path .\TAKServerPS\   -Settings .\TAKServerPS\PSScriptAnalyzerSettings.psd1 -Recurse
+Invoke-ScriptAnalyzer -Path .\TAKInstall\    -Recurse
+Invoke-ScriptAnalyzer -Path .\TAKDeploy\     -Settings .\TAKDeploy\PSScriptAnalyzerSettings.psd1 -Recurse
+Invoke-ScriptAnalyzer -Path .\TAKOnboarding\ -Recurse
 
 ```
 

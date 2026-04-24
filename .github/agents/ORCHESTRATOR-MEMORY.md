@@ -35,8 +35,13 @@ DigitalTAK/
 │   ├── TAKDeploy.psd1 / .psm1
 │   ├── PSScriptAnalyzerSettings.psd1
 │   ├── Private/ (Assert-HyperVPrerequisites, Get-TAKDeploymentConfig, Set-TAKVMBootOrder)
-│   ├── Public/  (New-TAKVirtualMachine, Start-TAKDeployment, Wait-TAKLinuxInstall)
-│   └── Tests/   (2 test files)
+│   ├── Public/  (New-TAKVirtualMachine, Wait-TAKLinuxInstall, Start-TAKDeployment, Remove-TAKDeployment, Invoke-TAKRollback)
+│   └── Tests/   (7 test files incl. Stubs/)
+├── TAKOnboarding/          # PS module — zero-to-team onboarding wrapper
+│   ├── TAKOnboarding.psd1 / .psm1
+│   ├── Private/ (Helpers.ps1)
+│   ├── Public/  (Invoke-TAKOnboarding, New-TAKDataPackage, New-TAKTeamRoster)
+│   └── Tests/   (TAKOnboarding.Module.Tests.ps1)
 ├── InstallShellScripts/    # Executable .sh scripts — source of truth
 │   ├── RL9_tak5.7r8_install.sh               # Main installer (entry point)
 │   ├── createTakCerts.sh                     # Interactive cert creation + CoreConfig patching
@@ -53,15 +58,20 @@ DigitalTAK/
 │   ├── channels-README.md
 │   └── Deploy-TAKServer.md
 ├── onboarding/                 # Team onboarding assets
-│   ├── Invoke-TAKOnboarding.ps1        # NOT here — root level (see below)
 │   ├── tak-team-certs.sh               # AutoRoster cert batch script (uploaded to /tmp/ via SFTP)
-│   ├── New-TAKTeamRoster.ps1           # Roster helper
-│   ├── New-TAKDataPackage.ps1          # Builds per-user ATAK .zip data packages
+│   ├── New-TAKTeamRoster.ps1           # Roster helper (legacy location — canonical copy is TAKOnboarding/Public/)
+│   ├── New-TAKDataPackage.ps1          # Data package builder (legacy location — canonical copy is TAKOnboarding/Public/)
 │   ├── README.md
 │   └── rosters/
 │       └── sample-roster-10.csv        # 20-person roster (10 bravo + 10 charlie), Team column
 ├── tests/e2e/
-│   └── 07-OnboardingFlow.Tests.ps1     # 46-test E2E validator against live server (moved from scripts/)
+│   └── 07-OnboardingFlow.Tests.ps1     # 46-test E2E validator against live server
+├── tests/integration/
+│   ├── 01-VMProvisioning.Tests.ps1 through 05-UserManagement.Tests.ps1
+│   ├── 09-RemovalVerification.Tests.ps1
+│   ├── 10-DataPackageBuild.Tests.ps1
+│   ├── 11-CertDistCleanup.Tests.ps1
+│   └── Helpers.ps1
 ├── reports/
 │   ├── TEST-REPORT.md       # Pester results
 │   ├── DEPLOYMENT-REPORT.md
@@ -204,6 +214,10 @@ When spawning subagents, use this as a guide:
 | 2026-04-04 | GitHub issues #1 and #5 closed | #1 (Connect-TAKServer validation): PFX auth confirmed working (C1-T03 PASS). #5 (docs notices): all under-development callouts removed. #2, #3, #4 remain open — blocked on upstream ESAPI fix. |
 | 2026-04-05 | `Invoke-TAKOnboarding.ps1` created | Zero-to-team onboarding script: cert gen via SSH, SFTP download, UserManager.jar user creation, group assignment, data packages. Supports AutoRoster (auto-named) and CustomRoster (-RosterPath CSV/JSON with Team filter column). Live-tested against TAK-BMTN-01: bravo + charlie teams fully provisioned. |
 | 2026-04-05 | `sample-roster-10.csv` extended to 20 users | Added `Team` column. Now holds two teams: `bravo` (10) + `charlie` (10). `Import-RosterFile` filters by `-TeamFilter $TeamName` when Team column present. |
+| 2026-04-24 | `TAKOnboarding` module added | Extracted onboarding logic from root-level `Invoke-TAKOnboarding.ps1` into a proper PS module at `TAKOnboarding/`. Root script is now a 4-line thin wrapper (`Import-Module TAKOnboarding.psd1 && Invoke-TAKOnboarding @args`). 3 exported cmdlets: `Invoke-TAKOnboarding`, `New-TAKDataPackage`, `New-TAKTeamRoster`. Module manifest: `TAKOnboarding.psd1`. Requires `Posh-SSH`. |
+| 2026-04-24 | `TAKDeploy` expanded to 5 cmdlets | Added `Remove-TAKDeployment` and `Invoke-TAKRollback` to TAKDeploy Public/. Module now exports 5 cmdlets (was 3). Test suite expanded to 7 test files + Stubs/. |
+| 2026-04-24 | Integration test suite reorganised | `IntegrationTests/` folder renamed to `tests/integration/`. Added tests 09 (`Remove-CivTAK.ps1` cert store cleanup), 10 (`New-TAKDataPackage.ps1` truststore), 11 (`Remove-CivTAK.ps1` filesystem teardown). `Invoke-IntegrationTests.ps1` updated to point to new path. |
+| 2026-04-24 | `Remove-CivTAK.ps1` cert cleanup fixed | Step 4 now recursive — covers all cert extensions across team subdirs. Step 4b added — removes `dist/` directory (holds embedded `.p12` + credentials). |
 
 ---
 

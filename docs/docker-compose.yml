@@ -1,0 +1,29 @@
+# DigitalTAK docs – Jekyll local dev server
+#
+# Usage:
+#   docker compose up --build   # first run or after Gemfile changes
+#   docker compose up           # subsequent runs (gems cached in volume)
+#   open http://localhost:4000
+#
+# LiveReload (port 35729) auto-refreshes the browser on file saves.
+# File watching uses --force_polling (set in Dockerfile CMD) for Windows
+# compatibility with Docker Desktop.
+#
+# Build context: this directory (docs/)
+
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+      - "35729:35729"
+    volumes:
+      - .:/srv/jekyll
+      - bundle_cache:/usr/local/bundle
+    environment:
+      JEKYLL_ENV: development
+
+volumes:
+  bundle_cache:

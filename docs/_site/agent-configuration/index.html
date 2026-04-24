@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Agent Configuration | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Agent Configuration" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/agent-configuration/" />
+<meta property="og:url" content="http://0.0.0.0:4000/agent-configuration/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Agent Configuration" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Agent Configuration","url":"http://0.0.0.0:4000/agent-configuration/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="agent-configuration">Agent Configuration</h1>
+
+<p>How to use the Paperclip AI agents to manage and extend the DigitalTAK project.</p>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#agent-configuration" id="markdown-toc-agent-configuration">Agent Configuration</a>    <ol>
+      <li><a href="#overview" id="markdown-toc-overview">Overview</a></li>
+      <li><a href="#paperclip-agents" id="markdown-toc-paperclip-agents">Paperclip Agents</a>        <ol>
+          <li><a href="#ceo" id="markdown-toc-ceo">CEO</a></li>
+          <li><a href="#founding-engineer" id="markdown-toc-founding-engineer">Founding Engineer</a></li>
+          <li><a href="#technical-author-this-agent" id="markdown-toc-technical-author-this-agent">Technical Author <em>(this agent)</em></a></li>
+        </ol>
+      </li>
+      <li><a href="#how-agents-work" id="markdown-toc-how-agents-work">How Agents Work</a></li>
+      <li><a href="#using-agents-for-deployment-configuration" id="markdown-toc-using-agents-for-deployment-configuration">Using Agents for Deployment Configuration</a>        <ol>
+          <li><a href="#changing-deployment-defaults" id="markdown-toc-changing-deployment-defaults">Changing Deployment Defaults</a></li>
+          <li><a href="#adding-a-new-tak-server-feature" id="markdown-toc-adding-a-new-tak-server-feature">Adding a New TAK Server Feature</a></li>
+          <li><a href="#requesting-documentation-updates" id="markdown-toc-requesting-documentation-updates">Requesting Documentation Updates</a></li>
+        </ol>
+      </li>
+      <li><a href="#vs-code--github-agents" id="markdown-toc-vs-code--github-agents">VS Code / GitHub Agents</a>        <ol>
+          <li><a href="#using-vs-code-agents" id="markdown-toc-using-vs-code-agents">Using VS Code Agents</a></li>
+        </ol>
+      </li>
+      <li><a href="#agent-instructions-files" id="markdown-toc-agent-instructions-files">Agent Instructions Files</a></li>
+      <li><a href="#skill-system" id="markdown-toc-skill-system">Skill System</a></li>
+      <li><a href="#monitoring-agent-activity" id="markdown-toc-monitoring-agent-activity">Monitoring Agent Activity</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<p>DigitalTAK uses <a href="https://paperclip.ing">Paperclip</a> to coordinate AI agents that assist with development, deployment, and documentation tasks. Agents run as autonomous workers that pick up tasks, do real work in the repository, and report back — without requiring manual intervention for routine operations.</p>
+
+<p>There are two separate but related agent systems in this repo:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>System</th>
+      <th>Location</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Paperclip agents</strong></td>
+      <td>Managed via Paperclip control plane</td>
+      <td>Project management, development, documentation</td>
+    </tr>
+    <tr>
+      <td><strong>VS Code / GitHub agents</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">.github/agents/</code></td>
+      <td>Scoped code-editing tasks within VS Code</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="paperclip-agents">Paperclip Agents</h2>
+
+<p>Three agents are active on this project:</p>
+
+<h3 id="ceo">CEO</h3>
+<ul>
+  <li><strong>Role:</strong> Company governance, task creation, agent hiring</li>
+  <li><strong>What it does:</strong> Creates high-level goals and tasks, reviews output, approves significant changes</li>
+</ul>
+
+<h3 id="founding-engineer">Founding Engineer</h3>
+<ul>
+  <li><strong>Role:</strong> Full-stack technical implementation</li>
+  <li><strong>What it does:</strong> Writes and maintains PowerShell modules (TAKServerPS, TAKInstall, TAKDeploy), Bash scripts, CI pipelines, integration tests, and deployment runbooks</li>
+  <li><strong>Success criteria:</strong> A single PowerShell command deploys a fully operational CivTAK instance with no manual steps</li>
+</ul>
+
+<h3 id="technical-author-this-agent">Technical Author <em>(this agent)</em></h3>
+<ul>
+  <li><strong>Role:</strong> Documentation</li>
+  <li><strong>What it does:</strong> Reviews the codebase, writes and maintains this documentation site, keeps docs in sync with implementation changes</li>
+</ul>
+
+<hr />
+
+<h2 id="how-agents-work">How Agents Work</h2>
+
+<p>Each agent runs in <strong>heartbeats</strong> — short execution windows triggered by Paperclip. Each heartbeat, an agent:</p>
+
+<ol>
+  <li>Checks its inbox for assigned tasks</li>
+  <li>Picks up the highest-priority open task</li>
+  <li>Does real work (reads/writes code, runs tests, makes commits)</li>
+  <li>Posts a comment on the task with what was done</li>
+  <li>Marks the task done or blocked, then exits</li>
+</ol>
+
+<p>Agents only work on tasks assigned to them. They do not pick up unassigned work.</p>
+
+<hr />
+
+<h2 id="using-agents-for-deployment-configuration">Using Agents for Deployment Configuration</h2>
+
+<h3 id="changing-deployment-defaults">Changing Deployment Defaults</h3>
+
+<p>If you want the Founding Engineer to modify default deployment parameters (e.g., change the default VM name, adjust resource sizes, or update the default ISO path), create a task and assign it to the Founding Engineer:</p>
+
+<ol>
+  <li>Open <a href="https://paperclip.ing">Paperclip</a> and navigate to the DigitalTAK project</li>
+  <li>Create a new task with a clear description of the change (e.g., <em>“Change default VHDSizeBytes to 120GB in Deploy-TAKServer.ps1”</em>)</li>
+  <li>Assign it to the <strong>Founding Engineer</strong> agent</li>
+  <li>The agent will pick it up, make the change, commit to <code class="language-plaintext highlighter-rouge">prod</code>, and mark the task done</li>
+</ol>
+
+<h3 id="adding-a-new-tak-server-feature">Adding a New TAK Server Feature</h3>
+
+<p>Example workflow for adding a new TAKServerPS cmdlet:</p>
+
+<ol>
+  <li>Create a task: <em>“Add Get-TAKFederation cmdlet to TAKServerPS”</em></li>
+  <li>Assign to <strong>Founding Engineer</strong></li>
+  <li>The agent writes the cmdlet, adds Pester tests, updates the module manifest, and commits</li>
+</ol>
+
+<h3 id="requesting-documentation-updates">Requesting Documentation Updates</h3>
+
+<ol>
+  <li>Create a task: <em>“Document the new Get-TAKFederation cmdlet”</em></li>
+  <li>Assign to <strong>Technical Author</strong></li>
+  <li>The agent reviews the new code and updates this documentation site</li>
+</ol>
+
+<hr />
+
+<h2 id="vs-code--github-agents">VS Code / GitHub Agents</h2>
+
+<p>These agents are defined in <code class="language-plaintext highlighter-rouge">.github/agents/</code> and are invoked directly within VS Code using the <code class="language-plaintext highlighter-rouge">@agent</code> tool. They are scoped to specific areas of the codebase:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Agent</th>
+      <th>File</th>
+      <th>Scope</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Orchestrator</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">ORCHESTRATOR.agent.md</code></td>
+      <td>Spawns sub-agents, coordinates cross-area work</td>
+    </tr>
+    <tr>
+      <td><strong>TAK Install</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">tak-install.agent.md</code></td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code>, <code class="language-plaintext highlighter-rouge">tak-uninstall.sh</code></td>
+    </tr>
+    <tr>
+      <td><strong>TAK Certs</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">tak-certs.agent.md</code></td>
+      <td>Certificate creation, <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> patching</td>
+    </tr>
+    <tr>
+      <td><strong>Let’s Encrypt</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">tak-letsencrypt.agent.md</code></td>
+      <td>Certbot issuance and renewal scripts</td>
+    </tr>
+    <tr>
+      <td><strong>Openfire</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">tak-openfire.agent.md</code></td>
+      <td>XMPP server installation and configuration</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="using-vs-code-agents">Using VS Code Agents</h3>
+
+<p>In VS Code with the GitHub Copilot extension:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@ORCHESTRATOR Update the Openfire installation script to use the latest upstream package
+</code></pre></div></div>
+
+<p>The orchestrator will analyse the request, decide which sub-agents to invoke, and coordinate the edits across the relevant files.</p>
+
+<p>Each sub-agent has a strict scope — it will only touch files it owns and will not make changes outside that scope, even if asked.</p>
+
+<hr />
+
+<h2 id="agent-instructions-files">Agent Instructions Files</h2>
+
+<p>Each Paperclip agent has an <code class="language-plaintext highlighter-rouge">AGENTS.md</code> file defining its role, responsibilities, and working style. These are stored in the Paperclip instance directory and are loaded at the start of every heartbeat.</p>
+
+<p>Agent instructions are managed through the Paperclip control plane. Contact the <strong>CEO</strong> agent if you need to update an agent’s role or responsibilities.</p>
+
+<hr />
+
+<h2 id="skill-system">Skill System</h2>
+
+<p>Paperclip agents can be extended with skills — pre-built capability packages that give agents new tools or domain knowledge. The <code class="language-plaintext highlighter-rouge">.agents/skills/</code> directory contains the skills available on this project.</p>
+
+<p>Available skills include:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Skill</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">documentation-writer</code></td>
+      <td>Technical writing assistance</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">gh-cli</code></td>
+      <td>GitHub CLI operations</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">git-commit</code></td>
+      <td>Structured commit message generation</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">github-issues</code></td>
+      <td>Issue management via GitHub API</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">security-review</code></td>
+      <td>Security analysis of scripts and configs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">microsoft-docs</code></td>
+      <td>Fetch and parse Microsoft documentation</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mcp-integration</code></td>
+      <td>MCP server integration helpers</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Skills are assigned to agents via the Paperclip control plane. To request a skill be added to an agent, create a task and assign it to the <strong>CEO</strong>.</p>
+
+<hr />
+
+<h2 id="monitoring-agent-activity">Monitoring Agent Activity</h2>
+
+<p>Agent runs are visible in the Paperclip UI under each agent’s <strong>Runs</strong> tab. Each run links to the task it worked on and shows the full action log including:</p>
+
+<ul>
+  <li>Files read and written</li>
+  <li>Git commits made</li>
+  <li>API calls made</li>
+  <li>Comments posted</li>
+</ul>
+
+<p>This provides a complete audit trail of what each agent did and why.</p>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

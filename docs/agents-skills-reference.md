@@ -20,13 +20,14 @@ Complete reference for all PowerShell modules, cmdlets, and Bash scripts in Digi
 
 ## PowerShell Modules
 
-DigitalTAK provides three PowerShell modules that layer from infrastructure to application:
+DigitalTAK provides four PowerShell modules that layer from infrastructure to application:
 
 | Module | Cmdlets | Layer | Requires |
 |--------|---------|-------|---------|
-| **TAKDeploy** | 3 | Hyper-V VM orchestration | PowerShell 7+, Hyper-V |
+| **TAKDeploy** | 5 | Hyper-V VM orchestration | PowerShell 7+, Hyper-V |
 | **TAKInstall** | 6 | Remote SSH provisioning | PowerShell 7+, Posh-SSH |
 | **TAKServerPS** | 44 | TAK Server REST API | PowerShell 7+, running TAK Server |
+| **TAKOnboarding** | 3 | Team cert + account + data-package pipeline | PowerShell 7+, Posh-SSH, running TAK Server |
 
 ---
 
@@ -59,7 +60,32 @@ Wait-TAKLinuxInstall -VMName 'CivTAK' -TimeoutSeconds 900
 ```
 
 #### `Start-TAKDeployment`
-Reserved internal scaffolding. `Deploy-TAKServer.ps1` calls `New-TAKVirtualMachine` and `Wait-TAKLinuxInstall` directly and does not use this cmdlet.
+Runs the complete end-to-end deployment pipeline — VM creation, OS install, TAK Server provisioning, certificate setup, and admin promotion — in a single call. `Deploy-TAKServer.ps1` delegates to this cmdlet.
+
+```powershell
+Start-TAKDeployment `
+    -VMName          'CivTAK' `
+    -SwitchName      'ExternalSwitch' `
+    -IsoPath         'C:\ISO\Rocky-9.7-x86_64-dvd.iso' `
+    -RpmPath         'C:\TAK\takserver-5.7-RELEASE8.noarch.rpm' `
+    -Credential      $cred `
+    -RootPassword    $rootPw `
+    -KeystorePassword $ksPw
+```
+
+#### `Remove-TAKDeployment`
+Tears down the entire DigitalTAK deployment — removes the VM, VHDX, all cert files, ATAK data packages, and Windows certificate store entries.
+
+```powershell
+Remove-TAKDeployment -VMName 'CivTAK'
+```
+
+#### `Invoke-TAKRollback`
+Restores the VM to a named phase snapshot, allowing re-run of a deployment phase without starting from scratch.
+
+```powershell
+Invoke-TAKRollback -VMName 'CivTAK' -SnapshotName 'Phase2-TAKInstalled'
+```
 
 ---
 
@@ -287,6 +313,58 @@ Remove-TAKUser -Username 'operator1'
 | Cmdlet | Description |
 |--------|-------------|
 | `Get-TAKFederate` | List federation connections |
+
+---
+
+## TAKOnboarding
+
+One-command team onboarding pipeline — generates client certificates, creates TAK Server user accounts, and builds ATAK data packages without requiring Linux knowledge.
+
+**Import:** `Import-Module .\TAKOnboarding\TAKOnboarding.psd1`
+**Dependency:** `Posh-SSH` module, `keytool` on PATH (JDK 11+)
+
+See also: [TAKOnboarding Module Reference](modules/TAKOnboarding/)
+
+### Cmdlets
+
+#### `Invoke-TAKOnboarding`
+Runs the complete team onboarding workflow: cert generation via SSH, SFTP download, server-side cleanup, user account creation, group assignment, and ATAK data package build.
+
+```powershell
+# Minimal — prompts for all credentials
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName alpha -TeamSize 10
+
+# Fully scripted
+$ssh = [PSCredential]::new('atak', (ConvertTo-SecureString 'P@ssw0rd!' -AsPlainText -Force))
+$ksPw = ConvertTo-SecureString 'P@ssw0rd!' -AsPlainText -Force
+Invoke-TAKOnboarding -ServerHost 10.10.0.154 -SshCredential $ssh `
+    -AdminPfxPath .\certs\admin.p12 -KeystorePassword $ksPw `
+    -TeamName alpha -TeamSize 10
+```
+
+#### `New-TAKTeamRoster`
+Provisions TAK Server user accounts for a 10- or 20-person team via `UserManager.jar` over SSH. Reads a `manifest.json` and creates one user per entry, assigning group membership automatically.
+
+```powershell
+Connect-TAKServer -HostName tak.example.com -PfxPath .\certs\admin.p12 -PfxPassword $adminPass
+New-TAKTeamRoster -ManifestPath .\certs\alpha\manifest.json
+
+# Without a manifest
+New-TAKTeamRoster -TeamName bravo -TeamSize 20 -PasswordCredential $cred
+```
+
+#### `New-TAKDataPackage`
+Builds per-user ATAK Mission Package ZIPs from team certificates, containing the user `.p12`, CA truststore, and ATAK server connection preferences.
+
+```powershell
+New-TAKDataPackage `
+    -ManifestPath   .\certs\alpha\manifest.json `
+    -ServerHostname tak.example.com `
+    -CertPassphrase (Read-Host -AsSecureString 'Cert pass')
+```
+
+{: .note }
+`New-TAKUser` and `Set-TAKUserGroup` REST endpoints have a server-side ESAPI bug in TAK Server 5.7-RELEASE8. `Invoke-TAKOnboarding` and `New-TAKTeamRoster` work around this by using `UserManager.jar` over SSH. See [Troubleshooting](troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception).
 
 ---
 

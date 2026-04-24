@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAKServerPS Module | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAKServerPS Module" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/modules/TAKServerPS/" />
+<meta property="og:url" content="http://0.0.0.0:4000/modules/TAKServerPS/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAKServerPS Module" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAKServerPS Module","url":"http://0.0.0.0:4000/modules/TAKServerPS/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="takserverps-module-takserver">TAKServerPS Module (TAKServer)</h1>
+
+<p><strong>Module file:</strong> <code class="language-plaintext highlighter-rouge">TAKServerPS\TAKServer.psd1</code>
+<strong>Version:</strong> 1.0.0
+<strong>PowerShell:</strong> 7.0+
+<strong>Required modules:</strong> none (uses <code class="language-plaintext highlighter-rouge">Invoke-WebRequest</code> / .NET <code class="language-plaintext highlighter-rouge">HttpClient</code> internally)</p>
+
+<h2 id="purpose">Purpose</h2>
+
+<p>TAKServerPS is a REST API wrapper for TAK Server 5.x. It provides 44 cmdlets covering users, groups, missions, certificates, network inputs, data feeds, video, federation, and more. All cmdlets share a module-scoped session established with <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code>.</p>
+
+<h2 id="installing">Installing</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKServerPS\TAKServer.psd1</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="session-management">Session Management</h2>
+
+<p>All cmdlets require an active session. Establish one with <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> and end it with <code class="language-plaintext highlighter-rouge">Disconnect-TAKServer</code>.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Certificate auth (most common — uses admin.p12)</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="nx">tak.example.com</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="nx">C:\certs\admin.p12</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="p">(</span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="p">)</span><span class="w">
+
+</span><span class="c"># Basic auth</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="nx">tak.example.com</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="p">(</span><span class="n">Get-Credential</span><span class="p">)</span><span class="w">
+
+</span><span class="c"># End session</span><span class="w">
+</span><span class="n">Disconnect-TAKServer</span><span class="w">
+</span></code></pre></div></div>
+
+<p>By default, server certificate validation is skipped (<code class="language-plaintext highlighter-rouge">-SkipCertificateCheck $true</code>) because TAK Server ships with a self-signed certificate. Set <code class="language-plaintext highlighter-rouge">-SkipCertificateCheck $false</code> only when using a trusted certificate (e.g. Let’s Encrypt).</p>
+
+<hr />
+
+<h2 id="cmdlet-reference">Cmdlet Reference</h2>
+
+<h3 id="session">Session</h3>
+
+<h4 id="connect-takserver"><code class="language-plaintext highlighter-rouge">Connect-TAKServer</code></h4>
+
+<p>Establishes a session and stores it in module scope.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">HostName</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Hostname or IP address of the TAK Server</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Port</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>HTTPS port (default: 8443)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Certificate</code></td>
+      <td>X509Certificate2</td>
+      <td>No</td>
+      <td>Client certificate object (Certificate set)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PfxPath</code></td>
+      <td>String</td>
+      <td>No (Pfx set)</td>
+      <td>Path to <code class="language-plaintext highlighter-rouge">.pfx</code>/<code class="language-plaintext highlighter-rouge">.p12</code> file</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PfxPassword</code></td>
+      <td>SecureString</td>
+      <td>No</td>
+      <td>Password for the PFX file</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td>No (Credential set)</td>
+      <td>Basic auth credential</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Token</code></td>
+      <td>SecureString</td>
+      <td>No (Token set)</td>
+      <td>Pre-obtained Bearer token</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SkipCertificateCheck</code></td>
+      <td>Bool</td>
+      <td>No</td>
+      <td>Skip server cert validation (default: <code class="language-plaintext highlighter-rouge">$true</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Outputs:</strong> <code class="language-plaintext highlighter-rouge">PSCustomObject</code> (the active session object)</p>
+
+<h4 id="disconnect-takserver"><code class="language-plaintext highlighter-rouge">Disconnect-TAKServer</code></h4>
+
+<p>Calls <code class="language-plaintext highlighter-rouge">/logout</code> and clears the module-scoped session.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Force</code></td>
+      <td>Switch</td>
+      <td>Clear local session without calling the remote logout endpoint</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h3 id="server-info">Server Info</h3>
+
+<h4 id="get-takversion"><code class="language-plaintext highlighter-rouge">Get-TAKVersion</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Detailed</code></td>
+      <td>Switch</td>
+      <td>Return full VersionInfo object (build date, git commit). Default returns short version string.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKVersion</span><span class="w">           </span><span class="c"># "5.7-RELEASE-8"</span><span class="w">
+</span><span class="n">Get-TAKVersion</span><span class="w"> </span><span class="nt">-Detailed</span><span class="w"> </span><span class="c"># Full build object</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="users">Users</h3>
+
+<h4 id="get-takuser"><code class="language-plaintext highlighter-rouge">Get-TAKUser</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>Returns all currently connected users</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AccountList</code></td>
+      <td>Switch</td>
+      <td>Returns all provisioned file-managed user accounts</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GroupName</code></td>
+      <td>String</td>
+      <td>Returns accounts belonging to the specified group</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ConnectionId</code></td>
+      <td>String</td>
+      <td>Returns the user record for a specific connection UID</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKUser</span><span class="w">                               </span><span class="c"># Connected users</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w"> </span><span class="nt">-AccountList</span><span class="w">                  </span><span class="c"># All accounts</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w"> </span><span class="nt">-AccountList</span><span class="w"> </span><span class="nt">-GroupName</span><span class="w"> </span><span class="s1">'Ops'</span><span class="w"> </span><span class="c"># Accounts in Ops group</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w"> </span><span class="nt">-ConnectionId</span><span class="w"> </span><span class="s1">'ANDROID-abc'</span><span class="w">   </span><span class="c"># Specific connection</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="new-takuser"><code class="language-plaintext highlighter-rouge">New-TAKUser</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td>Yes</td>
+      <td>Username and password for the new account</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GroupList</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Bi-directional group memberships</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">InboundGroups</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Inbound-only group memberships</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OutboundGroups</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Outbound-only group memberships</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$cred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'fielduser1'</span><span class="w">
+</span><span class="n">New-TAKUser</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-GroupList</span><span class="w"> </span><span class="s1">'Operators'</span><span class="w">
+</span><span class="n">New-TAKUser</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-InboundGroups</span><span class="w"> </span><span class="s1">'Intel'</span><span class="w"> </span><span class="nt">-OutboundGroups</span><span class="w"> </span><span class="s1">'Command'</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takuser"><code class="language-plaintext highlighter-rouge">Remove-TAKUser</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UserName</code></td>
+      <td>String</td>
+      <td>Username to delete (pipeline-compatible)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AlsoRevokeCertificates</code></td>
+      <td>Switch</td>
+      <td>Revoke all certs for the user before deleting</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKUser</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'exuser1'</span><span class="w">
+</span><span class="n">Remove-TAKUser</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'exuser1'</span><span class="w"> </span><span class="nt">-AlsoRevokeCertificates</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w"> </span><span class="nt">-AccountList</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">$_</span><span class="o">.</span><span class="nf">username</span><span class="w"> </span><span class="o">-like</span><span class="w"> </span><span class="s1">'temp_*'</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKUser</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="set-takuserpassword"><code class="language-plaintext highlighter-rouge">Set-TAKUserPassword</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td>Yes</td>
+      <td>Username and new password</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-TAKUserPassword</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="p">(</span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'fielduser1'</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="groups">Groups</h3>
+
+<h4 id="get-takgroup"><code class="language-plaintext highlighter-rouge">Get-TAKGroup</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>Returns all groups visible to the current user</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Specific group by name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Direction</code></td>
+      <td><code class="language-plaintext highlighter-rouge">IN</code>|<code class="language-plaintext highlighter-rouge">OUT</code></td>
+      <td>Filter by direction (used with <code class="language-plaintext highlighter-rouge">-Name</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">All</code></td>
+      <td>Switch</td>
+      <td>Returns all groups including hidden (admin only)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKGroup</span><span class="w">
+</span><span class="nx">Get-TAKGroup</span><span class="w"> </span><span class="nt">-All</span><span class="w">
+</span><span class="n">Get-TAKGroup</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'Operators'</span><span class="w"> </span><span class="nt">-Direction</span><span class="w"> </span><span class="nx">IN</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="set-takusergroup"><code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UserName</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Username to update</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GroupList</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Bi-directional memberships to set</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">InboundGroups</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Inbound-only memberships</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OutboundGroups</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Outbound-only memberships</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-TAKUserGroup</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'fielduser1'</span><span class="w"> </span><span class="nt">-GroupList</span><span class="w"> </span><span class="s1">'Operators'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Command'</span><span class="w">
+</span><span class="n">Set-TAKUserGroup</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'sensor1'</span><span class="w"> </span><span class="nt">-InboundGroups</span><span class="w"> </span><span class="s1">'Intel'</span><span class="w"> </span><span class="nt">-OutboundGroups</span><span class="w"> </span><span class="s1">'FieldTeam'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="certificates">Certificates</h3>
+
+<h4 id="get-takcertificate"><code class="language-plaintext highlighter-rouge">Get-TAKCertificate</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>All certificates</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UserName</code></td>
+      <td>String</td>
+      <td>Filter by username</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Active</code></td>
+      <td>Switch</td>
+      <td>Active certs only</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Revoked</code></td>
+      <td>Switch</td>
+      <td>Revoked certs only</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Expired</code></td>
+      <td>Switch</td>
+      <td>Expired certs only</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKCertificate</span><span class="w">
+</span><span class="nx">Get-TAKCertificate</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'fielduser1'</span><span class="w">
+</span><span class="n">Get-TAKCertificate</span><span class="w"> </span><span class="nt">-Expired</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="invoke-takcertificatesign"><code class="language-plaintext highlighter-rouge">Invoke-TAKCertificateSign</code></h4>
+
+<p>Signs a PEM-encoded CSR using the TAK Server CA.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CsrPem</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>PEM-encoded CSR string (pipeline-compatible)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Version2</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Use the <code class="language-plaintext highlighter-rouge">/v2</code> signing endpoint</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$csr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Content</span><span class="w"> </span><span class="s1">'client.csr'</span><span class="w"> </span><span class="nt">-Raw</span><span class="w">
+</span><span class="n">Invoke-TAKCertificateSign</span><span class="w"> </span><span class="nt">-CsrPem</span><span class="w"> </span><span class="nv">$csr</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takcertificate"><code class="language-plaintext highlighter-rouge">Remove-TAKCertificate</code></h4>
+
+<p>Revokes a certificate by its SHA-256 fingerprint hash.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Hash</code></td>
+      <td>String</td>
+      <td>Certificate hash (pipeline-compatible by value or <code class="language-plaintext highlighter-rouge">hash</code> property)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKCertificate</span><span class="w"> </span><span class="nt">-Hash</span><span class="w"> </span><span class="s1">'abc123...'</span><span class="w">
+</span><span class="n">Get-TAKCertificate</span><span class="w"> </span><span class="nt">-Expired</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKCertificate</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="contacts-and-cot">Contacts and CoT</h3>
+
+<h4 id="get-takcontact"><code class="language-plaintext highlighter-rouge">Get-TAKContact</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SortBy</code></td>
+      <td><code class="language-plaintext highlighter-rouge">CALLSIGN</code>|<code class="language-plaintext highlighter-rouge">UID</code></td>
+      <td><code class="language-plaintext highlighter-rouge">CALLSIGN</code></td>
+      <td>Sort field</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Direction</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ASCENDING</code>|<code class="language-plaintext highlighter-rouge">DESCENDING</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ASCENDING</code></td>
+      <td>Sort direction</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">NoFederates</code></td>
+      <td>Switch</td>
+      <td> </td>
+      <td>Exclude federated contacts</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Full</code></td>
+      <td>Switch</td>
+      <td> </td>
+      <td>Return full contact records including group mapping</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKContact</span><span class="w">
+</span><span class="nx">Get-TAKContact</span><span class="w"> </span><span class="nt">-SortBy</span><span class="w"> </span><span class="nx">UID</span><span class="w"> </span><span class="nt">-NoFederates</span><span class="w">
+</span><span class="n">Get-TAKContact</span><span class="w"> </span><span class="nt">-Full</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="get-takcot"><code class="language-plaintext highlighter-rouge">Get-TAKCoT</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>Returns current SA track for all contacts</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Uid</code></td>
+      <td>String</td>
+      <td>Returns CoT XML for a specific UID</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKCoT</span><span class="w">
+</span><span class="nx">Get-TAKCoT</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc123'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="missions">Missions</h3>
+
+<h4 id="get-takmission"><code class="language-plaintext highlighter-rouge">Get-TAKMission</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>All missions</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Single mission by name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Guid</code></td>
+      <td>String</td>
+      <td>Single mission by GUID</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Tool</code></td>
+      <td>String</td>
+      <td>Filter list by tool type (e.g. <code class="language-plaintext highlighter-rouge">public</code>, <code class="language-plaintext highlighter-rouge">vbm</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PasswordProtected</code></td>
+      <td>Switch</td>
+      <td>Filter to password-protected missions</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IncludeChanges</code></td>
+      <td>Switch</td>
+      <td>Include change log (single-mission mode)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IncludeLogs</code></td>
+      <td>Switch</td>
+      <td>Include log entries (single-mission mode)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SecAgo</code></td>
+      <td>Long</td>
+      <td>Content changed within last N seconds</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Start</code></td>
+      <td>DateTime</td>
+      <td>Content changed after this time</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">End</code></td>
+      <td>DateTime</td>
+      <td>Content changed before this time</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKMission</span><span class="w">
+</span><span class="nx">Get-TAKMission</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w">
+</span><span class="n">Get-TAKMission</span><span class="w"> </span><span class="nt">-Tool</span><span class="w"> </span><span class="s1">'public'</span><span class="w"> </span><span class="nt">-IncludeChanges</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="new-takmission"><code class="language-plaintext highlighter-rouge">New-TAKMission</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Unique mission name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Description</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Human-readable description</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Group</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Groups to assign (default: <code class="language-plaintext highlighter-rouge">__ANON__</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Tool</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Tool type (default: <code class="language-plaintext highlighter-rouge">public</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ChatRoom</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Associated chat room</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">BaseLayer</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Base map layer name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Bbox</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Bounding box (<code class="language-plaintext highlighter-rouge">minLon,minLat,maxLon,maxLat</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Classification</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Classification label</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Password</code></td>
+      <td>SecureString</td>
+      <td>No</td>
+      <td>Access password</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DefaultRole</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td><code class="language-plaintext highlighter-rouge">MISSION_OWNER</code>, <code class="language-plaintext highlighter-rouge">MISSION_SUBSCRIBER</code>, or <code class="language-plaintext highlighter-rouge">MISSION_READONLY_SUBSCRIBER</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">InviteOnly</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Restrict to invited members</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Expiration</code></td>
+      <td>Long</td>
+      <td>No</td>
+      <td>Unix timestamp expiry; <code class="language-plaintext highlighter-rouge">-1</code> for none (default)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">New-TAKMission</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w"> </span><span class="nt">-Description</span><span class="w"> </span><span class="s1">'Op Blue mission'</span><span class="w"> </span><span class="nt">-Group</span><span class="w"> </span><span class="s1">'TeamAlpha'</span><span class="w">
+</span><span class="n">New-TAKMission</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'IntelBrief'</span><span class="w"> </span><span class="nt">-Tool</span><span class="w"> </span><span class="s1">'vbm'</span><span class="w"> </span><span class="nt">-InviteOnly</span><span class="w"> </span><span class="nt">-DefaultRole</span><span class="w"> </span><span class="nx">MISSION_READONLY_SUBSCRIBER</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takmission"><code class="language-plaintext highlighter-rouge">Remove-TAKMission</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKMission</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w">
+</span><span class="n">Get-TAKMission</span><span class="w"> </span><span class="nt">-Tool</span><span class="w"> </span><span class="s1">'test'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKMission</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="get-takmissionchange"><code class="language-plaintext highlighter-rouge">Get-TAKMissionChange</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Mission name (required)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SecAgo</code></td>
+      <td>Long</td>
+      <td>Changes in the last N seconds</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Start</code> / <code class="language-plaintext highlighter-rouge">End</code></td>
+      <td>DateTime</td>
+      <td>Date range filter</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="get-takmissioncontact"><code class="language-plaintext highlighter-rouge">Get-TAKMissionContact</code></h4>
+
+<p>Returns contacts associated with a mission.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKMissionContact</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="get-takmissionsubscription"><code class="language-plaintext highlighter-rouge">Get-TAKMissionSubscription</code></h4>
+
+<p>Returns active subscriptions for a mission.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKMissionSubscription</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="register-takmissionsubscription"><code class="language-plaintext highlighter-rouge">Register-TAKMissionSubscription</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">MissionName</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Mission to subscribe to</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Uid</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>TAK client UID</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Role</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td><code class="language-plaintext highlighter-rouge">MISSION_OWNER</code>, <code class="language-plaintext highlighter-rouge">MISSION_SUBSCRIBER</code> (default), <code class="language-plaintext highlighter-rouge">MISSION_READONLY_SUBSCRIBER</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Register-TAKMissionSubscription</span><span class="w"> </span><span class="nt">-MissionName</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc123'</span><span class="w">
+</span><span class="n">Register-TAKMissionSubscription</span><span class="w"> </span><span class="nt">-MissionName</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc123'</span><span class="w"> </span><span class="nt">-Role</span><span class="w"> </span><span class="nx">MISSION_OWNER</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="unregister-takmissionsubscription"><code class="language-plaintext highlighter-rouge">Unregister-TAKMissionSubscription</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Unregister-TAKMissionSubscription</span><span class="w"> </span><span class="nt">-MissionName</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc123'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="network-inputs">Network Inputs</h3>
+
+<h4 id="get-takinput"><code class="language-plaintext highlighter-rouge">Get-TAKInput</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKInput</span><span class="w">           </span><span class="c"># All inputs</span><span class="w">
+</span><span class="n">Get-TAKInput</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'UDPInput'</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="new-takinput"><code class="language-plaintext highlighter-rouge">New-TAKInput</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Unique input name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Protocol</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td><code class="language-plaintext highlighter-rouge">tcp</code>, <code class="language-plaintext highlighter-rouge">udp</code>, <code class="language-plaintext highlighter-rouge">stcp</code>, <code class="language-plaintext highlighter-rouge">tcp_ssl</code>, <code class="language-plaintext highlighter-rouge">udp_broadcast</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Port</code></td>
+      <td>Int</td>
+      <td>Yes</td>
+      <td>Port to listen on (1–65535)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Group</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Groups this input feeds</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Interface</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Bind address (default: <code class="language-plaintext highlighter-rouge">0.0.0.0</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Archive</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Archive received events</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AnonGroup</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Allow anonymous clients</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ArchiveOnly</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Store only, do not forward</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">FederateOnly</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Forward to federates only</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AuthRequired</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Require client authentication</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">New-TAKInput</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'SACast'</span><span class="w"> </span><span class="nt">-Protocol</span><span class="w"> </span><span class="nx">udp</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">4242</span><span class="w">
+</span><span class="n">New-TAKInput</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TLSClients'</span><span class="w"> </span><span class="nt">-Protocol</span><span class="w"> </span><span class="nx">tcp_ssl</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">8089</span><span class="w"> </span><span class="nt">-AuthRequired</span><span class="w"> </span><span class="nt">-Archive</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takinput"><code class="language-plaintext highlighter-rouge">Remove-TAKInput</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKInput</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'SACast'</span><span class="w">
+</span><span class="n">Get-TAKInput</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">port</span><span class="w"> </span><span class="o">-gt</span><span class="w"> </span><span class="nx">9000</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKInput</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="data-feeds">Data Feeds</h3>
+
+<h4 id="get-takdatafeed"><code class="language-plaintext highlighter-rouge">Get-TAKDataFeed</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>(none)</em></td>
+      <td> </td>
+      <td>All data feed configurations</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Single feed by name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Uuid</code></td>
+      <td>String</td>
+      <td>Single feed by UUID (returns stats)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Stats</code></td>
+      <td>Switch</td>
+      <td>Stats for all feeds</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="new-takdatafeed"><code class="language-plaintext highlighter-rouge">New-TAKDataFeed</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Name</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Unique feed name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Protocol</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td><code class="language-plaintext highlighter-rouge">tcp</code>, <code class="language-plaintext highlighter-rouge">udp</code>, <code class="language-plaintext highlighter-rouge">stcp</code>, <code class="language-plaintext highlighter-rouge">tcp_ssl</code>, <code class="language-plaintext highlighter-rouge">udp_broadcast</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Port</code></td>
+      <td>Int</td>
+      <td>Yes</td>
+      <td>Port (1–65535)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Group</code></td>
+      <td>String[]</td>
+      <td>No</td>
+      <td>Groups this feed delivers to</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Interface</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Bind address (default: <code class="language-plaintext highlighter-rouge">0.0.0.0</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Archive</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Archive events</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">AnonGroup</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Allow anonymous clients</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Type</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Feed type (e.g. <code class="language-plaintext highlighter-rouge">Full</code>, <code class="language-plaintext highlighter-rouge">Diff</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Tag</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Tag string</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Sync</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Enable data sync</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">New-TAKDataFeed</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'SensorFeed'</span><span class="w"> </span><span class="nt">-Protocol</span><span class="w"> </span><span class="nx">udp</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">6666</span><span class="w"> </span><span class="nt">-Group</span><span class="w"> </span><span class="s1">'Operators'</span><span class="w">
+</span><span class="n">New-TAKDataFeed</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TLSFeed'</span><span class="w"> </span><span class="nt">-Protocol</span><span class="w"> </span><span class="nx">tcp_ssl</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">8089</span><span class="w"> </span><span class="nt">-Group</span><span class="w"> </span><span class="s1">'__ANON__'</span><span class="w"> </span><span class="nt">-Archive</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takdatafeed"><code class="language-plaintext highlighter-rouge">Remove-TAKDataFeed</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKDataFeed</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'SensorFeed'</span><span class="w">
+</span><span class="n">Get-TAKDataFeed</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">protocol</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="s1">'udp'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKDataFeed</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="subscriptions">Subscriptions</h3>
+
+<h4 id="get-taksubscription"><code class="language-plaintext highlighter-rouge">Get-TAKSubscription</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKSubscription</span><span class="w">                    </span><span class="c"># All subscriptions</span><span class="w">
+</span><span class="n">Get-TAKSubscription</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc'</span><span class="w"> </span><span class="c"># Specific subscription</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-taksubscription"><code class="language-plaintext highlighter-rouge">Remove-TAKSubscription</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKSubscription</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'ANDROID-abc'</span><span class="w">
+</span><span class="n">Get-TAKSubscription</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">callsign</span><span class="w"> </span><span class="o">-like</span><span class="w"> </span><span class="s1">'OLD-*'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKSubscription</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="video-connections">Video Connections</h3>
+
+<h4 id="get-takvideo"><code class="language-plaintext highlighter-rouge">Get-TAKVideo</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKVideo</span><span class="w">
+</span><span class="nx">Get-TAKVideo</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">active</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="new-takvideo"><code class="language-plaintext highlighter-rouge">New-TAKVideo</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Alias</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Friendly display name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Feeds</code></td>
+      <td>Object[]</td>
+      <td>Yes</td>
+      <td>Feed objects — each must have at least a <code class="language-plaintext highlighter-rouge">url</code> property</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Uuid</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>UUID (auto-generated if omitted)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Active</code></td>
+      <td>Bool</td>
+      <td>No</td>
+      <td>Visible to clients (default: <code class="language-plaintext highlighter-rouge">$true</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Thumbnail</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Thumbnail URL or path</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Classification</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Classification marking (e.g. <code class="language-plaintext highlighter-rouge">U//FOUO</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$feed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">@{</span><span class="w"> </span><span class="nx">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'rtsp://10.0.0.50:8554/live'</span><span class="p">;</span><span class="w"> </span><span class="nx">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'rtsp'</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span><span class="n">New-TAKVideo</span><span class="w"> </span><span class="nt">-Alias</span><span class="w"> </span><span class="s1">'Drone Camera 1'</span><span class="w"> </span><span class="nt">-Feeds</span><span class="w"> </span><span class="nv">$feed</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takvideo"><code class="language-plaintext highlighter-rouge">Remove-TAKVideo</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKVideo</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'7b3c9a2e-...'</span><span class="w">
+</span><span class="n">Get-TAKVideo</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">active</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$false</span><span class="w"> </span><span class="o">|</span><span class="w">
+    </span><span class="n">Select-Object</span><span class="w"> </span><span class="nt">-ExpandProperty</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="o">|</span><span class="w">
+    </span><span class="n">Remove-TAKVideo</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="outgoing-connections">Outgoing Connections</h3>
+
+<h4 id="get-takoutgoingconnection"><code class="language-plaintext highlighter-rouge">Get-TAKOutgoingConnection</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKOutgoingConnection</span><span class="w">
+</span><span class="nx">Get-TAKOutgoingConnection</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">enabled</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="new-takoutgoingconnection"><code class="language-plaintext highlighter-rouge">New-TAKOutgoingConnection</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Address</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Remote hostname or IP</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Port</code></td>
+      <td>Int</td>
+      <td>Yes</td>
+      <td>Remote TCP port (1–65535)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DisplayName</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Friendly name</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Tls</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Use TLS</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ProtocolVersion</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Protocol version (default: 1)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ReconnectInterval</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Seconds between reconnect attempts (default: 10)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">MaxRetries</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Max reconnect attempts (ignored if <code class="language-plaintext highlighter-rouge">-UnlimitedRetries</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UnlimitedRetries</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Retry indefinitely</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Enabled</code></td>
+      <td>Bool</td>
+      <td>No</td>
+      <td>Active immediately (default: <code class="language-plaintext highlighter-rouge">$true</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ConnectionToken</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Optional token for the connect handshake</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UseToken</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Include token in handshake</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">New-TAKOutgoingConnection</span><span class="w"> </span><span class="nt">-Address</span><span class="w"> </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">8089</span><span class="w"> </span><span class="nt">-Tls</span><span class="w"> </span><span class="nt">-DisplayName</span><span class="w"> </span><span class="s1">'HQ Server'</span><span class="w">
+</span><span class="n">New-TAKOutgoingConnection</span><span class="w"> </span><span class="nt">-Address</span><span class="w"> </span><span class="s1">'10.0.0.5'</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">8087</span><span class="w"> </span><span class="nt">-DisplayName</span><span class="w"> </span><span class="s1">'Field Hub'</span><span class="w"> </span><span class="nt">-UnlimitedRetries</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-takoutgoingconnection"><code class="language-plaintext highlighter-rouge">Remove-TAKOutgoingConnection</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKOutgoingConnection</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'HQ Server'</span><span class="w">
+</span><span class="n">Get-TAKOutgoingConnection</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">enabled</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$false</span><span class="w"> </span><span class="o">|</span><span class="w">
+    </span><span class="n">Select-Object</span><span class="w"> </span><span class="nt">-ExpandProperty</span><span class="w"> </span><span class="nx">displayName</span><span class="w"> </span><span class="o">|</span><span class="w">
+    </span><span class="n">Remove-TAKOutgoingConnection</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="federation">Federation</h3>
+
+<h4 id="get-takfederate"><code class="language-plaintext highlighter-rouge">Get-TAKFederate</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKFederate</span><span class="w">
+</span><span class="nx">Get-TAKFederate</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">enabled</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="security-configuration">Security Configuration</h3>
+
+<h4 id="get-taksecurityconfig"><code class="language-plaintext highlighter-rouge">Get-TAKSecurityConfig</code></h4>
+
+<p>Returns TLS settings, cipher suites, and authentication policy.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKSecurityConfig</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="set-taksecurityconfig"><code class="language-plaintext highlighter-rouge">Set-TAKSecurityConfig</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Config</code></td>
+      <td>Object</td>
+      <td>Yes</td>
+      <td>Security config object (from <code class="language-plaintext highlighter-rouge">Get-TAKSecurityConfig</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-TAKSecurityConfig</span><span class="w">
+</span><span class="nv">$cfg</span><span class="o">.</span><span class="nf">auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ldap'</span><span class="w">
+</span><span class="n">Set-TAKSecurityConfig</span><span class="w"> </span><span class="nt">-Config</span><span class="w"> </span><span class="nv">$cfg</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="other">Other</h3>
+
+<h4 id="get-takplugin"><code class="language-plaintext highlighter-rouge">Get-TAKPlugin</code></h4>
+
+<p>Returns metadata for all installed TAK Server plugins.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKPlugin</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="get-takmaplayer--remove-takmaplayer"><code class="language-plaintext highlighter-rouge">Get-TAKMapLayer</code> / <code class="language-plaintext highlighter-rouge">Remove-TAKMapLayer</code></h4>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKMapLayer</span><span class="w">
+</span><span class="nx">Get-TAKMapLayer</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'7b3c9a2e-...'</span><span class="w">
+</span><span class="n">Remove-TAKMapLayer</span><span class="w"> </span><span class="nt">-Uid</span><span class="w"> </span><span class="s1">'7b3c9a2e-...'</span><span class="w">
+</span><span class="n">Get-TAKMapLayer</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">-like</span><span class="w"> </span><span class="s1">'TEMP_*'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Remove-TAKMapLayer</span><span class="w"> </span><span class="nt">-Confirm</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="get-takdeviceprofile"><code class="language-plaintext highlighter-rouge">Get-TAKDeviceProfile</code></h4>
+
+<p>Returns the device enrollment/provisioning profile (settings pushed to enrolled TAK clients).</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-TAKDeviceProfile</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="remove-taktoken"><code class="language-plaintext highlighter-rouge">Remove-TAKToken</code></h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Token</code></td>
+      <td>String</td>
+      <td>Single token to delete</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Tokens</code></td>
+      <td>String[]</td>
+      <td>Multiple tokens to bulk-revoke</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Remove-TAKToken</span><span class="w"> </span><span class="nt">-Token</span><span class="w"> </span><span class="s1">'eyJhbGci...'</span><span class="w">
+</span><span class="n">Remove-TAKToken</span><span class="w"> </span><span class="nt">-Tokens</span><span class="w"> </span><span class="s1">'token1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'token2'</span><span class="p">,</span><span class="w"> </span><span class="s1">'token3'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="gaps-and-known-issues">Gaps and Known Issues</h2>
+
+<ul>
+  <li>No <code class="language-plaintext highlighter-rouge">Set-TAKMission</code> cmdlet — mission update requires <code class="language-plaintext highlighter-rouge">New-TAKMission</code> (the API uses idempotent PUT).</li>
+  <li>No cmdlets for TAK Server log retrieval or export.</li>
+  <li>No cmdlets for mission file attachment management (add/remove files from missions).</li>
+  <li>No <code class="language-plaintext highlighter-rouge">New-TAKFederate</code> / <code class="language-plaintext highlighter-rouge">Remove-TAKFederate</code> — federate configuration must be done via WebTAK or direct API.</li>
+  <li><code class="language-plaintext highlighter-rouge">Get-TAKGroup</code> with <code class="language-plaintext highlighter-rouge">-Name</code> always queries the IN direction by default; passing <code class="language-plaintext highlighter-rouge">-Direction OUT</code> is required for outbound-only group inspection.</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

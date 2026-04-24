@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Getting Started (Modules) | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Getting Started (Modules)" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/modules/getting-started/" />
+<meta property="og:url" content="http://0.0.0.0:4000/modules/getting-started/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Getting Started (Modules)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Getting Started (Modules)","url":"http://0.0.0.0:4000/modules/getting-started/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="getting-started-end-to-end-tak-server-deployment">Getting Started: End-to-End TAK Server Deployment</h1>
+
+<p>This guide covers a typical deployment from a Windows Hyper-V host to a fully operational TAK Server 5.7.</p>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<p>The DigitalTAK PowerShell pipeline involves three modules:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>TAKDeploy</strong></td>
+      <td>Create Hyper-V VM, wait for Rocky Linux install, hand off SSH session</td>
+    </tr>
+    <tr>
+      <td><strong>TAKInstall</strong></td>
+      <td>Remote-provision TAK Server on Rocky Linux 9 over SSH</td>
+    </tr>
+    <tr>
+      <td><strong>TAKServerPS</strong></td>
+      <td>Manage a running TAK Server via its REST API</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>TAKDeploy orchestrates TAKInstall. TAKServerPS is used independently after the server is running.</p>
+
+<hr />
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<h3 id="operator-workstation">Operator workstation</h3>
+
+<ul>
+  <li>Windows 10/11 or Windows Server 2019+ with Hyper-V role enabled</li>
+  <li>PowerShell 7.0 or later</li>
+  <li><code class="language-plaintext highlighter-rouge">Posh-SSH</code> module:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Install-Module</span><span class="w"> </span><span class="nx">Posh-SSH</span><span class="w"> </span><span class="nt">-Scope</span><span class="w"> </span><span class="nx">CurrentUser</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>At least one External Hyper-V virtual switch (or a physical NIC to create one — TAKDeploy handles this interactively)</li>
+</ul>
+
+<h3 id="files-required">Files required</h3>
+
+<ul>
+  <li><strong>Rocky Linux 9 DVD ISO</strong> — download from rockylinux.org</li>
+  <li><strong>TAK Server 5.7-RELEASE8 RPM</strong> (<code class="language-plaintext highlighter-rouge">takserver-5.7-RELEASE8.noarch.rpm</code>) — obtained from <a href="https://tak.gov">tak.gov</a></li>
+  <li><em>(optional)</em> TAK Server GPG key (<code class="language-plaintext highlighter-rouge">takserver-public-gpg.key</code>) — from tak.gov</li>
+  <li><em>(optional)</em> <code class="language-plaintext highlighter-rouge">takserver_renewLECerts.sh</code> — included in this repository, required for Let’s Encrypt</li>
+</ul>
+
+<hr />
+
+<h2 id="option-a-fully-automated-recommended">Option A: Fully Automated (Recommended)</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">Start-TAKDeployment</code> for a guided, end-to-end interactive deployment. It collects configuration upfront and orchestrates all phases automatically.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 1. Import the module (elevated PowerShell required)</span><span class="w">
+</span><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKDeploy\TAKDeploy.psd1</span><span class="w">
+
+</span><span class="c"># 2. Start the interactive deployment</span><span class="w">
+</span><span class="n">Start-TAKDeployment</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The wizard will prompt for:</p>
+<ul>
+  <li>VM name, path, ISO and RPM locations, hardware specs</li>
+  <li>Org details for certificate subject (State, City, Org, OU — must be uppercase)</li>
+  <li>Keystore password</li>
+  <li>Whether to install Openfire XMPP</li>
+  <li>Whether to configure Let’s Encrypt (requires a public FQDN)</li>
+</ul>
+
+<p>After the deployment completes, the console prints:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  VM:         TAKServer (192.168.1.50)
+  WebTAK:     https://192.168.1.50:8443
+  CoT:        192.168.1.50:8089 (TLS)
+  Cert Enrol: https://192.168.1.50:8446
+
+  Admin cert: /home/atak/admin.p12
+  Import this into your browser to access WebTAK admin.
+</code></pre></div></div>
+
+<h3 id="if-you-already-have-a-rocky-linux-vm">If you already have a Rocky Linux VM</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Start-TAKDeployment</span><span class="w"> </span><span class="nt">-SkipVMCreation</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This skips Hyper-V VM creation (Phases 1 and 1b) and prompts directly for the server’s IP address and SSH credentials.</p>
+
+<hr />
+
+<h2 id="option-b-step-by-step">Option B: Step by Step</h2>
+
+<p>Use the individual module cmdlets for more control.</p>
+
+<h3 id="step-1--create-the-vm">Step 1 — Create the VM</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKDeploy\TAKDeploy.psd1</span><span class="w">
+
+</span><span class="n">New-TAKVirtualMachine</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-IsoPath</span><span class="w"> </span><span class="s1">'C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-VHDSizeGB</span><span class="w"> </span><span class="nx">80</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-MemoryStartupBytes</span><span class="w"> </span><span class="nx">8GB</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-ProcessorCount</span><span class="w"> </span><span class="nx">4</span><span class="w">
+
+</span><span class="c"># Open the Hyper-V console and install Rocky Linux</span><span class="w">
+</span><span class="n">vmconnect.exe</span><span class="w"> </span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">COMPUTERNAME</span><span class="w"> </span><span class="nx">TAKServer</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Rocky Linux installation checklist:</p>
+<ol>
+  <li>Set a root password</li>
+  <li>Create a sudo-capable user (e.g. <code class="language-plaintext highlighter-rouge">atak</code>)</li>
+  <li>Configure networking (DHCP or static)</li>
+  <li>Select <strong>Minimal Install</strong></li>
+  <li>Complete installation and reboot</li>
+</ol>
+
+<h3 id="step-2--establish-ssh-session">Step 2 — Establish SSH session</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Wait-TAKLinuxInstall</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="nt">-TimeoutSeconds</span><span class="w"> </span><span class="nx">600</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="step-3--install-tak-server">Step 3 — Install TAK Server</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKInstall\TAKInstall.psd1</span><span class="w">
+
+</span><span class="nv">$cred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-Message</span><span class="w"> </span><span class="s1">'SSH credentials (same as Step 2)'</span><span class="w">
+
+</span><span class="n">Install-TAKServer</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="step-4--create-certificates">Step 4 — Create certificates</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="nt">-Prompt</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+
+</span><span class="n">New-TAKServerCertificate</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'TX'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'AUSTIN'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'MYORG'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'OPS'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="step-5--promote-admin-certificate">Step 5 — Promote admin certificate</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-TAKAdminCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Retrieve <code class="language-plaintext highlighter-rouge">/home/atak/admin.p12</code> from the server and import it into your browser (Chrome/Firefox: Settings → Certificates → Import). This certificate authenticates you to the WebTAK admin interface at <code class="language-plaintext highlighter-rouge">https://&lt;server-ip&gt;:8443</code>.</p>
+
+<h3 id="step-6--optional-install-openfire-xmpp">Step 6 — (Optional) Install Openfire XMPP</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Install-TAKOpenfire</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After installation, browse to <code class="language-plaintext highlighter-rouge">http://&lt;server-ip&gt;:9090</code> and complete the Openfire setup wizard before using TAK Chat in ATAK/WinTAK.</p>
+
+<h3 id="step-7--optional-configure-lets-encrypt">Step 7 — (Optional) Configure Let’s Encrypt</h3>
+
+<blockquote>
+  <p>Requires a public IP with a DNS A record pointing to the server, and port 80 open from the internet.</p>
+</blockquote>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">New-TAKLetsEncryptCertificate</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-DomainName</span><span class="w"> </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RenewalScriptPath</span><span class="w"> </span><span class="s1">'.\takserver_renewLECerts.sh'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="creating-user-certificates">Creating User Certificates</h2>
+
+<p>After the server is running, create client certificates for ATAK/WinTAK users by SSH-ing to the server:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh atak@&lt;server-ip&gt;
+/opt/tak/certs/takUserCreateCerts_doNotRunAsRoot.sh
+</code></pre></div></div>
+
+<p>The script creates a <code class="language-plaintext highlighter-rouge">.p12</code> file in <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code> for distribution to the user’s device.</p>
+
+<hr />
+
+<h2 id="managing-a-running-server">Managing a Running Server</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">TAKServerPS</code> to manage the server via its REST API.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKServerPS\TAKServer.psd1</span><span class="w">
+
+</span><span class="c"># Connect (certificate auth using admin.p12)</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="s1">'192.168.1.50'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="s1">'C:\certs\admin.p12'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="p">(</span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="p">)</span><span class="w">
+
+</span><span class="c"># Check version</span><span class="w">
+</span><span class="n">Get-TAKVersion</span><span class="w">
+
+</span><span class="c"># List connected users</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w">
+
+</span><span class="c"># Create a new user</span><span class="w">
+</span><span class="nv">$cred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'fielduser1'</span><span class="w">
+</span><span class="n">New-TAKUser</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-GroupList</span><span class="w"> </span><span class="s1">'Operators'</span><span class="w">
+
+</span><span class="c"># Create a mission</span><span class="w">
+</span><span class="n">New-TAKMission</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'OpBlue'</span><span class="w"> </span><span class="nt">-Description</span><span class="w"> </span><span class="s1">'Operation Blue'</span><span class="w"> </span><span class="nt">-Group</span><span class="w"> </span><span class="s1">'TeamAlpha'</span><span class="w">
+
+</span><span class="c"># List active subscriptions</span><span class="w">
+</span><span class="n">Get-TAKSubscription</span><span class="w">
+
+</span><span class="c"># End session</span><span class="w">
+</span><span class="n">Disconnect-TAKServer</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="port-reference">Port Reference</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Service</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8443</td>
+      <td>TCP/TLS</td>
+      <td>WebTAK HTTPS / REST API</td>
+    </tr>
+    <tr>
+      <td>8089</td>
+      <td>TCP/TLS</td>
+      <td>CoT (Cursor-on-Target) — client connections</td>
+    </tr>
+    <tr>
+      <td>8446</td>
+      <td>TCP/TLS</td>
+      <td>Certificate enrollment</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td>TCP</td>
+      <td>Let’s Encrypt ACME challenge (temporary)</td>
+    </tr>
+    <tr>
+      <td>5222</td>
+      <td>TCP</td>
+      <td>XMPP client (STARTTLS) — Openfire</td>
+    </tr>
+    <tr>
+      <td>5223</td>
+      <td>TCP</td>
+      <td>XMPP client (Direct TLS) — Openfire</td>
+    </tr>
+    <tr>
+      <td>7070</td>
+      <td>TCP</td>
+      <td>Openfire HTTP binding</td>
+    </tr>
+    <tr>
+      <td>7443</td>
+      <td>TCP</td>
+      <td>Openfire HTTPS binding</td>
+    </tr>
+    <tr>
+      <td>7777</td>
+      <td>TCP</td>
+      <td>Openfire file transfer proxy</td>
+    </tr>
+    <tr>
+      <td>9090</td>
+      <td>TCP</td>
+      <td>Openfire admin console (HTTP)</td>
+    </tr>
+    <tr>
+      <td>9091</td>
+      <td>TCP</td>
+      <td>Openfire admin console (HTTPS)</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

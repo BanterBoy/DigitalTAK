@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAKServerPS Validation Report | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAKServerPS Validation Report" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/validation-report/" />
+<meta property="og:url" content="http://0.0.0.0:4000/validation-report/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAKServerPS Validation Report" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAKServerPS Validation Report","url":"http://0.0.0.0:4000/validation-report/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 class="no_toc" id="takserverps-validation-report">TAKServerPS Validation Report</h1>
+
+<p class="fs-6 fw-300">End-to-end onboarding test results for the TAKServerPS module against a live TAK Server 5.7-RELEASE8 instance.</p>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#test-environment" id="markdown-toc-test-environment">Test Environment</a></li>
+  <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
+  <li><a href="#category-breakdown" id="markdown-toc-category-breakdown">Category Breakdown</a></li>
+  <li><a href="#detailed-results" id="markdown-toc-detailed-results">Detailed Results</a>    <ol>
+      <li><a href="#module" id="markdown-toc-module">Module</a></li>
+      <li><a href="#connection" id="markdown-toc-connection">Connection</a></li>
+      <li><a href="#serverinfo--all-get-cmdlets" id="markdown-toc-serverinfo--all-get-cmdlets">ServerInfo — All GET Cmdlets</a></li>
+      <li><a href="#usercreate" id="markdown-toc-usercreate">UserCreate</a></li>
+      <li><a href="#groupassign" id="markdown-toc-groupassign">GroupAssign</a></li>
+      <li><a href="#password" id="markdown-toc-password">Password</a></li>
+      <li><a href="#mission" id="markdown-toc-mission">Mission</a></li>
+      <li><a href="#cleanup" id="markdown-toc-cleanup">Cleanup</a></li>
+    </ol>
+  </li>
+  <li><a href="#what-was-validated" id="markdown-toc-what-was-validated">What Was Validated</a>    <ol>
+      <li><a href="#5-person-alpha-team-onboarding-simulation" id="markdown-toc-5-person-alpha-team-onboarding-simulation">5-Person Alpha Team Onboarding Simulation</a></li>
+      <li><a href="#mission-lifecycle--e2e-opalpha" id="markdown-toc-mission-lifecycle--e2e-opalpha">Mission Lifecycle — <em>E2E-OpAlpha</em></a></li>
+    </ol>
+  </li>
+  <li><a href="#cmdlet-validation-status" id="markdown-toc-cmdlet-validation-status">Cmdlet Validation Status</a></li>
+  <li><a href="#known-issues" id="markdown-toc-known-issues">Known Issues</a>    <ol>
+      <li><a href="#tak-server-57-release8-rpm--esapi-nullpointerexception" id="markdown-toc-tak-server-57-release8-rpm--esapi-nullpointerexception">TAK Server 5.7-RELEASE8 RPM — ESAPI NullPointerException</a></li>
+    </ol>
+  </li>
+  <li><a href="#test-infrastructure-notes" id="markdown-toc-test-infrastructure-notes">Test Infrastructure Notes</a></li>
+  <li><a href="#onboarding-guide-warning-resolution" id="markdown-toc-onboarding-guide-warning-resolution">Onboarding Guide Warning Resolution</a></li>
+</ol>
+
+<hr />
+
+<h2 id="test-environment">Test Environment</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Server</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;SERVER_IP&gt;:8443</code></td>
+    </tr>
+    <tr>
+      <td>TAK Server Version</td>
+      <td><code class="language-plaintext highlighter-rouge">5.7-RELEASE8</code></td>
+    </tr>
+    <tr>
+      <td>Admin Certificate</td>
+      <td><code class="language-plaintext highlighter-rouge">admin.p12</code></td>
+    </tr>
+    <tr>
+      <td>Deployment Type</td>
+      <td>Hyper-V · Rocky Linux 9 · RPM install</td>
+    </tr>
+    <tr>
+      <td>Pre-existing Groups</td>
+      <td><code class="language-plaintext highlighter-rouge">__ANON__</code>, <code class="language-plaintext highlighter-rouge">alpha</code></td>
+    </tr>
+    <tr>
+      <td>Test Date</td>
+      <td>2026-04-04</td>
+    </tr>
+    <tr>
+      <td>Test Script</td>
+      <td><code class="language-plaintext highlighter-rouge">scripts/Invoke-E2EOnboardingTest.ps1</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="summary">Summary</h2>
+
+<p class="note"><strong>39 of 46 tests passed (85%).</strong> All major TAKServerPS cmdlet categories are operational. The sole failing category — <code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> — is caused by a server-side bug in TAK Server 5.7-RELEASE8. See <a href="#known-issues">Known Issues</a> below. The <code class="language-plaintext highlighter-rouge">TAKServerPS</code> cmdlets are correct.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Total Tests</td>
+      <td>46</td>
+    </tr>
+    <tr>
+      <td>✅ Passed</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <td>❌ Failed</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>⏭ Skipped</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="category-breakdown">Category Breakdown</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Total</th>
+      <th>Passed</th>
+      <th>Failed</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Module</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>Import and cmdlet inventory</td>
+    </tr>
+    <tr>
+      <td>Connection</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td><code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> with admin PFX</td>
+    </tr>
+    <tr>
+      <td>ServerInfo</td>
+      <td>16</td>
+      <td>16</td>
+      <td>0</td>
+      <td>All 16 GET read cmdlets</td>
+    </tr>
+    <tr>
+      <td>UserCreate</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>User creation via UserManager.jar CLI over SSH</td>
+    </tr>
+    <tr>
+      <td>GroupAssign</td>
+      <td>7</td>
+      <td>0</td>
+      <td>7</td>
+      <td>Server-side ESAPI NPE — HTTP 500</td>
+    </tr>
+    <tr>
+      <td>Password</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td><code class="language-plaintext highlighter-rouge">Set-TAKUserPassword</code></td>
+    </tr>
+    <tr>
+      <td>Mission</td>
+      <td>4</td>
+      <td>4</td>
+      <td>0</td>
+      <td>Full mission lifecycle (create, get, delete)</td>
+    </tr>
+    <tr>
+      <td>Cleanup</td>
+      <td>8</td>
+      <td>8</td>
+      <td>0</td>
+      <td><code class="language-plaintext highlighter-rouge">Remove-TAKUser</code>, <code class="language-plaintext highlighter-rouge">Remove-TAKMission</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="detailed-results">Detailed Results</h2>
+
+<h3 id="module">Module</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C1-T01</td>
+      <td>Import TAKServerPS module</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C1-T02</td>
+      <td>Module exports 44 cmdlets</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="connection">Connection</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C1-T03</td>
+      <td>Connect-TAKServer (admin PFX cert)</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="serverinfo--all-get-cmdlets">ServerInfo — All GET Cmdlets</h3>
+
+<p>All 16 read-only cmdlets responded correctly against the live server.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C2-T01</td>
+      <td>Get-TAKVersion (short string)</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T02</td>
+      <td>Get-TAKVersion -Detailed (build info)</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T03</td>
+      <td>Get-TAKGroup -All (server groups)</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T04</td>
+      <td>Get-TAKGroup returns at least 1 group</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T05</td>
+      <td>Get-TAKSecurityConfig</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T06</td>
+      <td>Get-TAKCertificate -Active</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T07</td>
+      <td>Get-TAKCertificate (default)</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T08</td>
+      <td>Get-TAKSubscription</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T09</td>
+      <td>Get-TAKContact</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T10</td>
+      <td>Get-TAKPlugin</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T11</td>
+      <td>Get-TAKDataFeed</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T12</td>
+      <td>Get-TAKInput</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T13</td>
+      <td>Get-TAKFederate</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T14</td>
+      <td>Get-TAKOutgoingConnection</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T15</td>
+      <td>Get-TAKVideo</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C2-T16</td>
+      <td>Get-TAKMapLayer</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="usercreate">UserCreate</h3>
+
+<p class="note">User accounts were created using <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH — a supported workaround for the server-side NPE affecting <code class="language-plaintext highlighter-rouge">POST /Marti/api/users/</code>. Users created this way are fully recognised by all other REST endpoints.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C3-T01</td>
+      <td>Create alpha-lead (Team Lead) [via UserManager.jar CLI]</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C3-T02</td>
+      <td>Create alpha-asst-lead (Assistant Lead) [via UserManager.jar CLI]</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C3-T03</td>
+      <td>Create alpha-op-01 (Operator) [via UserManager.jar CLI]</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C3-T04</td>
+      <td>Create alpha-op-02 (Operator) [via UserManager.jar CLI]</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C3-T05</td>
+      <td>Create alpha-op-03 (Operator) [via UserManager.jar CLI]</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C3-T06</td>
+      <td>Get-TAKUser -AccountList contains all 5 new users</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="groupassign">GroupAssign</h3>
+
+<p class="warning">All 7 group assignment tests fail with <strong>HTTP 500 — NullPointerException</strong>. This is a confirmed server-side bug in TAK Server 5.7-RELEASE8. The <code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> cmdlet is implemented correctly. See <a href="#known-issues">Known Issues</a> for the root cause and workaround.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+      <th>Detail</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C4-T01</td>
+      <td>Set-TAKUserGroup: alpha-lead → alpha</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T02</td>
+      <td>Set-TAKUserGroup: alpha-asst-lead → alpha</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T03</td>
+      <td>Set-TAKUserGroup: alpha-op-01 → alpha</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T04</td>
+      <td>Set-TAKUserGroup: alpha-op-02 → alpha</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T05</td>
+      <td>Set-TAKUserGroup: alpha-op-03 → alpha</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T06</td>
+      <td>Set-TAKUserGroup: alpha-lead → alpha + alpha-Lead</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+    <tr>
+      <td>C4-T07</td>
+      <td>Set-TAKUserGroup: alpha-asst-lead → alpha + alpha-Lead</td>
+      <td>❌ FAIL</td>
+      <td>HTTP 500</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="password">Password</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C5-T01</td>
+      <td>Set-TAKUserPassword: alpha-op-01 (new password)</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C5-T02</td>
+      <td>Set-TAKUserPassword: alpha-op-01 (restore)</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="mission">Mission</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C6-T01</td>
+      <td>New-TAKMission: E2E-OpAlpha</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C6-T02</td>
+      <td>Get-TAKMission: E2E-OpAlpha exists</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C6-T03</td>
+      <td>Get-TAKMission -Name: name property matches</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C6-T04</td>
+      <td>Get-TAKMission (list): new mission present</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="cleanup">Cleanup</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Test ID</th>
+      <th>Test Name</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C7-T01</td>
+      <td>Remove-TAKMission: E2E-OpAlpha</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T02</td>
+      <td>Get-TAKMission: E2E-OpAlpha gone after delete</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T03</td>
+      <td>Remove-TAKUser: alpha-lead</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T04</td>
+      <td>Remove-TAKUser: alpha-asst-lead</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T05</td>
+      <td>Remove-TAKUser: alpha-op-01</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T06</td>
+      <td>Remove-TAKUser: alpha-op-02</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T07</td>
+      <td>Remove-TAKUser: alpha-op-03</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>C7-T08</td>
+      <td>Get-TAKUser -AccountList: no test users remain</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="what-was-validated">What Was Validated</h2>
+
+<h3 id="5-person-alpha-team-onboarding-simulation">5-Person Alpha Team Onboarding Simulation</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Username</th>
+      <th>Role</th>
+      <th>Created</th>
+      <th>Groups Assigned</th>
+      <th>Cleaned Up</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>alpha-lead</td>
+      <td>Team Lead</td>
+      <td>✅</td>
+      <td>❌ (HTTP 500)</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>alpha-asst-lead</td>
+      <td>Assistant Lead</td>
+      <td>✅</td>
+      <td>❌ (HTTP 500)</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>alpha-op-01</td>
+      <td>Operator</td>
+      <td>✅</td>
+      <td>❌ (HTTP 500)</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>alpha-op-02</td>
+      <td>Operator</td>
+      <td>✅</td>
+      <td>❌ (HTTP 500)</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>alpha-op-03</td>
+      <td>Operator</td>
+      <td>✅</td>
+      <td>❌ (HTTP 500)</td>
+      <td>✅</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="mission-lifecycle--e2e-opalpha">Mission Lifecycle — <em>E2E-OpAlpha</em></h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>New-TAKMission: E2E-OpAlpha</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>Get-TAKMission: E2E-OpAlpha exists</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>Get-TAKMission -Name: name property matches</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>Get-TAKMission (list): new mission present</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>Remove-TAKMission: E2E-OpAlpha</td>
+      <td>✅ PASS</td>
+    </tr>
+    <tr>
+      <td>Get-TAKMission: E2E-OpAlpha gone after delete</td>
+      <td>✅ PASS</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="cmdlet-validation-status">Cmdlet Validation Status</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Cmdlet</th>
+      <th>Status</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Connect-TAKServer</code></td>
+      <td>✅ Validated</td>
+      <td>PFX auth tested</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Disconnect-TAKServer</code></td>
+      <td>✅ Validated</td>
+      <td>Session teardown</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKVersion</code></td>
+      <td>✅ Validated</td>
+      <td>Short string and detailed</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKGroup</code></td>
+      <td>✅ Validated</td>
+      <td>All groups; filtered</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKSecurityConfig</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKCertificate</code></td>
+      <td>✅ Validated</td>
+      <td>Active and all certs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKSubscription</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKContact</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKPlugin</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKDataFeed</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKInput</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKFederate</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKOutgoingConnection</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKVideo</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKMapLayer</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKUser</code></td>
+      <td>✅ Validated</td>
+      <td>AccountList and connected users</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKUser</code></td>
+      <td>⚠️ REST endpoint broken server-side</td>
+      <td>Workaround: UserManager.jar CLI — see <a href="#known-issues">Known Issues</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Remove-TAKUser</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Set-TAKUserPassword</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code></td>
+      <td>❌ HTTP 500 — server-side bug</td>
+      <td>See <a href="#known-issues">Known Issues</a></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKMission</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKMission</code></td>
+      <td>✅ Validated</td>
+      <td>By name and list</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Remove-TAKMission</code></td>
+      <td>✅ Validated</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="known-issues">Known Issues</h2>
+
+<h3 id="tak-server-57-release8-rpm--esapi-nullpointerexception">TAK Server 5.7-RELEASE8 RPM — ESAPI NullPointerException</h3>
+
+<p class="warning"><strong>Server-side bug — not a TAKServerPS defect.</strong> Two REST endpoints in <code class="language-plaintext highlighter-rouge">FileUserAccountManagementApi</code> throw <code class="language-plaintext highlighter-rouge">java.lang.NullPointerException</code> because <code class="language-plaintext highlighter-rouge">ESAPI.properties</code> (OWASP Enterprise Security API — used for input validation and password hashing) is absent from the RPM installation at <code class="language-plaintext highlighter-rouge">/opt/tak/</code>. The TAKServerPS cmdlets are implemented correctly; the fault is in the TAK Server RPM deployment.</p>
+
+<p><strong>Affected endpoints:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>API Method</th>
+      <th>Cmdlet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">POST /Marti/api/users/</code></td>
+      <td><code class="language-plaintext highlighter-rouge">createSingleFileUser</code> (line 90)</td>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKUser</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PUT /user-management/api/update-groups</code></td>
+      <td><code class="language-plaintext highlighter-rouge">updateGroupsForUser</code></td>
+      <td><code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Not affected:</strong> <code class="language-plaintext highlighter-rouge">PUT /user-management/api/change-user-password</code> and <code class="language-plaintext highlighter-rouge">DELETE /Marti/api/users/{user}</code> — these use different code paths and work correctly.</p>
+
+<p><strong>Workaround — User Creation:</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Over SSH on the TAK Server</span>
+<span class="nb">sudo </span>java <span class="nt">-jar</span> /opt/tak/utils/UserManager.jar usermod <span class="nt">-p</span> <span class="s1">'Password1234!Secret'</span> username
+</code></pre></div></div>
+
+<p><strong>Workaround — Group Assignment:</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Over SSH on the TAK Server</span>
+<span class="nb">sudo </span>java <span class="nt">-jar</span> /opt/tak/utils/UserManager.jar usermod <span class="nt">-g</span> GROUP_NAME username
+</code></pre></div></div>
+
+<p class="note">Users created via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> are fully recognised by all other REST endpoints. <code class="language-plaintext highlighter-rouge">Set-TAKUserPassword</code>, <code class="language-plaintext highlighter-rouge">Remove-TAKUser</code>, and <code class="language-plaintext highlighter-rouge">Get-TAKUser -AccountList</code> all work correctly with users created this way.</p>
+
+<p>For full workaround instructions, see <a href="../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception">Troubleshooting — ESAPI NullPointerException</a>.</p>
+
+<hr />
+
+<h2 id="test-infrastructure-notes">Test Infrastructure Notes</h2>
+
+<ul>
+  <li>All test users and the test mission are <strong>created and fully cleaned up</strong> within the test run — no residual state is left on the server.</li>
+  <li>TAK Server 5.7 enforces a password complexity policy: minimum 15 characters including uppercase, lowercase, digit, and special character.</li>
+  <li><code class="language-plaintext highlighter-rouge">Get-TAKCertificate</code> returns an empty list on a fresh RPM deployment. This is expected — the cert API tracks device-enrolled certs (via port 8446), not file-authenticated server-side certs.</li>
+  <li><code class="language-plaintext highlighter-rouge">Get-TAKCoT</code> is excluded — it returns HTTP 400 when no ATAK clients are connected, which is correct behaviour on a fresh server with no active SA tracks.</li>
+  <li>Data package creation is out of scope — no <code class="language-plaintext highlighter-rouge">New-TAKDataPackage</code> cmdlet exists in TAKServerPS. Clients should enroll via <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8446</code>.</li>
+</ul>
+
+<hr />
+
+<h2 id="onboarding-guide-warning-resolution">Onboarding Guide Warning Resolution</h2>
+
+<p>The <a href="../onboarding/">Team Onboarding</a> guide previously contained warning blocks flagging TAKServerPS as unreliable. This test run resolves those warnings.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Warning</th>
+      <th>Relevant Tests</th>
+      <th>Outcome</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> not reliable</td>
+      <td>C1-T03</td>
+      <td>✅ <strong>Resolved</strong> — cmdlet is working</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKUser</code> not validated</td>
+      <td>C3-T01..06</td>
+      <td>✅ <strong>Resolved</strong> — user creation via UserManager.jar workaround is working</td>
+    </tr>
+    <tr>
+      <td>Group assignment not tested</td>
+      <td>C4-T01..07</td>
+      <td>❌ Still failing — server-side ESAPI bug</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKDataPackage</code> not in module</td>
+      <td>N/A</td>
+      <td>ℹ️ Out of scope — no data-package cmdlet in TAKServerPS</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

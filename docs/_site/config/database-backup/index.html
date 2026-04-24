@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Database Backup &amp; Recovery | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Database Backup &amp; Recovery" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/config/database-backup/" />
+<meta property="og:url" content="http://0.0.0.0:4000/config/database-backup/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Database Backup &amp; Recovery" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Database Backup &amp; Recovery","url":"http://0.0.0.0:4000/config/database-backup/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="tak-server-database-backup--recovery">TAK Server Database Backup &amp; Recovery</h1>
+
+<p>TAK Server stores all application state — users, missions, certificates, groups, CoT history, and server configuration — in a PostgreSQL 16 database named <code class="language-plaintext highlighter-rouge">cot_router</code>. Certificates and <code class="language-plaintext highlighter-rouge">.p12</code> files are <strong>not</strong> in the database; they live in <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code> on the server filesystem.</p>
+
+<hr />
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#tak-server-database-backup--recovery" id="markdown-toc-tak-server-database-backup--recovery">TAK Server Database Backup &amp; Recovery</a>    <ol>
+      <li><a href="#1-what-is-and-isnt-in-the-database" id="markdown-toc-1-what-is-and-isnt-in-the-database">1. What Is and Isn’t in the Database</a></li>
+      <li><a href="#2-manual-backup-pg_dump" id="markdown-toc-2-manual-backup-pg_dump">2. Manual Backup (pg_dump)</a>        <ol>
+          <li><a href="#copy-the-backup-to-your-windows-workstation" id="markdown-toc-copy-the-backup-to-your-windows-workstation">Copy the backup to your Windows workstation</a></li>
+        </ol>
+      </li>
+      <li><a href="#3-automated-daily-backups-cron" id="markdown-toc-3-automated-daily-backups-cron">3. Automated Daily Backups (Cron)</a></li>
+      <li><a href="#4-backup-certificate-files" id="markdown-toc-4-backup-certificate-files">4. Backup Certificate Files</a></li>
+      <li><a href="#5-restore-procedure" id="markdown-toc-5-restore-procedure">5. Restore Procedure</a>        <ol>
+          <li><a href="#51-stop-tak-server" id="markdown-toc-51-stop-tak-server">5.1 Stop TAK Server</a></li>
+          <li><a href="#52-drop-and-recreate-the-database" id="markdown-toc-52-drop-and-recreate-the-database">5.2 Drop and Recreate the Database</a></li>
+          <li><a href="#53-restore-from-dump" id="markdown-toc-53-restore-from-dump">5.3 Restore from Dump</a></li>
+          <li><a href="#54-restore-certificate-files-if-needed" id="markdown-toc-54-restore-certificate-files-if-needed">5.4 Restore Certificate Files (if needed)</a></li>
+          <li><a href="#55-restart-tak-server" id="markdown-toc-55-restart-tak-server">5.5 Restart TAK Server</a></li>
+          <li><a href="#56-validate" id="markdown-toc-56-validate">5.6 Validate</a></li>
+        </ol>
+      </li>
+      <li><a href="#6-disaster-recovery-checklist" id="markdown-toc-6-disaster-recovery-checklist">6. Disaster Recovery Checklist</a></li>
+      <li><a href="#references" id="markdown-toc-references">References</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="1-what-is-and-isnt-in-the-database">1. What Is and Isn’t in the Database</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Location</th>
+      <th>In backup?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Users, passwords, groups</td>
+      <td>PostgreSQL <code class="language-plaintext highlighter-rouge">cot_router</code></td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Missions and mission content</td>
+      <td>PostgreSQL <code class="language-plaintext highlighter-rouge">cot_router</code></td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>CoT event history</td>
+      <td>PostgreSQL <code class="language-plaintext highlighter-rouge">cot_router</code></td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>Server configuration</td>
+      <td>PostgreSQL <code class="language-plaintext highlighter-rouge">cot_router</code></td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>CA, server, and admin certificates</td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/*.pem/.jks/.p12</code></td>
+      <td>No — back up separately</td>
+    </tr>
+    <tr>
+      <td>Let’s Encrypt certificates</td>
+      <td><code class="language-plaintext highlighter-rouge">/etc/letsencrypt/</code></td>
+      <td>No — back up separately</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CoreConfig.xml</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/CoreConfig.xml</code></td>
+      <td>No — back up separately</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A complete recovery requires restoring both the PostgreSQL dump <strong>and</strong> the certificate files.</p>
+
+<hr />
+
+<h2 id="2-manual-backup-pg_dump">2. Manual Backup (pg_dump)</h2>
+
+<p>Run as the <code class="language-plaintext highlighter-rouge">tak</code> system user (which owns the PostgreSQL role):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Connect to the TAK Server over SSH</span>
+ssh atak@&lt;server-ip&gt;
+
+<span class="c"># Create a timestamped backup</span>
+<span class="nb">sudo</span> <span class="nt">-u</span> tak pg_dump <span class="nt">-U</span> tak cot_router <span class="o">&gt;</span> /tmp/tak-backup-<span class="si">$(</span><span class="nb">date</span> +%Y%m%d-%H%M<span class="si">)</span>.sql
+
+<span class="c"># Verify the file is non-zero</span>
+<span class="nb">ls</span> <span class="nt">-lh</span> /tmp/tak-backup-<span class="k">*</span>.sql
+</code></pre></div></div>
+
+<p>To include all databases and global roles (recommended for full-server recovery):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> <span class="nt">-u</span> postgres pg_dumpall <span class="o">&gt;</span> /tmp/tak-dumpall-<span class="si">$(</span><span class="nb">date</span> +%Y%m%d-%H%M<span class="si">)</span>.sql
+</code></pre></div></div>
+
+<h3 id="copy-the-backup-to-your-windows-workstation">Copy the backup to your Windows workstation</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$sftp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SFTPSession</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">server-ip</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-AcceptKey</span><span class="w">
+</span><span class="n">Get-SFTPItem</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sftp</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Path</span><span class="w"> </span><span class="s1">'/tmp/tak-backup-20260424-1200.sql'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Destination</span><span class="w"> </span><span class="s1">'.\backups\'</span><span class="w">
+</span><span class="n">Remove-SFTPSession</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sftp</span><span class="o">.</span><span class="nf">SessionId</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="3-automated-daily-backups-cron">3. Automated Daily Backups (Cron)</h2>
+
+<p>Add a daily cron job on the TAK Server that backs up to a local directory, retaining the last 7 days:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo tee</span> /etc/cron.daily/tak-db-backup <span class="o">&gt;</span> /dev/null <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">'
+#!/bin/bash
+BACKUP_DIR=/opt/tak/backups
+mkdir -p "</span><span class="nv">$BACKUP_DIR</span><span class="sh">"
+FILENAME="</span><span class="nv">$BACKUP_DIR</span><span class="sh">/tak-cot_router-</span><span class="si">$(</span><span class="nb">date</span> +%Y%m%d<span class="si">)</span><span class="sh">.sql"
+sudo -u tak pg_dump -U tak cot_router &gt; "</span><span class="nv">$FILENAME</span><span class="sh">"
+# Retain last 7 daily backups
+find "</span><span class="nv">$BACKUP_DIR</span><span class="sh">" -name 'tak-cot_router-*.sql' -mtime +7 -delete
+</span><span class="no">EOF
+
+</span><span class="nb">sudo chmod</span> +x /etc/cron.daily/tak-db-backup
+</code></pre></div></div>
+
+<p>Verify the script runs cleanly:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> /etc/cron.daily/tak-db-backup
+<span class="nb">ls</span> <span class="nt">-lh</span> /opt/tak/backups/
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Offsite copies:</strong> Copy backups to your Windows workstation or cloud storage periodically. The TAK Server VM itself is a single point of failure — local-only backups provide no protection against disk corruption or VM deletion.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="4-backup-certificate-files">4. Backup Certificate Files</h2>
+
+<p>Back up the cert directory alongside the database dump:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo tar </span>czf /tmp/tak-certs-<span class="si">$(</span><span class="nb">date</span> +%Y%m%d<span class="si">)</span>.tar.gz /opt/tak/certs/files/
+</code></pre></div></div>
+
+<p>Copy to Windows:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-SFTPItem</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sftp</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Path</span><span class="w"> </span><span class="s1">'/tmp/tak-certs-20260424.tar.gz'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Destination</span><span class="w"> </span><span class="s1">'.\backups\'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="5-restore-procedure">5. Restore Procedure</h2>
+
+<h3 id="51-stop-tak-server">5.1 Stop TAK Server</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl stop takserver
+</code></pre></div></div>
+
+<h3 id="52-drop-and-recreate-the-database">5.2 Drop and Recreate the Database</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> <span class="nt">-u</span> postgres psql <span class="nt">-c</span> <span class="s2">"DROP DATABASE IF EXISTS cot_router;"</span>
+<span class="nb">sudo</span> <span class="nt">-u</span> postgres psql <span class="nt">-c</span> <span class="s2">"CREATE DATABASE cot_router OWNER tak;"</span>
+</code></pre></div></div>
+
+<h3 id="53-restore-from-dump">5.3 Restore from Dump</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> <span class="nt">-u</span> tak psql <span class="nt">-U</span> tak cot_router &lt; /tmp/tak-backup-20260424-1200.sql
+</code></pre></div></div>
+
+<h3 id="54-restore-certificate-files-if-needed">5.4 Restore Certificate Files (if needed)</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo tar </span>xzf /tmp/tak-certs-20260424.tar.gz <span class="nt">-C</span> /
+<span class="nb">sudo chown</span> <span class="nt">-R</span> tak:tak /opt/tak/certs/files/
+<span class="nb">sudo chmod </span>750 /opt/tak/certs/files/
+</code></pre></div></div>
+
+<h3 id="55-restart-tak-server">5.5 Restart TAK Server</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl start takserver
+
+<span class="c"># Watch for "Server is running and ready to serve"</span>
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-f</span>
+</code></pre></div></div>
+
+<h3 id="56-validate">5.6 Validate</h3>
+
+<p>After restart, connect with TAKServerPS and confirm data:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">server-ip</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\admin.p12</span><span class="w"> </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-SkipCertificateCheck</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w">
+</span><span class="nx">Get-TAKMission</span><span class="w">
+</span><span class="n">Get-TAKVersion</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="6-disaster-recovery-checklist">6. Disaster Recovery Checklist</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Command / Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. Stop TAK Server</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl stop takserver</code></td>
+    </tr>
+    <tr>
+      <td>2. Drop database</td>
+      <td><code class="language-plaintext highlighter-rouge">psql -c "DROP DATABASE cot_router;"</code></td>
+    </tr>
+    <tr>
+      <td>3. Recreate database</td>
+      <td><code class="language-plaintext highlighter-rouge">psql -c "CREATE DATABASE cot_router OWNER tak;"</code></td>
+    </tr>
+    <tr>
+      <td>4. Restore SQL dump</td>
+      <td><code class="language-plaintext highlighter-rouge">psql -U tak cot_router &lt; backup.sql</code></td>
+    </tr>
+    <tr>
+      <td>5. Restore cert files</td>
+      <td><code class="language-plaintext highlighter-rouge">tar xzf tak-certs.tar.gz -C /</code></td>
+    </tr>
+    <tr>
+      <td>6. Fix permissions</td>
+      <td><code class="language-plaintext highlighter-rouge">chown -R tak:tak /opt/tak/certs/files/</code></td>
+    </tr>
+    <tr>
+      <td>7. Start TAK Server</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl start takserver</code></td>
+    </tr>
+    <tr>
+      <td>8. Validate</td>
+      <td><code class="language-plaintext highlighter-rouge">Get-TAKUser</code>, <code class="language-plaintext highlighter-rouge">Get-TAKMission</code>, <code class="language-plaintext highlighter-rouge">Get-TAKVersion</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="../TAK_Server_Configuration_Guide_5.7.pdf">TAK Server 5.7 Configuration Guide</a> — PostgreSQL configuration in Appendix D</li>
+  <li><a href="../../troubleshooting/">Troubleshooting</a> — TAK Server service failures and diagnostics</li>
+  <li><a href="/config/baseline/">Baseline Configuration</a> — full inventory of files managed outside the database</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

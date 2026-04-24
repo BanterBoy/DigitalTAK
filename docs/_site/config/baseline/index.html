@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Baseline Configuration | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Baseline Configuration" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/config/baseline/" />
+<meta property="og:url" content="http://0.0.0.0:4000/config/baseline/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Baseline Configuration" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Baseline Configuration","url":"http://0.0.0.0:4000/config/baseline/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="digitaltak-baseline-configuration-reference">DigitalTAK Baseline Configuration Reference</h1>
+
+<blockquote>
+  <p><strong>Status:</strong> Baseline snapshot — April 2026
+<strong>TAK Server version:</strong> 5.7-RELEASE8
+<strong>Target OS:</strong> Rocky Linux 9 (x86_64)
+<strong>Source:</strong> Derived from <code class="language-plaintext highlighter-rouge">InstallShellScripts/</code> and <code class="language-plaintext highlighter-rouge">Modules/TAKInstall/</code></p>
+</blockquote>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ol>
+  <li><a href="#system-requirements">System Requirements</a></li>
+  <li><a href="#software-inventory">Software Inventory</a></li>
+  <li><a href="#coreconfig-xml-key-settings">CoreConfig.xml — Key Settings</a></li>
+  <li><a href="#certificate-configuration">Certificate Configuration</a></li>
+  <li><a href="#openfire--takchat">Openfire / TAKChat</a></li>
+  <li><a href="#network-requirements">Network Requirements</a></li>
+  <li><a href="#gap-analysis">Gap Analysis</a></li>
+  <li><a href="#recommendations">Recommendations</a></li>
+</ol>
+
+<hr />
+
+<h2 id="1-system-requirements">1. System Requirements</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Resource</th>
+      <th>Minimum</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CPU</td>
+      <td>4 cores</td>
+      <td>Hyper-V Gen 2 VM (default)</td>
+    </tr>
+    <tr>
+      <td>RAM</td>
+      <td>8 GB</td>
+      <td>Configurable via <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> <code class="language-plaintext highlighter-rouge">MemoryBytes</code> parameter</td>
+    </tr>
+    <tr>
+      <td>Disk</td>
+      <td>40 GB VHD</td>
+      <td>Default VHD in <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code></td>
+    </tr>
+    <tr>
+      <td>OS</td>
+      <td>Rocky Linux 9</td>
+      <td>RHEL 9 also supported by TAK Server 5.7</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>17</td>
+      <td>Installed by <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code> via PGDG repo dependency chain</td>
+    </tr>
+    <tr>
+      <td>PostgreSQL</td>
+      <td>16 (PGDG)</td>
+      <td>Installed from <code class="language-plaintext highlighter-rouge">https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/</code></td>
+    </tr>
+    <tr>
+      <td>SELinux</td>
+      <td>Enforcing</td>
+      <td>Custom policy module applied at install time</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Hyper-V Defaults (Deploy-TAKServer.ps1):</strong></p>
+<ul>
+  <li>Generation: 2 (UEFI, Secure Boot)</li>
+  <li>Timezone: <code class="language-plaintext highlighter-rouge">Europe/London</code> <em>(hardcoded default)</em></li>
+  <li>Hostname: <code class="language-plaintext highlighter-rouge">takserver</code> <em>(hardcoded default)</em></li>
+  <li>SSH timeout: 600 seconds</li>
+</ul>
+
+<blockquote>
+  <p><strong>Workaround — Timezone:</strong> Pass <code class="language-plaintext highlighter-rouge">-Timezone 'America/Chicago'</code> (or any valid tz database name) to <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> to override the default. The parameter is forwarded to the kickstart configuration during unattended OS install.</p>
+
+  <p><strong>Workaround — Hostname:</strong> Pass <code class="language-plaintext highlighter-rouge">-VMHostname 'your-hostname'</code> to <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code>. The value is written into the kickstart <code class="language-plaintext highlighter-rouge">network --hostname</code> directive.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="2-software-inventory">2. Software Inventory</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Version</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TAK Server</td>
+      <td>5.7-RELEASE8</td>
+      <td>Uploaded via SSH from local path (<code class="language-plaintext highlighter-rouge">RpmPath</code> parameter)</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>17 (OpenJDK)</td>
+      <td>PGDG repo, installed as RPM dependency</td>
+    </tr>
+    <tr>
+      <td>PostgreSQL</td>
+      <td>16 (PGDG)</td>
+      <td><code class="language-plaintext highlighter-rouge">https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/</code></td>
+    </tr>
+    <tr>
+      <td>Openfire</td>
+      <td>5.0.3</td>
+      <td>GitHub Releases (<code class="language-plaintext highlighter-rouge">openfire_5.0.3-1_all.rpm</code>)</td>
+    </tr>
+    <tr>
+      <td>certbot</td>
+      <td>Latest snapd</td>
+      <td>Installed via <code class="language-plaintext highlighter-rouge">snapd</code> for Let’s Encrypt</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>GPG Verification:</strong> The install script supports optional GPG signature verification for the TAK Server RPM (controlled by <code class="language-plaintext highlighter-rouge">TAKInstall</code> module <code class="language-plaintext highlighter-rouge">Verify</code> parameter, defaults to <code class="language-plaintext highlighter-rouge">$true</code>).</p>
+
+<hr />
+
+<h2 id="3-coreconfigxml--key-settings">3. CoreConfig.xml — Key Settings</h2>
+
+<p>CoreConfig.xml is located at <code class="language-plaintext highlighter-rouge">/opt/tak/CoreConfig.xml</code> on the server. It is <strong>not committed to this repository</strong> — the file is created by the TAK Server RPM on installation and then patched in-place by shell scripts using <code class="language-plaintext highlighter-rouge">sed</code>.</p>
+
+<h3 id="31-network-inputs-ports">3.1 Network Inputs (Ports)</h3>
+
+<p>After certificate setup, <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> replaces the default anonymous TCP input with an x509-authenticated TLS input:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Auth</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8089</td>
+      <td>TLS</td>
+      <td>x509</td>
+      <td>Primary client connection (ATAK/WinTAK, mutual TLS)</td>
+    </tr>
+    <tr>
+      <td>8443</td>
+      <td>HTTPS</td>
+      <td>x509</td>
+      <td>WebTAK and REST API (set by TAK Server default)</td>
+    </tr>
+    <tr>
+      <td>8446</td>
+      <td>HTTPS</td>
+      <td>none</td>
+      <td>Certificate enrollment HTTPS (TAK Server default; replaced with LE-backed JKS if Let’s Encrypt is configured)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Before cert setup (TAK Server default):</strong></p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;input</span> <span class="na">auth=</span><span class="s">"anonymous"</span> <span class="na">_name=</span><span class="s">"stdtcp"</span> <span class="na">protocol=</span><span class="s">"tcp"</span> <span class="na">port=</span><span class="s">"8087"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p><strong>After <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code>:</strong></p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;input</span> <span class="na">auth=</span><span class="s">"x509"</span> <span class="na">_name=</span><span class="s">"stdssl"</span> <span class="na">protocol=</span><span class="s">"tls"</span> <span class="na">port=</span><span class="s">"8089"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<h3 id="32-truststore">3.2 Truststore</h3>
+
+<p>The intermediate CA truststore is used for client authentication (not the root CA):</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>truststoreFile="certs/files/truststore-intermediate-ca.jks"
+</code></pre></div></div>
+
+<p>This is patched from the TAK Server default (<code class="language-plaintext highlighter-rouge">truststore-root.jks</code>) by <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code>.</p>
+
+<h3 id="33-certificate-signing-atak-enrollment">3.3 Certificate Signing (ATAK Enrollment)</h3>
+
+<p>When <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> runs, it enables TAK Server as a Certificate Authority for device enrollment:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;certificateSigning</span> <span class="na">CA=</span><span class="s">"TAKServer"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;certificateConfig&gt;</span>
+    <span class="nt">&lt;nameEntries&gt;</span>
+      <span class="nt">&lt;nameEntry</span> <span class="na">name=</span><span class="s">"O"</span> <span class="na">value=</span><span class="s">"TAK"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;nameEntry</span> <span class="na">name=</span><span class="s">"OU"</span> <span class="na">value=</span><span class="s">"TAK"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/nameEntries&gt;</span>
+  <span class="nt">&lt;/certificateConfig&gt;</span>
+  <span class="nt">&lt;TAKServerCAConfig</span>
+    <span class="na">keystore=</span><span class="s">"JKS"</span>
+    <span class="na">keystoreFile=</span><span class="s">"certs/files/intermediate-ca-signing.jks"</span>
+    <span class="na">keystorePass=</span><span class="s">"&lt;KEYSTORE_PASSWORD&gt;"</span>
+    <span class="na">validityDays=</span><span class="s">"30"</span>
+    <span class="na">signatureAlg=</span><span class="s">"SHA256WithRSA"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/certificateSigning&gt;</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Note:</strong> <code class="language-plaintext highlighter-rouge">keystorePass</code> is written as plaintext into <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>. See <a href="#7-security-gaps">Gap Analysis</a> for the security implication.</p>
+</blockquote>
+
+<p><strong>Enrollment certificate validity:</strong> 30 days (hardcoded in <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code>).</p>
+
+<blockquote>
+  <p><strong>Workaround:</strong> To change the validity period, edit <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> and update the <code class="language-plaintext highlighter-rouge">validityDays</code> value at the <code class="language-plaintext highlighter-rouge">TAKServerCAConfig</code> sed anchor (line ~128). For non-operational labs, 365 days is a practical default that avoids frequent re-enrollment. The value is safe to increase — TAK Server enforces no upper limit.</p>
+</blockquote>
+
+<h3 id="34-group-authentication-cache">3.4 Group Authentication Cache</h3>
+
+<p>Enabled as part of cert setup:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;auth</span> <span class="na">x509useGroupCache=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<h3 id="35-lets-encrypt-8446-connector">3.5 Let’s Encrypt 8446 Connector</h3>
+
+<p>When <code class="language-plaintext highlighter-rouge">takserver_createLECerts.sh</code> is run, the <code class="language-plaintext highlighter-rouge">&lt;connector port="8446" .../&gt;</code> is replaced with:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;connector</span> <span class="na">port=</span><span class="s">"8446"</span> <span class="na">clientAuth=</span><span class="s">"false"</span>
+  <span class="na">keystoreFile=</span><span class="s">"certs/files/takserver-le.jks"</span>
+  <span class="na">keystorePass=</span><span class="s">"&lt;KEYSTORE_PASSWORD&gt;"</span>
+  <span class="na">truststoreFile=</span><span class="s">"certs/files/truststore-intermediate-ca.jks"</span>
+  <span class="na">truststorePass=</span><span class="s">"&lt;KEYSTORE_PASSWORD&gt;"</span>
+  <span class="na">_name=</span><span class="s">"cert_https"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<h3 id="36-settings-not-managed-by-this-pipeline">3.6 Settings NOT Managed by This Pipeline</h3>
+
+<p>The following CoreConfig.xml sections are <strong>not touched</strong> by any script in this repo and remain at TAK Server RPM defaults:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Setting</th>
+      <th>Default</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Database connection</td>
+      <td><code class="language-plaintext highlighter-rouge">localhost:5432</code></td>
+      <td>PostgreSQL on same host</td>
+    </tr>
+    <tr>
+      <td>Federation</td>
+      <td>Disabled</td>
+      <td>No federation scripts in repo</td>
+    </tr>
+    <tr>
+      <td>Metrics / logging</td>
+      <td>Default</td>
+      <td>No custom log4j or metrics config</td>
+    </tr>
+    <tr>
+      <td>Device Profiles</td>
+      <td>None</td>
+      <td>No device profile management</td>
+    </tr>
+    <tr>
+      <td>Mission package size limits</td>
+      <td>Default</td>
+      <td>Not configured</td>
+    </tr>
+    <tr>
+      <td>OAuth2 / LDAP</td>
+      <td>Disabled</td>
+      <td>File-based auth only</td>
+    </tr>
+    <tr>
+      <td>VBM (Video Broadcast Manager)</td>
+      <td>Disabled</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;vbm enabled="false"/&gt;</code> is the sed anchor</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="4-certificate-configuration">4. Certificate Configuration</h2>
+
+<h3 id="41-pki-architecture">4.1 PKI Architecture</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Root CA  (TAK-CA, or user-supplied name)
+  └── Intermediate CA  (intermediate-ca)
+        ├── TAK Server certificate  (takserver.pem)
+        ├── Admin certificate       (admin.pem / admin.p12)
+        └── User/device certificates (generated per device via enrollment or takUserCreateCerts_doNotRunAsRoot.sh)
+</code></pre></div></div>
+
+<p>All certificates are generated at runtime using TAK Server’s built-in <code class="language-plaintext highlighter-rouge">makeRootCa.sh</code> and <code class="language-plaintext highlighter-rouge">makeCert.sh</code> scripts in <code class="language-plaintext highlighter-rouge">/opt/tak/certs/</code>.</p>
+
+<h3 id="42-certificate-files-server-side">4.2 Certificate Files (Server-side)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Location</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">intermediate-ca-signing.jks</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td>JKS used for TAK Server signing enrollment certs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.jks</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td>Truststore for client auth (x509 input)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">takserver.pem</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td>Server identity certificate</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin.pem</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td>Admin user certificate</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin.p12</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/home/atak/admin.p12</code></td>
+      <td>Admin certificate for browser import (deployed by <code class="language-plaintext highlighter-rouge">promoteAdmin.sh</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">takserver-le.jks</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td><em>(Optional)</em> Let’s Encrypt JKS for port 8446</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">takserver-le.p12</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+      <td><em>(Optional)</em> Let’s Encrypt PKCS12</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Certs are Git-ignored (<code class="language-plaintext highlighter-rouge">certs/.gitignore</code>). No certificates are committed to this repository.</p>
+</blockquote>
+
+<h3 id="43-certificate-metadata">4.3 Certificate Metadata</h3>
+
+<p>Set interactively at cert creation time via <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code>. Passed via <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> parameters when using the PowerShell pipeline:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Constraint</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>STATE</td>
+      <td>UPPERCASE, no spaces, letters/digits/hyphens</td>
+      <td><code class="language-plaintext highlighter-rouge">VA</code></td>
+    </tr>
+    <tr>
+      <td>CITY</td>
+      <td>UPPERCASE, no spaces</td>
+      <td><code class="language-plaintext highlighter-rouge">ARLINGTON</code></td>
+    </tr>
+    <tr>
+      <td>ORGANIZATION</td>
+      <td>UPPERCASE, no spaces</td>
+      <td><code class="language-plaintext highlighter-rouge">MYORG</code></td>
+    </tr>
+    <tr>
+      <td>ORGANIZATIONAL_UNIT</td>
+      <td>UPPERCASE, no spaces</td>
+      <td><code class="language-plaintext highlighter-rouge">MYUNIT</code></td>
+    </tr>
+    <tr>
+      <td>CA Name</td>
+      <td>Default: <code class="language-plaintext highlighter-rouge">TAK-CA</code></td>
+      <td><code class="language-plaintext highlighter-rouge">TAK-CA</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="44-admin-certificate-promotion">4.4 Admin Certificate Promotion</h3>
+
+<p><code class="language-plaintext highlighter-rouge">promoteAdmin.sh</code> runs <code class="language-plaintext highlighter-rouge">UserManager.jar certmod -A</code> to grant the <code class="language-plaintext highlighter-rouge">admin.pem</code> certificate admin rights, then deploys <code class="language-plaintext highlighter-rouge">admin.p12</code> to <code class="language-plaintext highlighter-rouge">/home/atak/</code> with <code class="language-plaintext highlighter-rouge">atak:atak</code> ownership and <code class="language-plaintext highlighter-rouge">chmod 640</code>.</p>
+
+<h3 id="45-lets-encrypt-optional">4.5 Let’s Encrypt (Optional)</h3>
+
+<p><strong>Prerequisites:</strong></p>
+<ul>
+  <li>Public IP address</li>
+  <li>DNS A record pointing to the server’s FQDN</li>
+  <li>Port 80 (HTTP-01 ACME challenge) open inbound</li>
+</ul>
+
+<p><strong>Renewal:</strong> Monthly cron at <code class="language-plaintext highlighter-rouge">/etc/cron.monthly/takserver_renewLECerts.sh</code>
+<strong>Config:</strong> <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code> (root-owned, <code class="language-plaintext highlighter-rouge">chmod 600</code>) — stores <code class="language-plaintext highlighter-rouge">CERT_NAME</code> and <code class="language-plaintext highlighter-rouge">CERT_PASSWORD</code></p>
+
+<hr />
+
+<h2 id="5-openfire--takchat">5. Openfire / TAKChat</h2>
+
+<h3 id="51-version">5.1 Version</h3>
+
+<p>Openfire <strong>5.0.3</strong> installed from GitHub Releases RPM.</p>
+
+<p>SHA256 (verified at install time by <code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code>):</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a08493cb19bef6dd2b51ebe88d4ffd121553e2e4473ddbecf94f5ff350e367aa
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>When upgrading Openfire:</strong> Obtain the new SHA256 from the <a href="https://github.com/igniterealtime/Openfire/releases">Openfire GitHub Releases page</a> for the target RPM, update the <code class="language-plaintext highlighter-rouge">OPENFIRE_SHA256</code> variable in <code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code>, and update the hash above. The install script will fail with a checksum error if the values do not match, preventing installation of a tampered package.</p>
+</blockquote>
+
+<h3 id="52-service">5.2 Service</h3>
+
+<p>Openfire runs as a systemd service: <code class="language-plaintext highlighter-rouge">openfire-xmpp.service</code>
+Unit file written by <code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code> (not managed by the RPM’s own init.d integration).</p>
+
+<h3 id="53-port-conflict-resolution">5.3 Port Conflict Resolution</h3>
+
+<p>Cockpit is <strong>disabled</strong> (<code class="language-plaintext highlighter-rouge">systemctl disable --now cockpit.socket cockpit</code>) to free port 9090 for the Openfire admin console.</p>
+
+<h3 id="54-firewall-ports">5.4 Firewall Ports</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Service</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>5222</td>
+      <td>TCP</td>
+      <td>XMPP STARTTLS (primary ATAK TAKChat)</td>
+    </tr>
+    <tr>
+      <td>5223</td>
+      <td>TCP</td>
+      <td>XMPP Direct TLS (legacy)</td>
+    </tr>
+    <tr>
+      <td>5269</td>
+      <td>TCP</td>
+      <td>XMPP server-to-server federation</td>
+    </tr>
+    <tr>
+      <td>7070</td>
+      <td>TCP</td>
+      <td>Openfire HTTP web binding</td>
+    </tr>
+    <tr>
+      <td>7443</td>
+      <td>TCP</td>
+      <td>Openfire HTTPS web binding</td>
+    </tr>
+    <tr>
+      <td>7777</td>
+      <td>TCP</td>
+      <td>Openfire file transfer proxy</td>
+    </tr>
+    <tr>
+      <td>9090</td>
+      <td>TCP</td>
+      <td>Openfire admin console HTTP <em>(conditional — <code class="language-plaintext highlighter-rouge">OPENFIRE_OPEN_ADMIN_PORTS=true</code>)</em></td>
+    </tr>
+    <tr>
+      <td>9091</td>
+      <td>TCP</td>
+      <td>Openfire admin console HTTPS <em>(conditional)</em></td>
+    </tr>
+    <tr>
+      <td>8080</td>
+      <td>UDP</td>
+      <td>ATAK CoT/QUIC (ATAK 4.6+)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Default:</strong> Admin ports (9090/9091) are opened (<code class="language-plaintext highlighter-rouge">OPENFIRE_OPEN_ADMIN_PORTS=true</code>). Set to <code class="language-plaintext highlighter-rouge">false</code> to close them post-setup.</p>
+
+<h3 id="55-tak-plugin">5.5 TAK Plugin</h3>
+
+<p>No TAK-specific Openfire plugin JAR is distributed by this pipeline. Openfire provides the XMPP service; TAK Server handles the CoT/SA side.</p>
+
+<hr />
+
+<h2 id="6-network-requirements">6. Network Requirements</h2>
+
+<h3 id="61-inbound-ports-tak-server">6.1 Inbound Ports (TAK Server)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Required</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td>TCP</td>
+      <td>Yes</td>
+      <td>SSH (deployment and management)</td>
+    </tr>
+    <tr>
+      <td>8089</td>
+      <td>TCP</td>
+      <td>Yes</td>
+      <td>ATAK/WinTAK TLS client connections</td>
+    </tr>
+    <tr>
+      <td>8443</td>
+      <td>TCP</td>
+      <td>Yes</td>
+      <td>WebTAK and REST API (HTTPS)</td>
+    </tr>
+    <tr>
+      <td>8446</td>
+      <td>TCP</td>
+      <td>Yes</td>
+      <td>Certificate enrollment HTTPS</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td>TCP</td>
+      <td>LE only</td>
+      <td>ACME HTTP-01 challenge for Let’s Encrypt</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="62-inbound-ports-openfire-if-installed">6.2 Inbound Ports (Openfire, if installed)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Required</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>5222</td>
+      <td>TCP</td>
+      <td>Yes</td>
+      <td>XMPP STARTTLS</td>
+    </tr>
+    <tr>
+      <td>5223</td>
+      <td>TCP</td>
+      <td>Optional</td>
+      <td>XMPP Direct TLS</td>
+    </tr>
+    <tr>
+      <td>5269</td>
+      <td>TCP</td>
+      <td>Optional</td>
+      <td>XMPP S2S federation</td>
+    </tr>
+    <tr>
+      <td>7070</td>
+      <td>TCP</td>
+      <td>Optional</td>
+      <td>HTTP web binding</td>
+    </tr>
+    <tr>
+      <td>7443</td>
+      <td>TCP</td>
+      <td>Optional</td>
+      <td>HTTPS web binding</td>
+    </tr>
+    <tr>
+      <td>7777</td>
+      <td>TCP</td>
+      <td>Optional</td>
+      <td>File transfer proxy</td>
+    </tr>
+    <tr>
+      <td>8080</td>
+      <td>UDP</td>
+      <td>Optional</td>
+      <td>QUIC/CoT (ATAK 4.6+)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="63-system-level-settings">6.3 System-level Settings</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Setting</th>
+      <th>Value</th>
+      <th>Applied by</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">nofile</code> ulimit</td>
+      <td>32768</td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>SELinux</td>
+      <td>Enforcing (custom module)</td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Firewall</td>
+      <td><code class="language-plaintext highlighter-rouge">firewalld</code></td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>CRB repo</td>
+      <td>Enabled</td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code> (required for PostgreSQL 16 PGDG)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="7-gap-analysis">7. Gap Analysis</h2>
+
+<h3 id="71-configuration-gaps-missing-or-undocumented">7.1 Configuration Gaps (Missing or Undocumented)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Gap</th>
+      <th>Impact</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> template committed</td>
+      <td>Medium</td>
+      <td>Config state is opaque — only readable on a live server. Cannot diff or review configuration changes in git.</td>
+    </tr>
+    <tr>
+      <td>Enrollment cert validity hardcoded to 30 days</td>
+      <td>Medium</td>
+      <td><code class="language-plaintext highlighter-rouge">validityDays="30"</code> in <code class="language-plaintext highlighter-rouge">createTakCerts.sh:128</code> — no parameter to change this without editing the script</td>
+    </tr>
+    <tr>
+      <td>CA Name hardcoded to <code class="language-plaintext highlighter-rouge">TAK</code> in CoreConfig signing block</td>
+      <td>Low</td>
+      <td><code class="language-plaintext highlighter-rouge">nameEntry name="O" value="TAK"</code> and <code class="language-plaintext highlighter-rouge">name="OU" value="TAK"</code> do not respect the user-supplied CA name from the interactive prompt</td>
+    </tr>
+    <tr>
+      <td>Timezone and hostname defaults not parameterized in shell scripts</td>
+      <td>Low</td>
+      <td><code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> exposes these as parameters, but the underlying shell scripts assume the kickstart sets them</td>
+    </tr>
+    <tr>
+      <td>No database TLS</td>
+      <td>Low</td>
+      <td>PostgreSQL connection is localhost-only, not TLS-encrypted. TAK Server 5.7 supports PostgreSQL TLS (Appendix D of config guide).</td>
+    </tr>
+    <tr>
+      <td>No Federation configuration</td>
+      <td>Low</td>
+      <td>No scripts or config for TAK Server federation; requires manual setup</td>
+    </tr>
+    <tr>
+      <td>No device profile management</td>
+      <td>Low</td>
+      <td>TAK Server supports device profiles; not implemented in pipeline</td>
+    </tr>
+    <tr>
+      <td>Openfire not integrated with TAK Server auth</td>
+      <td>Medium</td>
+      <td>Openfire runs independently; TAK-XMPP integration requires manual Openfire setup (user provisioning, TAK Server XMPP plugin not included)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="72-security-gaps">7.2 Security Gaps</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Issue</th>
+      <th>Severity</th>
+      <th>Location</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">keystorePass</code> written as plaintext in <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code></td>
+      <td>High</td>
+      <td><code class="language-plaintext highlighter-rouge">createTakCerts.sh:128</code></td>
+      <td>World-readable by <code class="language-plaintext highlighter-rouge">tak</code> user; should use environment variable injection or secrets management</td>
+    </tr>
+    <tr>
+      <td>Let’s Encrypt password stored in plaintext <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code></td>
+      <td>Medium</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver_createLECerts.sh:134</code></td>
+      <td>Script includes a warning comment; file is <code class="language-plaintext highlighter-rouge">chmod 600</code> but still plaintext</td>
+    </tr>
+    <tr>
+      <td>Openfire admin ports (9090/9091) open by default</td>
+      <td>Medium</td>
+      <td><code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code></td>
+      <td><code class="language-plaintext highlighter-rouge">OPENFIRE_OPEN_ADMIN_PORTS=true</code> default; should close after initial setup</td>
+    </tr>
+    <tr>
+      <td>Anonymous TCP input (port 8087) present pre-cert setup</td>
+      <td>Medium</td>
+      <td>TAK Server default</td>
+      <td>Exists during install before <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> runs; brief exposure window</td>
+    </tr>
+    <tr>
+      <td>Port 80 must be open for Let’s Encrypt</td>
+      <td>Low</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver_createLECerts.sh</code></td>
+      <td>Temporary requirement; should be documented to close after cert issuance</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin.p12</code> permissions</td>
+      <td>Low</td>
+      <td><code class="language-plaintext highlighter-rouge">promoteAdmin.sh</code></td>
+      <td><code class="language-plaintext highlighter-rouge">chmod 640</code> with <code class="language-plaintext highlighter-rouge">atak:atak</code> ownership is reasonable but the <code class="language-plaintext highlighter-rouge">atak</code> group could be broader than intended</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="73-what-is-templated-vs-hardcoded">7.3 What is Templated vs Hardcoded</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Templated</th>
+      <th>Hardcoded</th>
+      <th>Where</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Certificate metadata (STATE/CITY/ORG/OU)</td>
+      <td>Yes (interactive / PS parameters)</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">createTakCerts.sh</code>, <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code></td>
+    </tr>
+    <tr>
+      <td>CA Name</td>
+      <td>Yes (interactive, default <code class="language-plaintext highlighter-rouge">TAK-CA</code>)</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">createTakCerts.sh</code></td>
+    </tr>
+    <tr>
+      <td>Keystore password</td>
+      <td>Yes (interactive / PS parameters)</td>
+      <td>—</td>
+      <td>All cert scripts</td>
+    </tr>
+    <tr>
+      <td>TAK Server RPM filename</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver-5.7-RELEASE8.noarch.rpm</code></td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Openfire version</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">5.0.3</code></td>
+      <td><code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Openfire SHA256</td>
+      <td>Env override allowed</td>
+      <td><code class="language-plaintext highlighter-rouge">a08493cb...</code></td>
+      <td><code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Certificate enrollment validity</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">30</code> days</td>
+      <td><code class="language-plaintext highlighter-rouge">createTakCerts.sh:128</code></td>
+    </tr>
+    <tr>
+      <td>TAK firewall ports</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">8089, 8443, 8446</code></td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Openfire firewall ports</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">5222, 5223, 5269, 7070, 7443, 7777</code></td>
+      <td><code class="language-plaintext highlighter-rouge">openfire_takChat_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>CoreConfig.xml CA O/OU in signing block</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK</code> / <code class="language-plaintext highlighter-rouge">TAK</code></td>
+      <td><code class="language-plaintext highlighter-rouge">createTakCerts.sh:128</code></td>
+    </tr>
+    <tr>
+      <td>VM timezone</td>
+      <td>PS default <code class="language-plaintext highlighter-rouge">Europe/London</code></td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code></td>
+    </tr>
+    <tr>
+      <td>VM hostname</td>
+      <td>PS default <code class="language-plaintext highlighter-rouge">takserver</code></td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">nofile</code> ulimit</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">32768</code></td>
+      <td><code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="8-recommendations">8. Recommendations</h2>
+
+<h3 id="81-quick-wins">8.1 Quick Wins</h3>
+
+<ol>
+  <li>
+    <p><strong>Parameterize enrollment cert validity</strong> — add a <code class="language-plaintext highlighter-rouge">VALIDITY_DAYS</code> variable to <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> and expose it as a <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> parameter. Default to 30 but allow override.</p>
+  </li>
+  <li>
+    <p><strong>Expose CA O/OU in the signing block</strong> — the <code class="language-plaintext highlighter-rouge">nameEntry</code> values in <code class="language-plaintext highlighter-rouge">createTakCerts.sh:128</code> currently hardcode <code class="language-plaintext highlighter-rouge">TAK/TAK</code>. They should reflect the user-supplied <code class="language-plaintext highlighter-rouge">orgvar</code>/<code class="language-plaintext highlighter-rouge">ouvar</code> values so the signing CA matches the PKI hierarchy.</p>
+  </li>
+  <li>
+    <p><strong>Close Openfire admin ports post-setup</strong> — document (or script) setting <code class="language-plaintext highlighter-rouge">OPENFIRE_OPEN_ADMIN_PORTS=false</code> after initial Openfire configuration. Alternatively, flip the default to <code class="language-plaintext highlighter-rouge">false</code> and require explicit opt-in.</p>
+  </li>
+  <li>
+    <p><strong>Commit a CoreConfig.xml template</strong> — add <code class="language-plaintext highlighter-rouge">docs/config/CoreConfig.xml.template</code> with placeholder tokens (e.g., <code class="language-plaintext highlighter-rouge">,</code>). This makes config changes reviewable in git and provides a reference for the expected schema.</p>
+  </li>
+  <li>
+    <p><strong>Document the Let’s Encrypt post-issuance port 80 closure</strong> — add a step to <code class="language-plaintext highlighter-rouge">takserver_createLECerts.sh</code> or its documentation to close port 80 after certbot completes.</p>
+  </li>
+</ol>
+
+<h3 id="82-best-practice-improvements-tak-server-57-aligned">8.2 Best-Practice Improvements (TAK Server 5.7 Aligned)</h3>
+
+<ol>
+  <li>
+    <p><strong>Replace plaintext password in CoreConfig.xml</strong> — TAK Server 5.7 supports loading the keystore password from an environment variable. Reference <a href="https://wiki.tak.gov">tak.gov wiki</a> for the <code class="language-plaintext highlighter-rouge">keystorePass</code> env override mechanism. Until then, ensure CoreConfig.xml is <code class="language-plaintext highlighter-rouge">chmod 640</code> with <code class="language-plaintext highlighter-rouge">tak:tak</code> ownership.</p>
+  </li>
+  <li>
+    <p><strong>Replace plaintext password in <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code></strong> — use <code class="language-plaintext highlighter-rouge">systemd-creds</code> (available on Rocky Linux 9 / systemd 249+) to encrypt the credential at rest. The renewal script already includes a comment acknowledging this gap.</p>
+  </li>
+  <li>
+    <p><strong>Enable PostgreSQL TLS</strong> — for defense-in-depth, configure PostgreSQL TLS per Appendix D of the TAK Server 5.7 Configuration Guide (<code class="language-plaintext highlighter-rouge">Documentation/TAK_Server_Configuration_Guide_5.7.pdf</code>). Beneficial even for localhost connections when running in a shared or multi-tenant VM environment.</p>
+  </li>
+  <li>
+    <p><strong>Add a post-install validation step</strong> — the <code class="language-plaintext highlighter-rouge">Invoke-IntegrationTests.ps1</code> script exists but is not called from <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> by default. Wire it into the deployment pipeline as an optional <code class="language-plaintext highlighter-rouge">-RunTests</code> flag to catch cert/port/service issues automatically.</p>
+  </li>
+  <li>
+    <p><strong>Version-pin with a SHA256 for the TAK Server RPM</strong> — the Openfire install already SHA256-verifies its RPM download. The same pattern should be applied to the TAK Server RPM when it is uploaded/cached locally, ensuring integrity even for files transferred over SCP.</p>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="../TAK_Server_Configuration_Guide_5.7.pdf">TAK Server 5.7 Configuration Guide</a> — official TAK.gov document (committed to <code class="language-plaintext highlighter-rouge">Documentation/</code>)</li>
+  <li><a href="https://wiki.tak.gov">TAK.gov wiki</a> — change log, community guidance, federation examples</li>
+  <li><a href="../../InstallShellScripts/RL9_tak5.7r8_install.sh">RL9_tak5.7r8_install.sh</a> — main install script</li>
+  <li><a href="../../InstallShellScripts/createTakCerts.sh">createTakCerts.sh</a> — certificate creation and CoreConfig patching</li>
+  <li><a href="../../InstallShellScripts/openfire_takChat_install.sh">openfire_takChat_install.sh</a> — Openfire installation</li>
+  <li><a href="../../InstallShellScripts/takserver_createLECerts.sh">takserver_createLECerts.sh</a> — Let’s Encrypt integration</li>
+  <li><a href="../../Deploy-TAKServer.ps1">Deploy-TAKServer.ps1</a> — Hyper-V deployment orchestration</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

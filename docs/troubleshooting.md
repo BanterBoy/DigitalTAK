@@ -454,6 +454,35 @@ sudo certbot renew --dry-run
 
 ---
 
+### Verifying Let's Encrypt Certificate Renewal Succeeded
+
+After running `Update-TAKLetsEncryptCertificate` (or the cron script), confirm the new certificate is in place:
+
+```bash
+# Check the expiry date of the renewed cert
+sudo openssl x509 -enddate -noout \
+    -in /etc/letsencrypt/live/<your-domain>/cert.pem
+# Expected: notAfter= approximately 90 days from today
+
+# Confirm the cert is loaded on TAK Server's enrollment port
+echo | openssl s_client -connect <server-ip>:8446 2>/dev/null \
+    | openssl x509 -noout -dates
+```
+
+If the date shown by port 8446 does not match the certbot cert, TAK Server may need a restart to reload the JKS:
+
+```bash
+sudo systemctl restart takserver
+```
+
+Check certbot logs if renewal failed silently:
+
+```bash
+sudo tail -50 /var/log/letsencrypt/letsencrypt.log
+```
+
+---
+
 ## PowerShell Module Issues
 
 ### Symptom: `Import-Module .\TAKDeploy\TAKDeploy.psm1` fails — "Module not found" or "Could not load file"
@@ -579,6 +608,50 @@ Stop-VM -Name 'TAKServer' -Force
 .\Invoke-TAKRollback.ps1 -VMName 'TAKServer' -SnapshotName 'Phase2-TAKInstalled'
 Start-VM -Name 'TAKServer'
 ```
+
+---
+
+## Upgrading TAK Server
+
+The current pipeline targets TAK Server **5.7-RELEASE8** (RPM filename hardcoded in `RL9_tak5.7r8_install.sh`). There is no automated upgrade path. Upgrading to a future release requires manual steps.
+
+> **Always test upgrades in a lab snapshot before applying to a production deployment.**
+
+### Step-by-step upgrade procedure
+
+1. **Take a VM snapshot**
+   ```powershell
+   Checkpoint-VM -Name 'TAKServer' -SnapshotName 'Pre-Upgrade-Snapshot'
+   ```
+
+2. **Back up the database** — see [Database Backup](config/database-backup/) before proceeding.
+
+3. **Stop TAK Server**
+   ```bash
+   sudo systemctl stop takserver
+   ```
+
+4. **Upload the new RPM** and install:
+   ```bash
+   # SCP the new RPM to the server (from Windows)
+   # Then on the server:
+   sudo dnf install -y /tmp/takserver-5.8-RELEASE1.noarch.rpm
+   # or: sudo rpm -Uvh /tmp/takserver-5.8-RELEASE1.noarch.rpm
+   ```
+
+5. **Review `CoreConfig.xml`** — new TAK Server versions may change the expected XML schema. Compare against the installed example:
+   ```bash
+   diff /opt/tak/CoreConfig.xml /opt/tak/CoreConfig.example.xml
+   ```
+
+6. **Start TAK Server and validate**
+   ```bash
+   sudo systemctl start takserver
+   sudo journalctl -u takserver -f
+   ```
+   Then connect with TAKServerPS and confirm `Get-TAKVersion` returns the new version.
+
+7. **Update pipeline scripts** — after a successful upgrade, update the RPM filename in `RL9_tak5.7r8_install.sh` and the version references in `docs/_config.yml`, `docs/index.md`, and `docs/config/baseline.md` to match the new release.
 
 ---
 

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAK Server Federation | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAK Server Federation" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/config/federation/" />
+<meta property="og:url" content="http://0.0.0.0:4000/config/federation/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAK Server Federation" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAK Server Federation","url":"http://0.0.0.0:4000/config/federation/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="tak-server-federation-configuration">TAK Server Federation Configuration</h1>
+
+<blockquote>
+  <p><strong>TAK Server version:</strong> 5.7-RELEASE8
+<strong>Source:</strong> TAK Server 5.7 Configuration Guide §12 and Federation Hub Configuration Guide
+<strong>DigitalTAK status:</strong> Federation ports and settings are not automated by the current pipeline. See <a href="#10-digitaktak-pipeline-gaps">§10 Pipeline Gaps</a> for the manual steps required before federation can be enabled.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="1-overview">1. Overview</h2>
+
+<p>Federation allows ATAK/WinTAK users connected to separate TAK Server instances (across independent administrative domains) to share situational awareness (SA) without direct cross-domain client connections.</p>
+
+<p>Key properties:</p>
+
+<ul>
+  <li>Each domain retains full control over what data it shares outbound.</li>
+  <li>ATAKs on one server are never directly exposed to the other server’s network.</li>
+  <li>Trust is established by exchanging CA certificates (or tokens), not user accounts.</li>
+  <li>No ATAK/WinTAK client reconfiguration is required to participate in federation.</li>
+</ul>
+
+<p><strong>DigitalTAK lab scope:</strong> Single-node federation is not applicable to a single-server lab. This document is a configuration reference for when a second TAK Server instance is available. The federation configuration settings in CoreConfig.xml are <strong>not touched</strong> by the current pipeline scripts.</p>
+
+<hr />
+
+<h2 id="2-federation-ports">2. Federation Ports</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>9000</td>
+      <td>TCP (TLS v1)</td>
+      <td>Legacy federation protocol (TAK Server ≤ 5.x)</td>
+    </tr>
+    <tr>
+      <td>9001</td>
+      <td>TCP (TLS v2)</td>
+      <td>Current federation protocol (v2, preferred)</td>
+    </tr>
+    <tr>
+      <td>Token port</td>
+      <td>TCP (configurable)</td>
+      <td>Token-based auth federation (alternative to mTLS)</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Federation ports are not opened by <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code>. Add them manually to firewalld if federation is required:</p>
+
+  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>9001/tcp
+firewall-cmd <span class="nt">--reload</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<hr />
+
+<h2 id="3-enabling-federation">3. Enabling Federation</h2>
+
+<p>Federation is enabled via the <strong>WebTAK admin UI</strong> — there is no CLI or CoreConfig.xml entry to set directly.</p>
+
+<ol>
+  <li>Navigate to <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code> and log in with the admin certificate.</li>
+  <li>Go to <strong>Configuration &gt; Manage Federates</strong>.</li>
+  <li>Click <strong>Edit Configuration</strong>.</li>
+  <li>Enable federation and select the protocol version (v2 / port 9001 recommended).</li>
+  <li><strong>Restart TAK Server</strong> after saving — federation port changes require a restart.</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the TAK Server host</span>
+systemctl restart takserver
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="4-certificate-exchange">4. Certificate Exchange</h2>
+
+<p>For federated servers to trust each other’s clients, each server must upload the other server’s CA certificate.</p>
+
+<h3 id="41-export-your-ca">4.1 Export Your CA</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On Server A — export the intermediate CA public cert</span>
+openssl x509 <span class="nt">-in</span> /opt/tak/certs/files/intermediate-ca.pem <span class="nt">-out</span> /tmp/server-a-ca.pem
+</code></pre></div></div>
+
+<p>Exchange <code class="language-plaintext highlighter-rouge">server-a-ca.pem</code> with the administrator of Server B via a secure out-of-band channel (email, USB, secure file transfer).</p>
+
+<h3 id="42-upload-peer-ca-to-tak-server">4.2 Upload Peer CA to TAK Server</h3>
+
+<ol>
+  <li>In WebTAK: <strong>Configuration &gt; Federate Certificate Authorities &gt; Upload CA</strong>.</li>
+  <li>Upload the <code class="language-plaintext highlighter-rouge">.pem</code> file received from the peer.</li>
+  <li>The peer CA is stored in a separate federate truststore — it does <strong>not</strong> grant that CA’s clients direct ATAK access to your server.</li>
+</ol>
+
+<hr />
+
+<h2 id="5-outgoing-connection-initiating-server">5. Outgoing Connection (Initiating Server)</h2>
+
+<p>Only <strong>one</strong> server initiates the connection. The other listens passively.</p>
+
+<ol>
+  <li>WebTAK: <strong>Configuration &gt; Manage Federates &gt; Outgoing Connection Configuration</strong>.</li>
+  <li>Enter peer server address and port (e.g., <code class="language-plaintext highlighter-rouge">&lt;PEER_IP&gt;:9001</code>).</li>
+  <li>Select protocol version v2.</li>
+  <li>Set reconnection interval (default: 5 seconds).</li>
+  <li>Enable connection.</li>
+</ol>
+
+<p>Verify in <strong>Active Connections</strong> — the connection status should show <code class="language-plaintext highlighter-rouge">Connected</code>.</p>
+
+<hr />
+
+<h2 id="6-group-filtering">6. Group Filtering</h2>
+
+<p>After connection, no data flows until groups are configured on both servers.</p>
+
+<ol>
+  <li>In <strong>Manage Federates &gt; Federate Configuration</strong>, locate the connected peer row.</li>
+  <li>Click <strong>Manage Groups</strong>.</li>
+  <li>Add the group names (or <code class="language-plaintext highlighter-rouge">__ANON__</code> for ungrouped clients) that you want to share outbound.</li>
+  <li>The peer must mirror this step for their groups.</li>
+  <li>No restart required — group changes take effect immediately.</li>
+</ol>
+
+<h3 id="61-federated-group-mapping-optional">6.1 Federated Group Mapping (Optional)</h3>
+
+<p>Incoming traffic from remote groups can be mapped to local groups. This allows cross-domain group normalisation without exposing internal group names.</p>
+
+<ol>
+  <li>In <strong>Federate Groups &gt; Federated Group Mapping</strong>, select a remote group from the dropdown.</li>
+  <li>Map it to a local group.</li>
+  <li>Traffic from the remote group is inserted into the mapped local group.</li>
+</ol>
+
+<hr />
+
+<h2 id="7-token-based-authentication-alternative-to-mtls">7. Token-Based Authentication (Alternative to mTLS)</h2>
+
+<p>Token auth is useful when network inspection (TLS break-and-inspect) prevents mutual TLS.</p>
+
+<h3 id="71-enable-token-auth">7.1 Enable Token Auth</h3>
+
+<ol>
+  <li>WebTAK: <strong>Configuration &gt; Federation</strong> — enable token authentication and set a token port.</li>
+</ol>
+
+<h3 id="72-issue-a-manual-token">7.2 Issue a Manual Token</h3>
+
+<ol>
+  <li>Navigate to <strong>Federate Token Generation</strong> in <strong>Configuration &gt; Federation</strong>.</li>
+  <li>Generate a token and distribute it to the peer admin.</li>
+  <li>The peer enters the token in their outgoing connection configuration.</li>
+</ol>
+
+<blockquote>
+  <p>The peer still needs your CA cert (<code class="language-plaintext highlighter-rouge">ca.pem</code>) for TLS trust even when using tokens.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="8-mission-federation-disruption-tolerance">8. Mission Federation Disruption Tolerance</h2>
+
+<p>Enables mission synchronisation catch-up after a federation link outage.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Setting</th>
+      <th>Default</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Enabled</td>
+      <td>Off</td>
+      <td>Check box in Federation Configuration page</td>
+    </tr>
+    <tr>
+      <td>Send changes newer than</td>
+      <td>2 days</td>
+      <td>Configurable per mission; <code class="language-plaintext highlighter-rouge">Unlimited</code> option available</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Enable in WebTAK: <strong>Configuration &gt; Manage Federates &gt; Federation Configuration &gt; Mission Federation Disruption Tolerance</strong>.</p>
+
+<hr />
+
+<h2 id="9-data-package-and-mission-file-blocker">9. Data Package and Mission File Blocker</h2>
+
+<p>Prevents federated <code class="language-plaintext highlighter-rouge">.pref</code> files and other config artefacts from propagating to remote clients.</p>
+
+<ol>
+  <li>WebTAK: <strong>Configuration &gt; Manage Federates &gt; Federation Configuration</strong>.</li>
+  <li>Check <strong>Data Package and Mission File Blocker</strong>.</li>
+  <li>Default blocked extension: <code class="language-plaintext highlighter-rouge">pref</code>. Add additional extensions as needed.</li>
+</ol>
+
+<hr />
+
+<h2 id="10-digitaltak-pipeline-gaps">10. DigitalTAK Pipeline Gaps</h2>
+
+<p>The following federation items are <strong>not implemented</strong> in the current pipeline and require manual setup:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Firewalld rules for port 9001</td>
+      <td>Not opened by <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code></td>
+    </tr>
+    <tr>
+      <td>Federation enabled in CoreConfig.xml</td>
+      <td>No script in repo touches federation settings</td>
+    </tr>
+    <tr>
+      <td>Peer CA exchange</td>
+      <td>Requires out-of-band coordination</td>
+    </tr>
+    <tr>
+      <td>Group filter configuration</td>
+      <td>Manual WebTAK admin step</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="11-federation-hub-separate-install">11. Federation Hub (Separate Install)</h2>
+
+<p>For hub-and-spoke topologies (multiple servers federated through a central relay), TAK provides a separate <strong>Federation Hub</strong> installer. This is distinct from the TAK Server federation described above.</p>
+
+<p>Key differences:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>TAK Server Federation</th>
+      <th>Federation Hub</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Architecture</td>
+      <td>Peer-to-peer</td>
+      <td>Hub-and-spoke</td>
+    </tr>
+    <tr>
+      <td>Install package</td>
+      <td>Included with TAK Server</td>
+      <td>Separate RPM (<code class="language-plaintext highlighter-rouge">takserver-fed-hub-*.noarch.rpm</code>)</td>
+    </tr>
+    <tr>
+      <td>Purpose</td>
+      <td>Two organisations share SA</td>
+      <td>Multiple enclaves through one central relay</td>
+    </tr>
+    <tr>
+      <td>DigitalTAK status</td>
+      <td>Documented (this stub)</td>
+      <td>Out of scope for current lab</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Refer to <code class="language-plaintext highlighter-rouge">Documentation/Federation_Hub_Configuration_Guide.pdf</code> and the TAK.gov wiki for Federation Hub setup.</p>
+
+<hr />
+
+<h2 id="12-enabling-federation-via-pipeline-future-work">12. Enabling Federation via Pipeline (Future Work)</h2>
+
+<p>The following items would need to be implemented in DigitalTAK to automate federation setup end-to-end. They are currently manual steps.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>What is needed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Firewalld rules</td>
+      <td>Add <code class="language-plaintext highlighter-rouge">--add-port=9001/tcp</code> to <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code> (currently only opens TAK Server ports)</td>
+    </tr>
+    <tr>
+      <td>Outgoing connection</td>
+      <td>Use <code class="language-plaintext highlighter-rouge">New-TAKOutgoingConnection</code> (TAKServerPS) to script the peer connection rather than using WebTAK UI</td>
+    </tr>
+    <tr>
+      <td>CA exchange</td>
+      <td>Add a cmdlet or script step that exports <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/intermediate-ca.pem</code> and accepts a peer CA for upload</td>
+    </tr>
+    <tr>
+      <td>Group filter</td>
+      <td>Use <code class="language-plaintext highlighter-rouge">Set-TAKFederateGroup</code> (to be implemented in TAKServerPS) rather than the WebTAK admin panel</td>
+    </tr>
+    <tr>
+      <td>CoreConfig.xml</td>
+      <td>Federation is enabled through the WebTAK UI rather than config file; no current scripted equivalent</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Until these are implemented, follow the manual steps in §3–§6 above using the WebTAK admin console at <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code>.</p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="../../Documentation/TAK_Server_Configuration_Guide_5.7.md#12-federation">TAK Server 5.7 Configuration Guide §12</a></li>
+  <li><a href="../../Documentation/Federation_Hub_Configuration_Guide.pdf">Federation Hub Configuration Guide</a></li>
+  <li><a href="https://wiki.tak.gov/display/TPC/Federation+Hub">TAK.gov wiki — Federation Hub</a></li>
+  <li><a href="/config/baseline/">baseline.md</a> — CoreConfig settings not managed by pipeline</li>
+  <li><a href="/config/client-validation/">client-validation.md</a> — post-deployment validation checklist</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

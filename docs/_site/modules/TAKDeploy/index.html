@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAKDeploy Module | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAKDeploy Module" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/modules/TAKDeploy/" />
+<meta property="og:url" content="http://0.0.0.0:4000/modules/TAKDeploy/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAKDeploy Module" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAKDeploy Module","url":"http://0.0.0.0:4000/modules/TAKDeploy/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="takdeploy-module">TAKDeploy Module</h1>
+
+<p><strong>Version:</strong> 1.1.0
+<strong>PowerShell:</strong> 7.0+
+<strong>Required modules:</strong> <code class="language-plaintext highlighter-rouge">Posh-SSH</code></p>
+
+<h2 id="purpose">Purpose</h2>
+
+<p>TAKDeploy provides cmdlets for creating a Hyper-V Gen 2 virtual machine running Rocky Linux 9 and orchestrating end-to-end TAK Server deployment on that VM. It shells out to TAKInstall over SSH once the OS is installed.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Windows host with Hyper-V enabled (elevated PowerShell required for VM creation)</li>
+  <li>PowerShell 7.0 or later</li>
+  <li><code class="language-plaintext highlighter-rouge">Posh-SSH</code> module: <code class="language-plaintext highlighter-rouge">Install-Module Posh-SSH -Scope CurrentUser</code></li>
+  <li>Rocky Linux 9 DVD ISO (<code class="language-plaintext highlighter-rouge">Rocky-9.x-x86_64-dvd.iso</code>)</li>
+  <li>TAK Server 5.7-RELEASE8 RPM (<code class="language-plaintext highlighter-rouge">takserver-5.7-RELEASE8.noarch.rpm</code>) — obtained from tak.gov</li>
+  <li>At least one External Hyper-V virtual switch (or a physical NIC to create one)</li>
+</ul>
+
+<h2 id="installing">Installing</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKDeploy\TAKDeploy.psd1</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="cmdlet-reference">Cmdlet Reference</h2>
+
+<h3 id="start-takdeployment"><code class="language-plaintext highlighter-rouge">Start-TAKDeployment</code></h3>
+
+<p><strong>Synopsis:</strong> Interactive orchestrator that deploys TAK Server from scratch on Hyper-V.</p>
+
+<p>Runs the full deployment pipeline in phases:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Collect configuration interactively; check prerequisites</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Create Hyper-V Gen 2 VM and boot Rocky Linux ISO</td>
+    </tr>
+    <tr>
+      <td>1b</td>
+      <td>Wait for operator to complete Rocky Linux install; establish SSH</td>
+    </tr>
+    <tr>
+      <td>2a</td>
+      <td><code class="language-plaintext highlighter-rouge">Install-TAKServer</code> — install RPM, Java, SELinux, firewall</td>
+    </tr>
+    <tr>
+      <td>2b</td>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> — create CA chain and server cert</td>
+    </tr>
+    <tr>
+      <td>2c</td>
+      <td><code class="language-plaintext highlighter-rouge">Set-TAKAdminCertificate</code> — promote admin cert</td>
+    </tr>
+    <tr>
+      <td>2d</td>
+      <td><em>(optional)</em> <code class="language-plaintext highlighter-rouge">Install-TAKOpenfire</code></td>
+    </tr>
+    <tr>
+      <td>2e</td>
+      <td><em>(optional)</em> <code class="language-plaintext highlighter-rouge">New-TAKLetsEncryptCertificate</code></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Print deployment summary with access URLs</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SkipVMCreation</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Skip Phase 1/1b; prompts for existing VM’s IP and SSH credentials</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Full interactive deployment</span><span class="w">
+</span><span class="n">Start-TAKDeployment</span><span class="w">
+
+</span><span class="c"># Skip VM creation — provision onto an existing Rocky Linux VM</span><span class="w">
+</span><span class="n">Start-TAKDeployment</span><span class="w"> </span><span class="nt">-SkipVMCreation</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="new-takvirtualmachine"><code class="language-plaintext highlighter-rouge">New-TAKVirtualMachine</code></h3>
+
+<p><strong>Synopsis:</strong> Creates a Hyper-V Gen 2 virtual machine configured for Rocky Linux 9.</p>
+
+<p>Creates and starts the VM. Open the Hyper-V console to complete the OS installation, then call <code class="language-plaintext highlighter-rouge">Wait-TAKLinuxInstall</code>.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VMName</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAKServer</code></td>
+      <td>Name of the VM in Hyper-V Manager</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VMPath</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Hyper-V\VMs</code></td>
+      <td>Directory for VM configuration and VHDX</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">IsoPath</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">C:\Hyper-V\ISO\Rocky-9.7-x86_64-dvd.iso</code></td>
+      <td>Path to Rocky Linux 9 DVD ISO</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VHDSizeGB</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">80</code></td>
+      <td>Dynamic VHDX size in GB (min 20, max 2048)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">MemoryStartupBytes</code></td>
+      <td>Long</td>
+      <td><code class="language-plaintext highlighter-rouge">8GB</code></td>
+      <td>Fixed memory allocation in bytes (dynamic memory disabled)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ProcessorCount</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">4</code></td>
+      <td>Number of virtual processors (max 64)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SwitchName</code></td>
+      <td>String</td>
+      <td><em>(auto-detected)</em></td>
+      <td>Hyper-V External virtual switch name</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Outputs:</strong> <code class="language-plaintext highlighter-rouge">Microsoft.HyperV.PowerShell.VirtualMachine</code></p>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>Requires an elevated (Administrator) PowerShell session.</li>
+  <li>If no External vSwitch exists, the cmdlet offers to create one using the first active physical NIC. Network connectivity will briefly drop during switch creation.</li>
+  <li>Supports <code class="language-plaintext highlighter-rouge">-WhatIf</code> / <code class="language-plaintext highlighter-rouge">-Confirm</code> (<code class="language-plaintext highlighter-rouge">ConfirmImpact = High</code>).</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create VM with all defaults</span><span class="w">
+</span><span class="n">New-TAKVirtualMachine</span><span class="w">
+
+</span><span class="c"># Custom VM with 120 GB disk and 8 vCPUs</span><span class="w">
+</span><span class="n">New-TAKVirtualMachine</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAK-Lab'</span><span class="w"> </span><span class="nt">-VHDSizeGB</span><span class="w"> </span><span class="nx">120</span><span class="w"> </span><span class="nt">-ProcessorCount</span><span class="w"> </span><span class="nx">8</span><span class="w">
+
+</span><span class="c"># Open the console to install Rocky Linux</span><span class="w">
+</span><span class="n">vmconnect.exe</span><span class="w"> </span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">COMPUTERNAME</span><span class="w"> </span><span class="nx">TAKServer</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="wait-taklinuxinstall"><code class="language-plaintext highlighter-rouge">Wait-TAKLinuxInstall</code></h3>
+
+<p><strong>Synopsis:</strong> Waits for the Rocky Linux installation to complete and establishes an SSH session.</p>
+
+<p>Pauses for the operator to complete the OS install via the Hyper-V console, then auto-detects the VM’s IP address and retries SSH until the connection succeeds or the timeout expires.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VMName</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAKServer</code></td>
+      <td>Name of the Hyper-V VM to monitor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">TimeoutSeconds</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">300</code></td>
+      <td>Maximum seconds to attempt SSH (30–3600)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RetryIntervalSeconds</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">10</code></td>
+      <td>Seconds between SSH attempts (5–120)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td><em>(prompted)</em></td>
+      <td>SSH credentials; prompted interactively if not supplied</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Outputs:</strong> <code class="language-plaintext highlighter-rouge">SSH.SshSession</code></p>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Wait for install, get session, pass to Install-TAKServer</span><span class="w">
+</span><span class="nv">$session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Wait-TAKLinuxInstall</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w">
+</span><span class="n">Install-TAKServer</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$session</span><span class="w"> </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w">
+
+</span><span class="c"># Use a 10-minute SSH retry timeout</span><span class="w">
+</span><span class="nv">$session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Wait-TAKLinuxInstall</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAK-Lab'</span><span class="w"> </span><span class="nt">-TimeoutSeconds</span><span class="w"> </span><span class="nx">600</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<hr />
+
+<h3 id="remove-takdeployment"><code class="language-plaintext highlighter-rouge">Remove-TAKDeployment</code></h3>
+
+<p><strong>Synopsis:</strong> Fully removes a CivTAK deployment from Hyper-V and the local machine.</p>
+
+<p>Performs a complete teardown in six steps:</p>
+
+<ol>
+  <li><em>(optional)</em> SSH into the VM and run <code class="language-plaintext highlighter-rouge">tak-uninstall.sh</code> to cleanly uninstall TAK Server from the guest OS (<code class="language-plaintext highlighter-rouge">-UninstallGuest</code>)</li>
+  <li>Stop and remove the Hyper-V VM and all its snapshots</li>
+  <li>Delete the VHDX disk file</li>
+  <li>Remove all cert/key files from <code class="language-plaintext highlighter-rouge">certs\</code> (recursive, covers team subdirectories)</li>
+  <li>Remove ATAK data packages from <code class="language-plaintext highlighter-rouge">dist\</code></li>
+  <li>Remove imported TAK certificates from the Windows certificate store</li>
+</ol>
+
+<p>This cmdlet is <strong>idempotent</strong> — re-running on an already-cleaned deployment is safe.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VMName</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">CivTAK</code></td>
+      <td>Name of the Hyper-V VM to remove</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VHDPath</code></td>
+      <td>String</td>
+      <td><em>(auto)</em></td>
+      <td>Path of the VHDX to delete. Defaults to <code class="language-plaintext highlighter-rouge">C:\Hyper-V\VMs\&lt;VMName&gt;\&lt;VMName&gt;.vhdx</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UninstallGuest</code></td>
+      <td>Switch</td>
+      <td>Off</td>
+      <td>SSH into the running VM and run <code class="language-plaintext highlighter-rouge">tak-uninstall.sh</code> before destroying it. Requires <code class="language-plaintext highlighter-rouge">-Credential</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td><em>(none)</em></td>
+      <td>Linux admin SSH credential. Required when <code class="language-plaintext highlighter-rouge">-UninstallGuest</code> is set</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Organization</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK</code></td>
+      <td>Organisation string used to scope Windows cert store cleanup. Must match the value used during deployment</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CAName</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">TAK-CA</code></td>
+      <td>Root CA name used during deployment. Used to identify and remove root CA, intermediate CA, and admin certs from the Windows store</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DeploymentRoot</code></td>
+      <td>String</td>
+      <td><em>(cwd)</em></td>
+      <td>Root folder of the DigitalTAK repo. Used to locate <code class="language-plaintext highlighter-rouge">certs\</code>, <code class="language-plaintext highlighter-rouge">dist\</code>, and <code class="language-plaintext highlighter-rouge">InstallShellScripts\tak-uninstall.sh</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>Requires an elevated (Administrator) PowerShell session for Hyper-V and Windows cert store operations.</li>
+  <li>Supports <code class="language-plaintext highlighter-rouge">-WhatIf</code> / <code class="language-plaintext highlighter-rouge">-Confirm</code> (<code class="language-plaintext highlighter-rouge">ConfirmImpact = High</code>).</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Full teardown with all defaults</span><span class="w">
+</span><span class="n">Remove-TAKDeployment</span><span class="w">
+
+</span><span class="c"># Custom org/CA name matching deployment parameters</span><span class="w">
+</span><span class="n">Remove-TAKDeployment</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'LEIGH-SERVICES'</span><span class="w"> </span><span class="nt">-CAName</span><span class="w"> </span><span class="s1">'TAK-CA'</span><span class="w">
+
+</span><span class="c"># Clean uninstall from guest before VM destruction</span><span class="w">
+</span><span class="nv">$cred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Credential</span><span class="w"> </span><span class="nt">-UserName</span><span class="w"> </span><span class="s1">'atak'</span><span class="w">
+</span><span class="n">Remove-TAKDeployment</span><span class="w"> </span><span class="nt">-UninstallGuest</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w">
+
+</span><span class="c"># Remove a named VM with an explicit VHDX path</span><span class="w">
+</span><span class="n">Remove-TAKDeployment</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'CivTAK-Prod'</span><span class="w"> </span><span class="nt">-VHDPath</span><span class="w"> </span><span class="s1">'D:\VMs\CivTAK-Prod\CivTAK-Prod.vhdx'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="invoke-takrollback"><code class="language-plaintext highlighter-rouge">Invoke-TAKRollback</code></h3>
+
+<p><strong>Synopsis:</strong> Rolls back a CivTAK Hyper-V deployment to a known-good Phase snapshot.</p>
+
+<p>Lists all deployment Phase snapshots for the target VM (created by <code class="language-plaintext highlighter-rouge">Start-TAKDeployment</code>) and restores either the specified snapshot or the most recent one. After rollback, the VM is started and SSH connectivity is confirmed.</p>
+
+<p>Available snapshots (created automatically by <code class="language-plaintext highlighter-rouge">Start-TAKDeployment</code>):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Snapshot</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase0-RockyInstalled</code></td>
+      <td>Rocky Linux OS installed, SSH working</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase2-TAKInstalled</code></td>
+      <td>TAK Server RPM installed and running</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Phase4-CertsAndAdmin</code></td>
+      <td>Certificates created, admin promoted</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">VMName</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">CivTAK</code></td>
+      <td>Name of the Hyper-V VM to roll back</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SnapshotName</code></td>
+      <td>String</td>
+      <td><em>(most recent)</em></td>
+      <td>Exact snapshot name to restore (e.g. <code class="language-plaintext highlighter-rouge">Phase0-RockyInstalled</code>). If omitted, the most recent deployment snapshot is used</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ListOnly</code></td>
+      <td>Switch</td>
+      <td>Off</td>
+      <td>List available deployment snapshots without restoring any</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SSHTimeoutSeconds</code></td>
+      <td>Int</td>
+      <td><code class="language-plaintext highlighter-rouge">120</code></td>
+      <td>Seconds to wait for SSH after restore</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>Supports <code class="language-plaintext highlighter-rouge">-WhatIf</code> / <code class="language-plaintext highlighter-rouge">-Confirm</code>.</li>
+  <li>After rollback, <code class="language-plaintext highlighter-rouge">Start-TAKDeployment</code> re-run will resume from the appropriate phase.</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Restore the most recent deployment snapshot</span><span class="w">
+</span><span class="n">Invoke-TAKRollback</span><span class="w">
+
+</span><span class="c"># List available snapshots without restoring</span><span class="w">
+</span><span class="n">Invoke-TAKRollback</span><span class="w"> </span><span class="nt">-ListOnly</span><span class="w">
+
+</span><span class="c"># Roll back to a specific phase</span><span class="w">
+</span><span class="n">Invoke-TAKRollback</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Phase0-RockyInstalled'</span><span class="w">
+
+</span><span class="c"># Roll back a named VM to a specific phase</span><span class="w">
+</span><span class="n">Invoke-TAKRollback</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'CivTAK-Prod'</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Phase2-TAKInstalled'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="gaps-and-known-issues">Gaps and Known Issues</h2>
+
+<ul>
+  <li>No automated Rocky Linux installation (Kickstart/unattended) — the operator must complete the graphical installer manually.</li>
+  <li><code class="language-plaintext highlighter-rouge">New-TAKVirtualMachine</code> does not validate that the ISO is a valid Rocky Linux image before booting.</li>
+  <li><code class="language-plaintext highlighter-rouge">Wait-TAKLinuxInstall</code> relies on Hyper-V’s IP detection via <code class="language-plaintext highlighter-rouge">Get-VMNetworkAdapter</code>; IP detection may fail if Hyper-V guest services are not running. The operator is prompted to enter the IP manually in that case.</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

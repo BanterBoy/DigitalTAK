@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Troubleshooting | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Troubleshooting" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/troubleshooting/" />
+<meta property="og:url" content="http://0.0.0.0:4000/troubleshooting/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Troubleshooting" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Troubleshooting","url":"http://0.0.0.0:4000/troubleshooting/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="troubleshooting">Troubleshooting</h1>
+
+<p>Diagnosis and resolution steps for common DigitalTAK deployment failures.</p>
+
+<blockquote>
+  <p><em>Chuck Norris doesn’t troubleshoot. Problems quietly fix themselves before he notices.</em></p>
+</blockquote>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#troubleshooting" id="markdown-toc-troubleshooting">Troubleshooting</a>    <ol>
+      <li><a href="#vm-boot-failures" id="markdown-toc-vm-boot-failures">VM Boot Failures</a>        <ol>
+          <li><a href="#symptom-vm-does-not-appear-in-hyper-v-manager-after-new-takvirtualmachine" id="markdown-toc-symptom-vm-does-not-appear-in-hyper-v-manager-after-new-takvirtualmachine">Symptom: VM does not appear in Hyper-V Manager after <code class="language-plaintext highlighter-rouge">New-TAKVirtualMachine</code></a></li>
+          <li><a href="#symptom-vm-boots-but-rocky-linux-installer-does-not-start-uefi-shell-appears-instead" id="markdown-toc-symptom-vm-boots-but-rocky-linux-installer-does-not-start-uefi-shell-appears-instead">Symptom: VM boots but Rocky Linux installer does not start; UEFI shell appears instead</a></li>
+          <li><a href="#symptom-rocky-linux-installer-completes-but-the-vm-reboots-back-into-the-iso" id="markdown-toc-symptom-rocky-linux-installer-completes-but-the-vm-reboots-back-into-the-iso">Symptom: Rocky Linux installer completes but the VM reboots back into the ISO</a></li>
+          <li><a href="#symptom-deploy-takserverps1-fails-at-phase-1-with-no-external-virtual-switch-found" id="markdown-toc-symptom-deploy-takserverps1-fails-at-phase-1-with-no-external-virtual-switch-found">Symptom: <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> fails at Phase 1 with “No External virtual switch found”</a></li>
+        </ol>
+      </li>
+      <li><a href="#ssh-timeout-failures" id="markdown-toc-ssh-timeout-failures">SSH Timeout Failures</a>        <ol>
+          <li><a href="#symptom-wait-taklinuxinstall-times-out-waiting-for-ssh" id="markdown-toc-symptom-wait-taklinuxinstall-times-out-waiting-for-ssh">Symptom: <code class="language-plaintext highlighter-rouge">Wait-TAKLinuxInstall</code> times out waiting for SSH</a></li>
+          <li><a href="#symptom-ssh-connects-but-invoke-takremotecommand-fails-with-permission-denied" id="markdown-toc-symptom-ssh-connects-but-invoke-takremotecommand-fails-with-permission-denied">Symptom: SSH connects but <code class="language-plaintext highlighter-rouge">Invoke-TAKRemoteCommand</code> fails with “Permission denied”</a></li>
+          <li><a href="#symptom-install-takserver-fails-at-scp-upload--could-not-upload-file" id="markdown-toc-symptom-install-takserver-fails-at-scp-upload--could-not-upload-file">Symptom: <code class="language-plaintext highlighter-rouge">Install-TAKServer</code> fails at SCP upload — “Could not upload file”</a></li>
+        </ol>
+      </li>
+      <li><a href="#certificate-errors" id="markdown-toc-certificate-errors">Certificate Errors</a>        <ol>
+          <li><a href="#symptom-new-takservercertificate-fails--sed-cant-find-label-for-jump-to-end" id="markdown-toc-symptom-new-takservercertificate-fails--sed-cant-find-label-for-jump-to-end">Symptom: <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> fails — “sed: can’t find label for jump to ‘end’”</a></li>
+          <li><a href="#symptom-set-takadmincertificate-fails--ignite-timeout-or-usermanagerjar-returned-non-zero" id="markdown-toc-symptom-set-takadmincertificate-fails--ignite-timeout-or-usermanagerjar-returned-non-zero">Symptom: <code class="language-plaintext highlighter-rouge">Set-TAKAdminCertificate</code> fails — “Ignite timeout” or “UserManager.jar returned non-zero”</a></li>
+          <li><a href="#symptom-certificate-fields-rejected--invalid-value-for-statecityorgou" id="markdown-toc-symptom-certificate-fields-rejected--invalid-value-for-statecityorgou">Symptom: Certificate fields rejected — “Invalid value for STATE/CITY/ORG/OU”</a></li>
+          <li><a href="#symptom-browser-rejects-adminp12-import--invalid-password-or-file-format-not-recognised" id="markdown-toc-symptom-browser-rejects-adminp12-import--invalid-password-or-file-format-not-recognised">Symptom: Browser rejects <code class="language-plaintext highlighter-rouge">admin.p12</code> import — “Invalid password” or “File format not recognised”</a></li>
+          <li><a href="#symptom-atak-client-connects-but-shows-certificate-not-trusted" id="markdown-toc-symptom-atak-client-connects-but-shows-certificate-not-trusted">Symptom: ATAK client connects but shows “Certificate not trusted”</a></li>
+        </ol>
+      </li>
+      <li><a href="#port-unreachability" id="markdown-toc-port-unreachability">Port Unreachability</a>        <ol>
+          <li><a href="#symptom-test-netconnection--port-8443-succeeds-from-the-vm-itself-but-fails-from-the-windows-host" id="markdown-toc-symptom-test-netconnection--port-8443-succeeds-from-the-vm-itself-but-fails-from-the-windows-host">Symptom: <code class="language-plaintext highlighter-rouge">Test-NetConnection -Port 8443</code> succeeds from the VM itself but fails from the Windows host</a></li>
+          <li><a href="#symptom-ports-808984438446-are-unreachable-after-deploy" id="markdown-toc-symptom-ports-808984438446-are-unreachable-after-deploy">Symptom: Ports 8089/8443/8446 are unreachable after deploy</a></li>
+          <li><a href="#symptom-rest-api-calls-fail-with-connection-refused-on-port-8443" id="markdown-toc-symptom-rest-api-calls-fail-with-connection-refused-on-port-8443">Symptom: REST API calls fail with “Connection refused” on port 8443</a></li>
+        </ol>
+      </li>
+      <li><a href="#tak-server-service-failures" id="markdown-toc-tak-server-service-failures">TAK Server Service Failures</a>        <ol>
+          <li><a href="#symptom-takserver-service-fails-to-start--exit-code-1" id="markdown-toc-symptom-takserver-service-fails-to-start--exit-code-1">Symptom: <code class="language-plaintext highlighter-rouge">takserver</code> service fails to start — “Exit code 1”</a></li>
+          <li><a href="#symptom-tak-server-starts-but-rest-api-returns-503--not-responding" id="markdown-toc-symptom-tak-server-starts-but-rest-api-returns-503--not-responding">Symptom: TAK Server starts but REST API returns 503 / not responding</a></li>
+        </ol>
+      </li>
+      <li><a href="#openfire--xmpp-issues" id="markdown-toc-openfire--xmpp-issues">Openfire / XMPP Issues</a>        <ol>
+          <li><a href="#symptom-openfire-admin-console-port-9090-is-unreachable" id="markdown-toc-symptom-openfire-admin-console-port-9090-is-unreachable">Symptom: Openfire admin console (port 9090) is unreachable</a></li>
+          <li><a href="#symptom-install-takopenfire-fails-at-the-rpm-download-step" id="markdown-toc-symptom-install-takopenfire-fails-at-the-rpm-download-step">Symptom: <code class="language-plaintext highlighter-rouge">Install-TAKOpenfire</code> fails at the RPM download step</a></li>
+          <li><a href="#symptom-atak-clients-cannot-connect-to-openfire-takchat" id="markdown-toc-symptom-atak-clients-cannot-connect-to-openfire-takchat">Symptom: ATAK clients cannot connect to Openfire (TAKChat)</a></li>
+        </ol>
+      </li>
+      <li><a href="#lets-encrypt-issues" id="markdown-toc-lets-encrypt-issues">Let’s Encrypt Issues</a>        <ol>
+          <li><a href="#symptom-certbot-certonly-fails--connection-timed-out-during-acme-challenge" id="markdown-toc-symptom-certbot-certonly-fails--connection-timed-out-during-acme-challenge">Symptom: <code class="language-plaintext highlighter-rouge">certbot certonly</code> fails — “Connection timed out during ACME challenge”</a></li>
+          <li><a href="#symptom-lets-encrypt-certificate-renewal-fails-monthly-cron" id="markdown-toc-symptom-lets-encrypt-certificate-renewal-fails-monthly-cron">Symptom: Let’s Encrypt certificate renewal fails (monthly cron)</a></li>
+          <li><a href="#verifying-lets-encrypt-certificate-renewal-succeeded" id="markdown-toc-verifying-lets-encrypt-certificate-renewal-succeeded">Verifying Let’s Encrypt Certificate Renewal Succeeded</a></li>
+        </ol>
+      </li>
+      <li><a href="#powershell-module-issues" id="markdown-toc-powershell-module-issues">PowerShell Module Issues</a>        <ol>
+          <li><a href="#symptom-import-module-takdeploytakdeploypsm1-fails--module-not-found-or-could-not-load-file" id="markdown-toc-symptom-import-module-takdeploytakdeploypsm1-fails--module-not-found-or-could-not-load-file">Symptom: <code class="language-plaintext highlighter-rouge">Import-Module .\TAKDeploy\TAKDeploy.psm1</code> fails — “Module not found” or “Could not load file”</a></li>
+          <li><a href="#symptom-connect-takserver-fails--ssltls-connection-error-or-authentication-failed" id="markdown-toc-symptom-connect-takserver-fails--ssltls-connection-error-or-authentication-failed">Symptom: <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> fails — “SSL/TLS connection error” or “authentication failed”</a></li>
+          <li><a href="#symptom-takserverps-cmdlets-return-no-active-tak-server-session" id="markdown-toc-symptom-takserverps-cmdlets-return-no-active-tak-server-session">Symptom: TAKServerPS cmdlets return “No active TAK Server session”</a></li>
+          <li><a href="#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception" id="markdown-toc-symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception">Symptom: <code class="language-plaintext highlighter-rouge">New-TAKUser</code> or <code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> returns HTTP 500 — NullPointerException</a></li>
+        </ol>
+      </li>
+      <li><a href="#deployment-resume--snapshot-issues" id="markdown-toc-deployment-resume--snapshot-issues">Deployment Resume / Snapshot Issues</a>        <ol>
+          <li><a href="#symptom-re-running-deploy-takserverps1-does-not-resume-from-the-last-checkpoint" id="markdown-toc-symptom-re-running-deploy-takserverps1-does-not-resume-from-the-last-checkpoint">Symptom: Re-running <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> does not resume from the last checkpoint</a></li>
+          <li><a href="#symptom-phase-rollback-leaves-the-vm-in-a-corrupt-state" id="markdown-toc-symptom-phase-rollback-leaves-the-vm-in-a-corrupt-state">Symptom: Phase rollback leaves the VM in a corrupt state</a></li>
+        </ol>
+      </li>
+      <li><a href="#upgrading-tak-server" id="markdown-toc-upgrading-tak-server">Upgrading TAK Server</a>        <ol>
+          <li><a href="#step-by-step-upgrade-procedure" id="markdown-toc-step-by-step-upgrade-procedure">Step-by-step upgrade procedure</a></li>
+        </ol>
+      </li>
+      <li><a href="#collecting-diagnostic-information" id="markdown-toc-collecting-diagnostic-information">Collecting Diagnostic Information</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="vm-boot-failures">VM Boot Failures</h2>
+
+<h3 id="symptom-vm-does-not-appear-in-hyper-v-manager-after-new-takvirtualmachine">Symptom: VM does not appear in Hyper-V Manager after <code class="language-plaintext highlighter-rouge">New-TAKVirtualMachine</code></h3>
+
+<p><strong>Cause:</strong> PowerShell session is not elevated, or the Hyper-V feature is not enabled.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Verify Hyper-V is enabled</span><span class="w">
+</span><span class="n">Get-WindowsOptionalFeature</span><span class="w"> </span><span class="nt">-FeatureName</span><span class="w"> </span><span class="nx">Microsoft-Hyper-V-All</span><span class="w"> </span><span class="nt">-Online</span><span class="w">
+
+</span><span class="c"># If disabled, enable it (reboot required)</span><span class="w">
+</span><span class="n">Enable-WindowsOptionalFeature</span><span class="w"> </span><span class="nt">-FeatureName</span><span class="w"> </span><span class="nx">Microsoft-Hyper-V-All</span><span class="w"> </span><span class="nt">-Online</span><span class="w">
+
+</span><span class="c"># Re-run in an elevated (Administrator) PowerShell session</span><span class="w">
+</span><span class="n">Start-Process</span><span class="w"> </span><span class="nx">pwsh</span><span class="w"> </span><span class="nt">-Verb</span><span class="w"> </span><span class="nx">RunAs</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-vm-boots-but-rocky-linux-installer-does-not-start-uefi-shell-appears-instead">Symptom: VM boots but Rocky Linux installer does not start; UEFI shell appears instead</h3>
+
+<p><strong>Cause:</strong> Secure Boot is rejecting the ISO, or the VHDX boot order is wrong.</p>
+
+<p><strong>Resolution:</strong></p>
+
+<ol>
+  <li>Connect to the VM console: <code class="language-plaintext highlighter-rouge">vmconnect.exe $env:COMPUTERNAME TAKServer</code></li>
+  <li>At the UEFI shell prompt, identify the Rocky Linux EFI binary:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>map -r
+fs0:
+ls EFI\BOOT\
+</code></pre></div>    </div>
+  </li>
+  <li>Boot it manually: <code class="language-plaintext highlighter-rouge">fs0:\EFI\BOOT\BOOTX64.EFI</code></li>
+  <li>Long-term: Disable Secure Boot on the VM in Hyper-V Manager → Settings → Security → uncheck “Enable Secure Boot”.</li>
+</ol>
+
+<hr />
+
+<h3 id="symptom-rocky-linux-installer-completes-but-the-vm-reboots-back-into-the-iso">Symptom: Rocky Linux installer completes but the VM reboots back into the ISO</h3>
+
+<p><strong>Cause:</strong> The ISO is still the first boot device.</p>
+
+<p><strong>Resolution:</strong>
+In Hyper-V Manager → Settings → SCSI Controller, remove the DVD drive or move the hard disk above it in the boot order (Firmware tab). Then perform a normal restart.</p>
+
+<hr />
+
+<h3 id="symptom-deploy-takserverps1-fails-at-phase-1-with-no-external-virtual-switch-found">Symptom: <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> fails at Phase 1 with “No External virtual switch found”</h3>
+
+<p><strong>Cause:</strong> No External Hyper-V switch exists, and auto-creation failed (no active physical NIC).</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># List physical NICs</span><span class="w">
+</span><span class="n">Get-NetAdapter</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Where-Object</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="s1">'Up'</span><span class="w">
+
+</span><span class="c"># Create an External switch using a specific NIC (brief network disruption expected)</span><span class="w">
+</span><span class="n">New-VMSwitch</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'ExternalSwitch'</span><span class="w"> </span><span class="nt">-NetAdapterName</span><span class="w"> </span><span class="s1">'Ethernet'</span><span class="w"> </span><span class="nt">-AllowManagementOS</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+
+</span><span class="c"># Re-run the deployment</span><span class="w">
+</span><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-SwitchName</span><span class="w"> </span><span class="s1">'ExternalSwitch'</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="ssh-timeout-failures">SSH Timeout Failures</h2>
+
+<h3 id="symptom-wait-taklinuxinstall-times-out-waiting-for-ssh">Symptom: <code class="language-plaintext highlighter-rouge">Wait-TAKLinuxInstall</code> times out waiting for SSH</h3>
+
+<p><strong>Cause:</strong> The Rocky Linux installation has not completed, the VM has no IP address, or firewalld is blocking SSH.</p>
+
+<p><strong>Diagnosis steps:</strong></p>
+
+<ol>
+  <li>Open the VM console and check installer progress: <code class="language-plaintext highlighter-rouge">vmconnect.exe $env:COMPUTERNAME TAKServer</code></li>
+  <li>After the OS has booted to a login prompt, get the VM’s IP:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">Get-VMNetworkAdapter</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="p">)</span><span class="o">.</span><span class="nf">IPAddresses</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>Test SSH manually:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Test-NetConnection</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-Port</span><span class="w"> </span><span class="nx">22</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+</ol>
+
+<p><strong>Resolution:</strong></p>
+<ul>
+  <li>If the IP is blank, Hyper-V Integration Services may not be running. Log in via console and run <code class="language-plaintext highlighter-rouge">sudo systemctl start hyperv-*</code> or manually set a static IP.</li>
+  <li>If port 22 is unreachable, verify the guest firewall: <code class="language-plaintext highlighter-rouge">sudo firewall-cmd --list-all</code>.</li>
+  <li>Extend the SSH timeout when re-running:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-SSHTimeoutSeconds</span><span class="w"> </span><span class="nx">1800</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="symptom-ssh-connects-but-invoke-takremotecommand-fails-with-permission-denied">Symptom: SSH connects but <code class="language-plaintext highlighter-rouge">Invoke-TAKRemoteCommand</code> fails with “Permission denied”</h3>
+
+<p><strong>Cause:</strong> The credential supplied does not have <code class="language-plaintext highlighter-rouge">sudo</code> access, or the account name is wrong.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the guest — verify sudo works</span>
+<span class="nb">sudo id</span>
+
+<span class="c"># Add user to wheel group if missing</span>
+<span class="nb">sudo </span>usermod <span class="nt">-aG</span> wheel atak
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-install-takserver-fails-at-scp-upload--could-not-upload-file">Symptom: <code class="language-plaintext highlighter-rouge">Install-TAKServer</code> fails at SCP upload — “Could not upload file”</h3>
+
+<p><strong>Cause:</strong> <code class="language-plaintext highlighter-rouge">Posh-SSH</code> 3.x SCP requires a separate credential for the file transfer even when an SSH session already exists.</p>
+
+<p><strong>Resolution:</strong> Always pass <code class="language-plaintext highlighter-rouge">-Credential</code> explicitly to <code class="language-plaintext highlighter-rouge">Install-TAKServer</code>:</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Install-TAKServer</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w">   </span><span class="c"># &lt;-- required even with an active session</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="certificate-errors">Certificate Errors</h2>
+
+<h3 id="symptom-new-takservercertificate-fails--sed-cant-find-label-for-jump-to-end">Symptom: <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> fails — “sed: can’t find label for jump to ‘end’”</h3>
+
+<p><strong>Cause:</strong> The <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> on the server does not contain the expected XML patterns that <code class="language-plaintext highlighter-rouge">cert-metadata.sh</code> and <code class="language-plaintext highlighter-rouge">createTakCerts.sh</code> try to patch with <code class="language-plaintext highlighter-rouge">sed</code>.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the guest — check the file exists and is not empty</span>
+<span class="nb">ls</span> <span class="nt">-lh</span> /opt/tak/CoreConfig.xml
+<span class="nb">grep</span> <span class="nt">-c</span> <span class="s2">"certificateSigning"</span> /opt/tak/CoreConfig.xml
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<ul>
+  <li>If the file is empty or missing, TAK Server did not finish starting. Check service status:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl status takserver
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-n</span> 50
+</code></pre></div>    </div>
+  </li>
+  <li>If <code class="language-plaintext highlighter-rouge">takserver</code> failed to start because PostgreSQL is not running:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl start postgresql-16
+<span class="nb">sudo </span>systemctl start takserver
+</code></pre></div>    </div>
+  </li>
+  <li>After the service is healthy, re-run <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code>.</li>
+</ul>
+
+<hr />
+
+<h3 id="symptom-set-takadmincertificate-fails--ignite-timeout-or-usermanagerjar-returned-non-zero">Symptom: <code class="language-plaintext highlighter-rouge">Set-TAKAdminCertificate</code> fails — “Ignite timeout” or “UserManager.jar returned non-zero”</h3>
+
+<p><strong>Cause:</strong> TAK Server’s Apache Ignite distributed cache has not finished initialising. This can take 2–5 minutes after a restart.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Increase the service restart timeout</span><span class="w">
+</span><span class="n">Set-TAKAdminCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-ServiceRestartTimeout</span><span class="w"> </span><span class="nx">600</span><span class="w">
+</span></code></pre></div></div>
+
+<p>On the guest, check Ignite startup progress:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-f</span> | <span class="nb">grep</span> <span class="nt">-i</span> ignite
+</code></pre></div></div>
+<p>Wait until you see <code class="language-plaintext highlighter-rouge">Ignite node started OK</code> before re-running the cmdlet.</p>
+
+<hr />
+
+<h3 id="symptom-certificate-fields-rejected--invalid-value-for-statecityorgou">Symptom: Certificate fields rejected — “Invalid value for STATE/CITY/ORG/OU”</h3>
+
+<p><strong>Cause:</strong> TAK Server requires certificate subject fields to be <strong>uppercase with no spaces</strong>. Lowercase or space-containing values cause <code class="language-plaintext highlighter-rouge">makeRootCa.sh</code> to fail silently.</p>
+
+<p><strong>Resolution:</strong> Always pass uppercase, no-space values:</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Correct</span><span class="w">
+</span><span class="n">New-TAKServerCertificate</span><span class="w"> </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'TX'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'AUSTIN'</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'MYORG'</span><span class="w"> </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'OPS'</span><span class="w"> </span><span class="o">...</span><span class="w">
+
+</span><span class="c"># Wrong — will fail</span><span class="w">
+</span><span class="n">New-TAKServerCertificate</span><span class="w"> </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'Texas'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'San Antonio'</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'My Org'</span><span class="w"> </span><span class="o">...</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-browser-rejects-adminp12-import--invalid-password-or-file-format-not-recognised">Symptom: Browser rejects <code class="language-plaintext highlighter-rouge">admin.p12</code> import — “Invalid password” or “File format not recognised”</h3>
+
+<p><strong>Cause:</strong> The <code class="language-plaintext highlighter-rouge">.p12</code> file was copied with wrong permissions or is zero-length, or the keystore password is incorrect.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the guest — check file</span>
+<span class="nb">ls</span> <span class="nt">-lh</span> /home/atak/admin.p12
+openssl pkcs12 <span class="nt">-in</span> /home/atak/admin.p12 <span class="nt">-noout</span> 2&gt;&amp;1
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<ul>
+  <li>Re-download the <code class="language-plaintext highlighter-rouge">.p12</code> from the server using SFTP:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$sftp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SFTPSession</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-AcceptKey</span><span class="w">
+</span><span class="n">Get-SFTPItem</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sftp</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s1">'/home/atak/admin.p12'</span><span class="w"> </span><span class="nt">-Destination</span><span class="w"> </span><span class="s1">'.\reports\certs\'</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>Confirm the password is the same <code class="language-plaintext highlighter-rouge">KeystorePassword</code> passed to <code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code>.</li>
+</ul>
+
+<hr />
+
+<h3 id="symptom-atak-client-connects-but-shows-certificate-not-trusted">Symptom: ATAK client connects but shows “Certificate not trusted”</h3>
+
+<p><strong>Cause:</strong> The client’s trust anchor is not set to the TAK Server’s intermediate CA.</p>
+
+<p><strong>Resolution:</strong></p>
+<ol>
+  <li>Export the CA certificate from the server:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp atak@&lt;IP&gt;:/opt/tak/certs/files/ca.pem ./ca.pem
+</code></pre></div>    </div>
+  </li>
+  <li>In ATAK → Settings → Network → TAK Servers → Add Server, import the CA <code class="language-plaintext highlighter-rouge">.pem</code> as the trust anchor.</li>
+  <li>Alternatively, use ATAK’s Certificate Enrollment (port 8446) to receive a full certificate package.</li>
+</ol>
+
+<hr />
+
+<h2 id="port-unreachability">Port Unreachability</h2>
+
+<h3 id="symptom-test-netconnection--port-8443-succeeds-from-the-vm-itself-but-fails-from-the-windows-host">Symptom: <code class="language-plaintext highlighter-rouge">Test-NetConnection -Port 8443</code> succeeds from the VM itself but fails from the Windows host</h3>
+
+<p><strong>Cause:</strong> The Hyper-V vSwitch is Internal-only; traffic between the host management OS and the guest is not routed.</p>
+
+<p><strong>Resolution:</strong></p>
+<ol>
+  <li>Confirm the switch type:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-VMSwitch</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Select-Object</span><span class="w"> </span><span class="nx">Name</span><span class="p">,</span><span class="w"> </span><span class="nx">SwitchType</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>If <code class="language-plaintext highlighter-rouge">SwitchType = Internal</code>, either:
+    <ul>
+      <li>Convert to an External switch (requires a physical NIC and brief network disruption), or</li>
+      <li>Add a NAT network using <code class="language-plaintext highlighter-rouge">New-NetNat</code> to route host-to-guest traffic on the Internal switch.</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="symptom-ports-808984438446-are-unreachable-after-deploy">Symptom: Ports 8089/8443/8446 are unreachable after deploy</h3>
+
+<p><strong>Cause:</strong> <code class="language-plaintext highlighter-rouge">firewalld</code> rules were not applied, or the TAK Server service is not running.</p>
+
+<p><strong>Diagnosis on guest:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check service</span>
+<span class="nb">sudo </span>systemctl status takserver
+
+<span class="c"># Check firewall rules</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--list-ports</span>
+
+<span class="c"># Expected output should include:</span>
+<span class="c"># 8089/tcp  8443/tcp  8446/tcp  22/tcp</span>
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Re-apply firewall rules if missing</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>8089/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>8443/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>8446/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--reload</span>
+
+<span class="c"># Restart TAK Server if stopped</span>
+<span class="nb">sudo </span>systemctl restart takserver
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-rest-api-calls-fail-with-connection-refused-on-port-8443">Symptom: REST API calls fail with “Connection refused” on port 8443</h3>
+
+<p><strong>Cause:</strong> TAK Server is running but the HTTPS connector has not started (common during cert reconfiguration).</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-n</span> 100 | <span class="nb">grep</span> <span class="nt">-i</span> <span class="s2">"8443</span><span class="se">\|</span><span class="s2">connector</span><span class="se">\|</span><span class="s2">error"</span>
+</code></pre></div></div>
+
+<p>Look for <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> parse errors or missing keystore file references. A misconfigured <code class="language-plaintext highlighter-rouge">certificateSigning</code> block will prevent the connector from binding.</p>
+
+<hr />
+
+<h2 id="tak-server-service-failures">TAK Server Service Failures</h2>
+
+<h3 id="symptom-takserver-service-fails-to-start--exit-code-1">Symptom: <code class="language-plaintext highlighter-rouge">takserver</code> service fails to start — “Exit code 1”</h3>
+
+<p><strong>Cause:</strong> PostgreSQL is not running, or the <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> contains a syntax error.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl status takserver
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">--no-pager</span> | <span class="nb">tail</span> <span class="nt">-50</span>
+<span class="nb">sudo </span>systemctl status postgresql-16
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start PostgreSQL first</span>
+<span class="nb">sudo </span>systemctl start postgresql-16
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>postgresql-16
+
+<span class="c"># Then start TAK Server</span>
+<span class="nb">sudo </span>systemctl start takserver
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-tak-server-starts-but-rest-api-returns-503--not-responding">Symptom: TAK Server starts but REST API returns 503 / not responding</h3>
+
+<p><strong>Cause:</strong> The Ignite distributed cache or the Tomcat web server has not finished initialising. Normal start time is 60–120 seconds; allow 3 minutes after a cold start.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Watch logs until "Server is running and ready to serve"</span>
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-f</span> | <span class="nb">grep</span> <span class="nt">-E</span> <span class="s2">"ready|started|error|exception"</span>
+</code></pre></div></div>
+
+<p>If the server never becomes ready, check for Java heap issues:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver | <span class="nb">grep</span> <span class="s2">"OutOfMemoryError"</span>
+</code></pre></div></div>
+<p>Increase the VM memory allocation if heap exhaustion is seen (default is 8 GB; TAK Server recommends a minimum of 4 GB heap).</p>
+
+<hr />
+
+<h2 id="openfire--xmpp-issues">Openfire / XMPP Issues</h2>
+
+<h3 id="symptom-openfire-admin-console-port-9090-is-unreachable">Symptom: Openfire admin console (port 9090) is unreachable</h3>
+
+<p><strong>Cause:</strong> Cockpit was not disabled, or the <code class="language-plaintext highlighter-rouge">openfire-xmpp.service</code> systemd unit was not created correctly.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check which process owns port 9090</span>
+<span class="nb">sudo </span>ss <span class="nt">-tlnp</span> | <span class="nb">grep </span>9090
+
+<span class="c"># Check Openfire service</span>
+<span class="nb">sudo </span>systemctl status openfire-xmpp.service
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> openfire-xmpp.service <span class="nt">-n</span> 50
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Disable Cockpit to free port 9090</span>
+<span class="nb">sudo </span>systemctl disable <span class="nt">--now</span> cockpit.socket cockpit
+
+<span class="c"># Restart Openfire</span>
+<span class="nb">sudo </span>systemctl restart openfire-xmpp.service
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-install-takopenfire-fails-at-the-rpm-download-step">Symptom: <code class="language-plaintext highlighter-rouge">Install-TAKOpenfire</code> fails at the RPM download step</h3>
+
+<p><strong>Cause:</strong> The GitHub Releases URL for Openfire 5.0.3 may have changed, or there is no outbound internet access.</p>
+
+<p><strong>Resolution:</strong></p>
+<ol>
+  <li>Download the Openfire RPM manually from the <a href="https://github.com/igniterealtime/Openfire/releases/tag/v5.0.3">Openfire GitHub releases page</a>.</li>
+  <li>Upload it to the guest via SCP:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-SFTPItem</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sftp</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Path</span><span class="w"> </span><span class="s1">'.\openfire_5.0.3-1_all.rpm'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Destination</span><span class="w"> </span><span class="s1">'/tmp/'</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>Install manually on the guest:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> /tmp/openfire_5.0.3-1_all.rpm
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="symptom-atak-clients-cannot-connect-to-openfire-takchat">Symptom: ATAK clients cannot connect to Openfire (TAKChat)</h3>
+
+<p><strong>Cause:</strong> Firewall rules for XMPP ports were not applied, or Openfire setup wizard was not completed.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>firewall-cmd <span class="nt">--list-ports</span> | <span class="nb">grep </span>5222
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Apply XMPP firewall rules</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>5222/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>5223/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--reload</span>
+</code></pre></div></div>
+
+<p>Complete the Openfire setup wizard at <code class="language-plaintext highlighter-rouge">http://&lt;server-ip&gt;:9090</code> before connecting ATAK clients.</p>
+
+<hr />
+
+<h2 id="lets-encrypt-issues">Let’s Encrypt Issues</h2>
+
+<h3 id="symptom-certbot-certonly-fails--connection-timed-out-during-acme-challenge">Symptom: <code class="language-plaintext highlighter-rouge">certbot certonly</code> fails — “Connection timed out during ACME challenge”</h3>
+
+<p><strong>Cause:</strong> Port 80 is not reachable from the internet, or the DNS A record does not resolve to the server’s public IP.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the guest — verify port 80 is open</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--list-ports</span> | <span class="nb">grep</span> <span class="s2">"80"</span>
+
+<span class="c"># Verify public DNS resolution from the guest</span>
+dig +short &lt;your-domain&gt;
+curl <span class="nt">-s</span> http://&lt;your-domain&gt;/.well-known/acme-challenge/test
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Open port 80 if missing</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--permanent</span> <span class="nt">--add-port</span><span class="o">=</span>80/tcp
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--reload</span>
+</code></pre></div></div>
+<p>Check with your DNS provider or cloud platform that the A record is correctly set to the server’s public IP.</p>
+
+<hr />
+
+<h3 id="symptom-lets-encrypt-certificate-renewal-fails-monthly-cron">Symptom: Let’s Encrypt certificate renewal fails (monthly cron)</h3>
+
+<p><strong>Cause:</strong> The domain no longer resolves to the server, or port 80 is blocked.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check renewal configuration</span>
+<span class="nb">cat</span> /etc/takserver_renew.conf
+
+<span class="c"># Test renewal in dry-run mode</span>
+<span class="nb">sudo </span>certbot renew <span class="nt">--dry-run</span>
+</code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<ul>
+  <li>Verify port 80 is still open: <code class="language-plaintext highlighter-rouge">sudo firewall-cmd --list-ports</code></li>
+  <li>If the server IP has changed, update the DNS A record before running renewal.</li>
+  <li>To force an immediate renewal:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> /etc/cron.monthly/takserver_renewLECerts.sh
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="verifying-lets-encrypt-certificate-renewal-succeeded">Verifying Let’s Encrypt Certificate Renewal Succeeded</h3>
+
+<p>After running <code class="language-plaintext highlighter-rouge">Update-TAKLetsEncryptCertificate</code> (or the cron script), confirm the new certificate is in place:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check the expiry date of the renewed cert</span>
+<span class="nb">sudo </span>openssl x509 <span class="nt">-enddate</span> <span class="nt">-noout</span> <span class="se">\</span>
+    <span class="nt">-in</span> /etc/letsencrypt/live/&lt;your-domain&gt;/cert.pem
+<span class="c"># Expected: notAfter= approximately 90 days from today</span>
+
+<span class="c"># Confirm the cert is loaded on TAK Server's enrollment port</span>
+<span class="nb">echo</span> | openssl s_client <span class="nt">-connect</span> &lt;server-ip&gt;:8446 2&gt;/dev/null <span class="se">\</span>
+    | openssl x509 <span class="nt">-noout</span> <span class="nt">-dates</span>
+</code></pre></div></div>
+
+<p>If the date shown by port 8446 does not match the certbot cert, TAK Server may need a restart to reload the JKS:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl restart takserver
+</code></pre></div></div>
+
+<p>Check certbot logs if renewal failed silently:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo tail</span> <span class="nt">-50</span> /var/log/letsencrypt/letsencrypt.log
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="powershell-module-issues">PowerShell Module Issues</h2>
+
+<h3 id="symptom-import-module-takdeploytakdeploypsm1-fails--module-not-found-or-could-not-load-file">Symptom: <code class="language-plaintext highlighter-rouge">Import-Module .\TAKDeploy\TAKDeploy.psm1</code> fails — “Module not found” or “Could not load file”</h3>
+
+<p><strong>Cause:</strong> PowerShell execution policy is blocking the module, or the path is wrong.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check execution policy</span><span class="w">
+</span><span class="n">Get-ExecutionPolicy</span><span class="w">
+
+</span><span class="c"># If restricted, set for current user</span><span class="w">
+</span><span class="n">Set-ExecutionPolicy</span><span class="w"> </span><span class="nt">-ExecutionPolicy</span><span class="w"> </span><span class="nx">RemoteSigned</span><span class="w"> </span><span class="nt">-Scope</span><span class="w"> </span><span class="nx">CurrentUser</span><span class="w">
+
+</span><span class="c"># Confirm you are in the repo root</span><span class="w">
+</span><span class="n">Get-Location</span><span class="w">   </span><span class="c"># Should show C:\...\DigitalTAK</span><span class="w">
+</span><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKDeploy\TAKDeploy.psm1</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-connect-takserver-fails--ssltls-connection-error-or-authentication-failed">Symptom: <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> fails — “SSL/TLS connection error” or “authentication failed”</h3>
+
+<p><strong>Cause:</strong> Server uses a self-signed certificate and <code class="language-plaintext highlighter-rouge">-SkipCertificateCheck</code> is <code class="language-plaintext highlighter-rouge">$false</code>, or the PFX path/password is wrong.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># For self-signed certificates (default for new deployments):</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="s1">'.\admin.p12'</span><span class="w"> </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-SkipCertificateCheck</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+
+</span><span class="c"># Verify the PFX is readable</span><span class="w">
+</span><span class="nv">$cert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">System.Security.Cryptography.X509Certificates.X509Certificate2</span><span class="p">]::</span><span class="n">new</span><span class="p">(</span><span class="s1">'admin.p12'</span><span class="p">,</span><span class="w"> </span><span class="nv">$pass</span><span class="p">)</span><span class="w">
+</span><span class="nv">$cert</span><span class="o">.</span><span class="nf">Subject</span><span class="w">   </span><span class="c"># Should show the admin cert DN</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-takserverps-cmdlets-return-no-active-tak-server-session">Symptom: TAKServerPS cmdlets return “No active TAK Server session”</h3>
+
+<p><strong>Cause:</strong> <code class="language-plaintext highlighter-rouge">Connect-TAKServer</code> was not called, or the session was lost due to a module reload.</p>
+
+<p><strong>Resolution:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Always connect before using any cmdlet</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="err">&lt;</span><span class="nx">IP</span><span class="err">&gt;</span><span class="w"> </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="s1">'.\admin.p12'</span><span class="w"> </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-SkipCertificateCheck</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+
+</span><span class="c"># Confirm a session exists</span><span class="w">
+</span><span class="n">Get-TAKVersion</span><span class="w">   </span><span class="c"># Should return the server version string</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception">Symptom: <code class="language-plaintext highlighter-rouge">New-TAKUser</code> or <code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> returns HTTP 500 — NullPointerException</h3>
+
+<p><strong>Cause:</strong> <code class="language-plaintext highlighter-rouge">ESAPI.properties</code> (OWASP Enterprise Security API — used for input validation and password hashing) is absent from the TAK Server 5.7-RELEASE8 RPM installation at <code class="language-plaintext highlighter-rouge">/opt/tak/</code>. Two API methods in <code class="language-plaintext highlighter-rouge">FileUserAccountManagementApi</code> depend on ESAPI:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>API Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">POST /Marti/api/users/</code></td>
+      <td><code class="language-plaintext highlighter-rouge">createSingleFileUser</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PUT /user-management/api/update-groups</code></td>
+      <td><code class="language-plaintext highlighter-rouge">updateGroupsForUser</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The TAKServerPS cmdlets are correct — the fault is server-side. Endpoints for password change (<code class="language-plaintext highlighter-rouge">PUT .../change-user-password</code>) and user delete (<code class="language-plaintext highlighter-rouge">DELETE /Marti/api/users/{user}</code>) are <strong>not</strong> affected.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check the API log on the server for the NullPointerException stack trace</span>
+<span class="nb">sudo tail</span> <span class="nt">-n</span> 100 /opt/tak/logs/takserver-api.log | <span class="nb">grep</span> <span class="nt">-A</span> 10 <span class="s2">"NullPointerException"</span>
+</code></pre></div></div>
+
+<p>Look for: <code class="language-plaintext highlighter-rouge">ERROR c.b.u.FileUserAccountManagementApi - Error in createSingleFileUser</code> or <code class="language-plaintext highlighter-rouge">Error in updateGroupsForUser</code>.</p>
+
+<p><strong>Workaround — Create a user:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Over SSH on the TAK Server (as a user with sudo)</span>
+<span class="nb">sudo </span>java <span class="nt">-jar</span> /opt/tak/utils/UserManager.jar usermod <span class="nt">-p</span> <span class="s1">'Password1234!Secret'</span> username
+</code></pre></div></div>
+
+<p><strong>Workaround — Assign a user to a group:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>java <span class="nt">-jar</span> /opt/tak/utils/UserManager.jar usermod <span class="nt">-g</span> GROUP_NAME username
+</code></pre></div></div>
+
+<p><strong>Workaround — From PowerShell via Posh-SSH:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Requires an active Posh-SSH session ($sshSession)</span><span class="w">
+</span><span class="n">Invoke-SSHCommand</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sshSession</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Command</span><span class="w"> </span><span class="s2">"sudo java -jar /opt/tak/utils/UserManager.jar usermod -p 'Password1234!' username"</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="note">Users created via <code class="language-plaintext highlighter-rouge">UserManager.jar</code> are fully recognised by all other REST endpoints. <code class="language-plaintext highlighter-rouge">Set-TAKUserPassword</code>, <code class="language-plaintext highlighter-rouge">Remove-TAKUser</code>, and <code class="language-plaintext highlighter-rouge">Get-TAKUser -AccountList</code> all work correctly with these accounts.</p>
+
+<hr />
+
+<h2 id="deployment-resume--snapshot-issues">Deployment Resume / Snapshot Issues</h2>
+
+<h3 id="symptom-re-running-deploy-takserverps1-does-not-resume-from-the-last-checkpoint">Symptom: Re-running <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> does not resume from the last checkpoint</h3>
+
+<p><strong>Cause:</strong> The expected snapshot names (<code class="language-plaintext highlighter-rouge">Phase0-RockyInstalled</code>, <code class="language-plaintext highlighter-rouge">Phase2-TAKInstalled</code>, <code class="language-plaintext highlighter-rouge">Phase4-CertsAndAdmin</code>) are missing, renamed, or the wrong VM name is being used.</p>
+
+<p><strong>Diagnosis:</strong></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># List all snapshots for the VM</span><span class="w">
+</span><span class="n">Get-VMSnapshot</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Select-Object</span><span class="w"> </span><span class="nx">Name</span><span class="p">,</span><span class="w"> </span><span class="nx">CreationTime</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Resolution:</strong></p>
+<ul>
+  <li>If the snapshot names differ from the expected values, you can rename them in Hyper-V Manager, or use <code class="language-plaintext highlighter-rouge">-DisableSnapshotResume</code> to force a fresh run from Phase 0.</li>
+  <li>If the VM was renamed, pass the <code class="language-plaintext highlighter-rouge">-VMName</code> parameter explicitly:
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">.</span><span class="n">\Deploy-TAKServer.ps1</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer-Prod'</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="nt">-RootPassword</span><span class="w"> </span><span class="nv">$rootPw</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$ksPw</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="symptom-phase-rollback-leaves-the-vm-in-a-corrupt-state">Symptom: Phase rollback leaves the VM in a corrupt state</h3>
+
+<p><strong>Cause:</strong> Rolling back while the VM is running can corrupt the VHDX.</p>
+
+<p><strong>Resolution:</strong> Always shut down the VM cleanly before rolling back:</p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Stop-VM</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-TAKRollback.ps1</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Phase2-TAKInstalled'</span><span class="w">
+</span><span class="n">Start-VM</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="upgrading-tak-server">Upgrading TAK Server</h2>
+
+<p>The current pipeline targets TAK Server <strong>5.7-RELEASE8</strong> (RPM filename hardcoded in <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code>). There is no automated upgrade path. Upgrading to a future release requires manual steps.</p>
+
+<blockquote>
+  <p><strong>Always test upgrades in a lab snapshot before applying to a production deployment.</strong></p>
+</blockquote>
+
+<h3 id="step-by-step-upgrade-procedure">Step-by-step upgrade procedure</h3>
+
+<ol>
+  <li><strong>Take a VM snapshot</strong>
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Checkpoint-VM</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="nt">-SnapshotName</span><span class="w"> </span><span class="s1">'Pre-Upgrade-Snapshot'</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Back up the database</strong> — see <a href="config/database-backup/">Database Backup</a> before proceeding.</p>
+  </li>
+  <li><strong>Stop TAK Server</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl stop takserver
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Upload the new RPM</strong> and install:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># SCP the new RPM to the server (from Windows)</span>
+<span class="c"># Then on the server:</span>
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> /tmp/takserver-5.8-RELEASE1.noarch.rpm
+<span class="c"># or: sudo rpm -Uvh /tmp/takserver-5.8-RELEASE1.noarch.rpm</span>
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Review <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code></strong> — new TAK Server versions may change the expected XML schema. Compare against the installed example:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>diff /opt/tak/CoreConfig.xml /opt/tak/CoreConfig.example.xml
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Start TAK Server and validate</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl start takserver
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">-f</span>
+</code></pre></div>    </div>
+    <p>Then connect with TAKServerPS and confirm <code class="language-plaintext highlighter-rouge">Get-TAKVersion</code> returns the new version.</p>
+  </li>
+  <li><strong>Update pipeline scripts</strong> — after a successful upgrade, update the RPM filename in <code class="language-plaintext highlighter-rouge">RL9_tak5.7r8_install.sh</code> and the version references in <code class="language-plaintext highlighter-rouge">docs/_config.yml</code>, <code class="language-plaintext highlighter-rouge">docs/index.md</code>, and <code class="language-plaintext highlighter-rouge">docs/config/baseline.md</code> to match the new release.</li>
+</ol>
+
+<hr />
+
+<h2 id="collecting-diagnostic-information">Collecting Diagnostic Information</h2>
+
+<p>When opening a support issue, include the following:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># PowerShell and module versions</span><span class="w">
+</span><span class="bp">$PSVersionTable</span><span class="w">
+</span><span class="p">(</span><span class="n">Get-Module</span><span class="w"> </span><span class="nx">TAKDeploy</span><span class="p">)</span><span class="o">.</span><span class="nf">Version</span><span class="w">
+</span><span class="p">(</span><span class="n">Get-Module</span><span class="w"> </span><span class="nx">TAKInstall</span><span class="p">)</span><span class="o">.</span><span class="nf">Version</span><span class="w">
+</span><span class="p">(</span><span class="n">Get-Module</span><span class="w"> </span><span class="nx">TAKServerPS</span><span class="p">)</span><span class="o">.</span><span class="nf">Version</span><span class="w">
+
+</span><span class="c"># Hyper-V VM state</span><span class="w">
+</span><span class="n">Get-VM</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Select-Object</span><span class="w"> </span><span class="nx">Name</span><span class="p">,</span><span class="w"> </span><span class="nx">State</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAssigned</span><span class="p">,</span><span class="w"> </span><span class="nx">ProcessorCount</span><span class="w">
+</span><span class="n">Get-VMSnapshot</span><span class="w"> </span><span class="nt">-VMName</span><span class="w"> </span><span class="s1">'TAKServer'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Select-Object</span><span class="w"> </span><span class="nx">Name</span><span class="p">,</span><span class="w"> </span><span class="nx">CreationTime</span><span class="w">
+</span></code></pre></div></div>
+
+<p>On the guest (via SSH):</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl status takserver postgresql-16
+<span class="nb">sudo </span>journalctl <span class="nt">-u</span> takserver <span class="nt">--no-pager</span> | <span class="nb">tail</span> <span class="nt">-100</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--list-all</span>
+<span class="nb">uname</span> <span class="nt">-r</span> <span class="o">&amp;&amp;</span> <span class="nb">cat</span> /etc/rocky-release
+java <span class="nt">-version</span> 2&gt;&amp;1
+</code></pre></div></div>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 ---
 description: "Use when working on the DigitalTAK repository — TAK Server installation, configuration, certificate management, Openfire chat, Let's Encrypt TLS, Rocky Linux 9, RPM install scripts, shellscript fixes, or repository structure. Orchestrates all sub-agents and holds full repo knowledge. Spawns specialist sub-agents for install, certs, openfire, and letsencrypt domains."
-name: "DigitalTAK Orchestrator"
+name: "DigitalTAK Orchestrator (GitHub)"
 tools: [agent, vscode/getProjectSetupInfo, vscode/installExtension, vscode/memory, vscode/newWorkspace, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, vscode/askQuestions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/getNotebookSummary, read/problems, read/readFile, read/viewImage, read/readNotebookCellOutput, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/createJupyterNotebook, edit/editFiles, edit/editNotebook, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, web/fetch, web/githubRepo, browser/openBrowserPage, pylance-mcp-server/pylanceDocString, pylance-mcp-server/pylanceDocuments, pylance-mcp-server/pylanceFileSyntaxErrors, pylance-mcp-server/pylanceImports, pylance-mcp-server/pylanceInstalledTopLevelModules, pylance-mcp-server/pylanceInvokeRefactoring, pylance-mcp-server/pylancePythonEnvironments, pylance-mcp-server/pylanceRunCodeSnippet, pylance-mcp-server/pylanceSettings, pylance-mcp-server/pylanceSyntaxErrors, pylance-mcp-server/pylanceUpdatePythonEnvironment, pylance-mcp-server/pylanceWorkspaceRoots, pylance-mcp-server/pylanceWorkspaceUserFiles, microsoft/markitdown/convert_to_markdown, microsoftdocs/mcp/microsoft_code_sample_search, microsoftdocs/mcp/microsoft_docs_fetch, microsoftdocs/mcp/microsoft_docs_search, github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/labels_fetch, github.vscode-pull-request-github/notification_fetch, github.vscode-pull-request-github/doSearch, github.vscode-pull-request-github/activePullRequest, github.vscode-pull-request-github/pullRequestStatusChecks, github.vscode-pull-request-github/openPullRequest, ms-python.python/getPythonEnvironmentInfo, ms-python.python/getPythonExecutableCommand, ms-python.python/installPythonPackage, ms-python.python/configurePythonEnvironment, todo]
 agents: ["TAK Install Agent", "TAK Certs Agent", "TAK Openfire Agent", "TAK LetsEncrypt Agent"]
 ---
@@ -40,8 +40,13 @@ DigitalTAK/
 │   ├── TAKDeploy.psd1 / .psm1
 │   ├── PSScriptAnalyzerSettings.psd1
 │   ├── Private/ (3 helpers)
-│   ├── Public/  (3 cmdlets)
-│   └── Tests/   (2 test files)
+│   ├── Public/  (5 cmdlets: New-TAKVirtualMachine, Wait-TAKLinuxInstall, Start-TAKDeployment, Remove-TAKDeployment, Invoke-TAKRollback)
+│   └── Tests/   (7 test files incl. Stubs/)
+├── TAKOnboarding/                  ← PS module — zero-to-team onboarding wrapper
+│   ├── TAKOnboarding.psd1 / .psm1
+│   ├── Private/ (Helpers.ps1)
+│   ├── Public/  (3 cmdlets: Invoke-TAKOnboarding, New-TAKDataPackage, New-TAKTeamRoster)
+│   └── Tests/   (TAKOnboarding.Module.Tests.ps1)
 ├── InstallShellScripts/            ← Executable Bash scripts
 │   ├── RL9_tak5.7r8_install.sh     ← Main TAK installation (called by TAKInstall module)
 │   ├── rocky-9-tak.ks              ← Kickstart template for unattended Rocky Linux 9 install
@@ -53,12 +58,15 @@ DigitalTAK/
 │   ├── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
 │   ├── tak-uninstall.sh            ← Remove TAK Server + PostgreSQL + Openfire from guest
 │   └── utils.sh                    ← Shared helper functions
-├── IntegrationTests/               ← Pester end-to-end tests (requires TAK_INTEGRATION_HOST)
+├── tests/integration/              ← Integration tests (require TAK_INTEGRATION_HOST)
 │   ├── 01-VMProvisioning.Tests.ps1
 │   ├── 02-OSInstall.Tests.ps1
 │   ├── 03-TAKServerHealth.Tests.ps1
 │   ├── 04-Certificates.Tests.ps1
 │   ├── 05-UserManagement.Tests.ps1
+│   ├── 09-RemovalVerification.Tests.ps1
+│   ├── 10-DataPackageBuild.Tests.ps1
+│   ├── 11-CertDistCleanup.Tests.ps1
 │   └── Helpers.ps1
 ├── onboarding/                     ← Team onboarding assets
 │   ├── tak-team-certs.sh           ← AutoRoster cert batch script (uploaded to /tmp/ via SFTP)
@@ -73,8 +81,8 @@ DigitalTAK/
 ├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, E2E-ONBOARDING-REPORT.md
 ├── Deploy-TAKServer.ps1            ← ENTRY POINT — zero-to-running CivTAK (Phases 0–8)
 ├── Deploy-TAKTestServer.ps1        ← Test deployment script
-├── Invoke-TAKOnboarding.ps1        ← Zero-to-team onboarding (certs + users + data packages)
-├── Invoke-IntegrationTests.ps1     ← Runner for IntegrationTests/ suite
+├── Invoke-TAKOnboarding.ps1        ← Thin wrapper — imports TAKOnboarding module and splats @args
+├── Invoke-IntegrationTests.ps1     ← Runner for tests/integration/ suite
 ├── Invoke-TAKRollback.ps1          ← Restore VM to a Phase snapshot created by Deploy-TAKServer.ps1
 ├── Remove-CivTAK.ps1               ← Full teardown: VM, VHDX, certs, Windows store
 ├── CHANGELOG.md

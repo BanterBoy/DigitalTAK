@@ -44,6 +44,10 @@ nav_title: Baseline Config
 - Hostname: `takserver` *(hardcoded default)*
 - SSH timeout: 600 seconds
 
+> **Workaround — Timezone:** Pass `-Timezone 'America/Chicago'` (or any valid tz database name) to `Deploy-TAKServer.ps1` to override the default. The parameter is forwarded to the kickstart configuration during unattended OS install.
+>
+> **Workaround — Hostname:** Pass `-VMHostname 'your-hostname'` to `Deploy-TAKServer.ps1`. The value is written into the kickstart `network --hostname` directive.
+
 ---
 
 ## 2. Software Inventory
@@ -118,6 +122,8 @@ When `createTakCerts.sh` runs, it enables TAK Server as a Certificate Authority 
 > **Note:** `keystorePass` is written as plaintext into `CoreConfig.xml`. See [Gap Analysis](#7-security-gaps) for the security implication.
 
 **Enrollment certificate validity:** 30 days (hardcoded in `createTakCerts.sh`).
+
+> **Workaround:** To change the validity period, edit `createTakCerts.sh` and update the `validityDays` value at the `TAKServerCAConfig` sed anchor (line ~128). For non-operational labs, 365 days is a practical default that avoids frequent re-enrollment. The value is safe to increase — TAK Server enforces no upper limit.
 
 ### 3.4 Group Authentication Cache
 
@@ -218,10 +224,12 @@ Set interactively at cert creation time via `createTakCerts.sh`. Passed via `New
 
 Openfire **5.0.3** installed from GitHub Releases RPM.
 
-SHA256 (hardcoded, can be overridden via `OPENFIRE_OPEN_ADMIN_PORTS` env var):
+SHA256 (verified at install time by `openfire_takChat_install.sh`):
 ```
 a08493cb19bef6dd2b51ebe88d4ffd121553e2e4473ddbecf94f5ff350e367aa
 ```
+
+> **When upgrading Openfire:** Obtain the new SHA256 from the [Openfire GitHub Releases page](https://github.com/igniterealtime/Openfire/releases) for the target RPM, update the `OPENFIRE_SHA256` variable in `openfire_takChat_install.sh`, and update the hash above. The install script will fail with a checksum error if the values do not match, preventing installation of a tampered package.
 
 ### 5.2 Service
 

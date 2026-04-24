@@ -1,5 +1,5 @@
 ---
-name: DigitalTAK Orchestrator
+name: DigitalTAK Orchestrator (Claude)
 description: Use when working on the DigitalTAK repository — TAK Server installation, configuration, certificate management, Openfire chat, Let's Encrypt TLS, Rocky Linux 9, RPM install scripts, shell script fixes, PowerShell modules, or repository structure. Orchestrates all sub-agents and holds full repo knowledge. Spawns specialist sub-agents for install, certs, openfire, and letsencrypt domains.
 tools: [Bash, Read, Write, Edit, Glob, Grep, Agent, WebFetch, WebSearch, TodoWrite]
 ---
@@ -43,8 +43,13 @@ DigitalTAK/
 │   ├── TAKDeploy.psd1 / .psm1
 │   ├── PSScriptAnalyzerSettings.psd1
 │   ├── Private/ (3 helpers)
-│   ├── Public/  (3 cmdlets)
-│   └── Tests/   (2 test files)
+│   ├── Public/  (5 cmdlets: New-TAKVirtualMachine, Wait-TAKLinuxInstall, Start-TAKDeployment, Remove-TAKDeployment, Invoke-TAKRollback)
+│   └── Tests/   (7 test files incl. Stubs/)
+├── TAKOnboarding/                  ← PS module — zero-to-team onboarding wrapper
+│   ├── TAKOnboarding.psd1 / .psm1
+│   ├── Private/ (Helpers.ps1)
+│   ├── Public/  (3 cmdlets: Invoke-TAKOnboarding, New-TAKDataPackage, New-TAKTeamRoster)
+│   └── Tests/   (TAKOnboarding.Module.Tests.ps1)
 ├── InstallShellScripts/            ← Executable Bash scripts
 │   ├── RL9_tak5.7r8_install.sh     ← ENTRY POINT — main TAK installation
 │   ├── createTakCerts.sh           ← TAK CA + server cert generation
@@ -53,6 +58,7 @@ DigitalTAK/
 │   ├── takserver_createLECerts.sh  ← Initial Let's Encrypt TLS cert issuance
 │   ├── takserver_renewLECerts.sh   ← Automated LE cert renewal
 │   ├── takUserCreateCerts_doNotRunAsRoot.sh ← Per-user client cert generation
+│   ├── tak-uninstall.sh            ← Remove TAK Server + PostgreSQL + Openfire from guest
 │   └── utils.sh                    ← Shared helper functions
 ├── onboarding/                     ← Team onboarding assets
 │   ├── tak-team-certs.sh           ← AutoRoster cert batch script (uploaded to /tmp/ via SFTP)
@@ -61,14 +67,14 @@ DigitalTAK/
 │   ├── README.md
 │   └── rosters/
 │       └── sample-roster-10.csv   ← 20-person roster (10 bravo + 10 charlie), has Team column
-├── scripts/
-│   └── Invoke-E2EOnboardingTest.ps1 ← 46-test E2E validator against live TAK Server
+├── tests/e2e/
+│   └── 07-OnboardingFlow.Tests.ps1 ← 46-test E2E validator against live TAK Server
 ├── TXTScripts/                     ← TXT mirrors (must stay byte-identical to .sh)
 ├── Documentation/                  ← Official TAK PDFs + channels README
 ├── reports/                        ← TEST-REPORT.md, DEPLOYMENT-REPORT.md, E2E-ONBOARDING-REPORT.md
 ├── Deploy-TAKServer.ps1            ← End-to-end deployment orchestration script
 ├── Deploy-TAKTestServer.ps1        ← Test deployment script
-├── Invoke-TAKOnboarding.ps1        ← Zero-to-team onboarding (certs + users + data packages)
+├── Invoke-TAKOnboarding.ps1        ← Thin wrapper — imports TAKOnboarding module and splats @args
 ├── Sync-TXTMirrors.ps1             ← Syncs .sh → .txt mirrors
 ├── CHANGELOG.md
 ├── channels.zip                    ← ATAK client data package
@@ -132,7 +138,7 @@ RL9_tak5.7r8_install.sh           ← main install (run as root or with sudo)
 
 | Sub-Agent | Owns | Must NOT touch |
 |-----------|------|----------------|
-| `tak-install` | `RL9_tak5.7r8_install.sh` + its TXT mirror | All other scripts |
+| `tak-install` | `RL9_tak5.7r8_install.sh`, `tak-uninstall.sh` + their TXT mirrors | All other scripts |
 | `tak-certs` | `createTakCerts.sh`, `takUserCreateCerts_doNotRunAsRoot.sh`, `promoteAdmin.sh` + mirrors | Install + Openfire + LE scripts |
 | `tak-openfire` | `openfire_takChat_install.sh` + mirror | All TAK core scripts |
 | `tak-letsencrypt` | `takserver_createLECerts.sh`, `takserver_renewLECerts.sh` + mirrors | All non-LE scripts |

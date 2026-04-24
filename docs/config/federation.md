@@ -6,9 +6,9 @@ nav_title: Federation
 
 # TAK Server Federation Configuration
 
-> **Status:** M4 stub — April 2026
 > **TAK Server version:** 5.7-RELEASE8
 > **Source:** TAK Server 5.7 Configuration Guide §12 and Federation Hub Configuration Guide
+> **DigitalTAK status:** Federation ports and settings are not automated by the current pipeline. See [§10 Pipeline Gaps](#10-digitaktak-pipeline-gaps) for the manual steps required before federation can be enabled.
 
 ---
 
@@ -184,6 +184,22 @@ Key differences:
 | DigitalTAK status | Documented (this stub) | Out of scope for current lab |
 
 Refer to `Documentation/Federation_Hub_Configuration_Guide.pdf` and the TAK.gov wiki for Federation Hub setup.
+
+---
+
+## 12. Enabling Federation via Pipeline (Future Work)
+
+The following items would need to be implemented in DigitalTAK to automate federation setup end-to-end. They are currently manual steps.
+
+| Item | What is needed |
+|------|----------------|
+| Firewalld rules | Add `--add-port=9001/tcp` to `RL9_tak5.7r8_install.sh` (currently only opens TAK Server ports) |
+| Outgoing connection | Use `New-TAKOutgoingConnection` (TAKServerPS) to script the peer connection rather than using WebTAK UI |
+| CA exchange | Add a cmdlet or script step that exports `/opt/tak/certs/files/intermediate-ca.pem` and accepts a peer CA for upload |
+| Group filter | Use `Set-TAKFederateGroup` (to be implemented in TAKServerPS) rather than the WebTAK admin panel |
+| CoreConfig.xml | Federation is enabled through the WebTAK UI rather than config file; no current scripted equivalent |
+
+Until these are implemented, follow the manual steps in §3–§6 above using the WebTAK admin console at `https://<SERVER_IP>:8443`.
 
 ---
 

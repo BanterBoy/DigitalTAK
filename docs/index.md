@@ -20,6 +20,8 @@ DigitalTAK is a complete automation framework for deploying, configuring, and ma
 
 A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to a fully running CivTAK instance with certificates, user management, and optional XMPP chat.
 
+> **Local docs preview:** `cd docs && docker compose up --build` → [http://localhost:4000](http://localhost:4000)
+
 ## Key Capabilities
 
 | Capability | Details |
@@ -45,9 +47,11 @@ A single PowerShell script — `Deploy-TAKServer.ps1` — takes you from zero to
 | [API Reference](api-reference/) | Complete cmdlet reference for TAKDeploy, TAKInstall, TAKOnboarding, and TAKServerPS |
 | [Validation Report](validation-report/) | TAKServerPS end-to-end test results — 39/46 tests pass (April 2026) |
 | [Troubleshooting](troubleshooting/) | Diagnosis and fixes for common failures |
-| [Runbook: Machine Rebuild](runbook-machine-rebuild/) | Restore Paperclip on a rebuilt or new Windows machine |
 | [Configuration Reference](config/baseline/) | CoreConfig.xml settings, certificate layout, port inventory |
+| [Database Backup](config/database-backup/) | PostgreSQL backup, restore, and automated retention for TAK Server |
 | [Agent Configuration](agent-configuration/) | Managing deployments with AI agents |
+
+> **Note:** Machine rebuild runbook is forthcoming.
 
 ## Architecture Overview
 

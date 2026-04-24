@@ -295,6 +295,22 @@ Update-TAKLetsEncryptCertificate -SshSession $sess `
     -KeystorePassword $pass
 ```
 
+**Verifying renewal succeeded:**
+
+After the cmdlet returns, confirm the new certificate is active on port 8446:
+
+```powershell
+# Check expiry via SSH
+Invoke-SSHCommand -SessionId $sess.SessionId `
+    -Command "sudo openssl x509 -enddate -noout -in /etc/letsencrypt/live/tak.example.com/cert.pem"
+
+# Confirm the cert is loaded on port 8446
+Invoke-SSHCommand -SessionId $sess.SessionId `
+    -Command "echo | openssl s_client -connect localhost:8446 2>/dev/null | openssl x509 -noout -dates"
+```
+
+If port 8446 still shows the old expiry, TAK Server may not have restarted cleanly — check `ServiceRestartTimeout` or restart manually via SSH.
+
 ---
 
 ## Gaps and Known Issues

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Getting Started | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Getting Started" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/getting-started/" />
+<meta property="og:url" content="http://0.0.0.0:4000/getting-started/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Getting Started" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Getting Started","url":"http://0.0.0.0:4000/getting-started/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="getting-started">Getting Started</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#getting-started" id="markdown-toc-getting-started">Getting Started</a>    <ol>
+      <li><a href="#prerequisites" id="markdown-toc-prerequisites">Prerequisites</a>        <ol>
+          <li><a href="#host-system-requirements" id="markdown-toc-host-system-requirements">Host System Requirements</a></li>
+          <li><a href="#required-files-not-included-in-repo" id="markdown-toc-required-files-not-included-in-repo">Required Files (Not Included in Repo)</a></li>
+          <li><a href="#powershell-modules" id="markdown-toc-powershell-modules">PowerShell Modules</a></li>
+        </ol>
+      </li>
+      <li><a href="#cloning-the-repository" id="markdown-toc-cloning-the-repository">Cloning the Repository</a>        <ol>
+          <li><a href="#repository-layout" id="markdown-toc-repository-layout">Repository Layout</a></li>
+        </ol>
+      </li>
+      <li><a href="#running-the-unit-tests" id="markdown-toc-running-the-unit-tests">Running the Unit Tests</a>        <ol>
+          <li><a href="#integration-tests" id="markdown-toc-integration-tests">Integration tests</a></li>
+          <li><a href="#e2e-tests-live-server-required" id="markdown-toc-e2e-tests-live-server-required">E2E tests (live server required)</a></li>
+          <li><a href="#what-the-tests-cover" id="markdown-toc-what-the-tests-cover">What the tests cover</a></li>
+        </ol>
+      </li>
+      <li><a href="#ci-pipeline" id="markdown-toc-ci-pipeline">CI Pipeline</a></li>
+      <li><a href="#quick-start-takonboarding-module" id="markdown-toc-quick-start-takonboarding-module">Quick-Start: TAKOnboarding Module</a></li>
+      <li><a href="#quick-start-takserverps-module" id="markdown-toc-quick-start-takserverps-module">Quick-Start: TAKServerPS Module</a></li>
+      <li><a href="#next-steps" id="markdown-toc-next-steps">Next Steps</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Before cloning and running the project, ensure your host machine meets these requirements:</p>
+
+<h3 id="host-system-requirements">Host System Requirements</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Requirement</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>OS</strong></td>
+      <td>Windows 10/11 Pro or Windows Server 2019+</td>
+    </tr>
+    <tr>
+      <td><strong>Hyper-V</strong></td>
+      <td>Enabled (Windows Feature)</td>
+    </tr>
+    <tr>
+      <td><strong>PowerShell</strong></td>
+      <td>7.0 or later</td>
+    </tr>
+    <tr>
+      <td><strong>RAM</strong></td>
+      <td>Minimum 8 GB free for the VM (16 GB host recommended)</td>
+    </tr>
+    <tr>
+      <td><strong>Disk</strong></td>
+      <td>Minimum 40 GB free for the VM VHDX</td>
+    </tr>
+    <tr>
+      <td><strong>Network</strong></td>
+      <td>Internal or External Hyper-V switch available</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="required-files-not-included-in-repo">Required Files (Not Included in Repo)</h3>
+
+<p>You must download these separately before running a deployment. <strong>They are not included in this repository and must not be committed.</strong></p>
+
+<ol>
+  <li><strong>Rocky Linux 9.7 ISO</strong> — from <a href="https://rockylinux.org/download">rockylinux.org</a></li>
+  <li><strong>TAK Server 5.7 RPM</strong> (<code class="language-plaintext highlighter-rouge">takserver-5.7-RELEASE8.noarch.rpm</code>) — from <a href="https://tak.gov">tak.gov</a>
+    <ul>
+      <li>A free TAK.gov account is required</li>
+      <li><strong>MFA is enforced</strong> on the downloads portal — enrol a second factor before attempting to download</li>
+      <li>Navigate to <strong>Downloads → TAK Server</strong> after logging in</li>
+      <li>The RPM is over 500 MB and is <code class="language-plaintext highlighter-rouge">.gitignore</code>d — never commit it to this repository</li>
+    </ul>
+  </li>
+</ol>
+
+<p class="warning">If VS Code shows a <strong>“Files too large”</strong> warning when committing, click <strong>Cancel</strong>. The TAK Server RPM must not be committed to this repository.</p>
+
+<h3 id="powershell-modules">PowerShell Modules</h3>
+
+<p>Install the required PowerShell modules before using TAKInstall or running tests:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Required for SSH-based provisioning</span><span class="w">
+</span><span class="n">Install-Module</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="nx">Posh-SSH</span><span class="w"> </span><span class="nt">-Scope</span><span class="w"> </span><span class="nx">CurrentUser</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+
+</span><span class="c"># Required for running unit tests</span><span class="w">
+</span><span class="n">Install-Module</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="nx">Pester</span><span class="w"> </span><span class="nt">-MinimumVersion</span><span class="w"> </span><span class="nx">5.0</span><span class="w"> </span><span class="nt">-Scope</span><span class="w"> </span><span class="nx">CurrentUser</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><em>Chuck Norris doesn’t install <code class="language-plaintext highlighter-rouge">Posh-SSH</code>. SSH clients install themselves in his presence.</em></p>
+</blockquote>
+
+<hr />
+
+<h2 id="cloning-the-repository">Cloning the Repository</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">git</span><span class="w"> </span><span class="nx">clone</span><span class="w"> </span><span class="nx">https://github.com/BanterBoy/DigitalTAK.git</span><span class="w">
+</span><span class="n">cd</span><span class="w"> </span><span class="nx">DigitalTAK</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="repository-layout">Repository Layout</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DigitalTAK/
+├── Deploy-TAKServer.ps1        # Main entry point — full automated deployment
+├── Deploy-TAKTestServer.ps1    # Backward-compat wrapper → Deploy-TAKServer.ps1
+├── Invoke-TAKOnboarding.ps1    # Thin wrapper → TAKOnboarding\Invoke-TAKOnboarding
+├── Invoke-TAKRollback.ps1      # Thin wrapper → TAKDeploy\Invoke-TAKRollback
+├── Remove-CivTAK.ps1           # Thin wrapper → TAKDeploy\Remove-TAKDeployment
+├── Invoke-UnitTests.ps1        # Run all Pester unit tests
+├── Invoke-IntegrationTests.ps1 # Run integration tests (no live server required)
+├── Invoke-E2ETests.ps1         # Run E2E tests against a live TAK Server
+│
+├── TAKServerPS/                # PowerShell REST API wrapper (44 cmdlets)
+├── TAKInstall/                 # PowerShell SSH provisioning module (6 cmdlets)
+├── TAKDeploy/                  # PowerShell Hyper-V orchestration module (5 cmdlets)
+├── TAKOnboarding/              # PowerShell team onboarding module (3 cmdlets)
+│
+├── onboarding/                 # Team onboarding scripts and roster helpers
+│   └── rosters/                # Sample CSV/JSON roster files
+├── certs/                      # Downloaded team cert files (generated; git-ignored)
+├── dist/                       # Per-user ATAK .zip data packages (generated; git-ignored)
+│
+├── InstallShellScripts/        # Bash scripts executed on the Rocky Linux guest
+├── tests/integration/          # Pester 5 integration tests (no live server required)
+├── tests/e2e/                  # E2E tests requiring a live TAK Server instance
+│
+├── Documentation/              # TAK Server PDF and Markdown guides
+├── docs/                       # This documentation site
+└── .github/workflows/          # GitHub Actions CI/CD pipelines
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="running-the-unit-tests">Running the Unit Tests</h2>
+
+<p>Unit tests run against mocked dependencies — no live TAK Server or VM required.</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Run all unit tests</span><span class="w">
+</span><span class="n">Invoke-Pester</span><span class="w"> </span><span class="o">.</span><span class="nx">/TAKServerPS/Tests/</span><span class="w"> </span><span class="nt">-Output</span><span class="w"> </span><span class="nx">Detailed</span><span class="w">
+</span><span class="n">Invoke-Pester</span><span class="w"> </span><span class="o">.</span><span class="nx">/TAKInstall/Tests/</span><span class="w"> </span><span class="nt">-Output</span><span class="w"> </span><span class="nx">Detailed</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Expected output: <strong>179 unit tests, all passing</strong>.</p>
+
+<h3 id="integration-tests">Integration tests</h3>
+
+<p>A separate suite of integration tests validates the onboarding pipeline and teardown scripts without a live server:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Run integration tests (no TAK Server required)</span><span class="w">
+</span><span class="n">Invoke-Pester</span><span class="w"> </span><span class="o">.</span><span class="nx">/tests/integration/</span><span class="w"> </span><span class="nt">-Output</span><span class="w"> </span><span class="nx">Detailed</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Expected: <strong>45 integration tests pass</strong>. Tests that require Administrator (Windows cert store writes) are automatically skipped in non-elevated sessions.</p>
+
+<p>Total across all test suites: <strong>224 tests, all passing</strong>.</p>
+
+<h3 id="e2e-tests-live-server-required">E2E tests (live server required)</h3>
+
+<p>A separate E2E suite validates the full request/response cycle against a running TAK Server:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set required environment variables</span><span class="w">
+</span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">TAK_INTEGRATION_HOST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'192.168.1.50'</span><span class="w">
+</span><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">TAK_CERT_PASS</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s1">'YourCertPassword'</span><span class="w">
+
+</span><span class="c"># Run the full E2E suite</span><span class="w">
+</span><span class="o">.</span><span class="n">\Invoke-E2ETests.ps1</span><span class="w">
+</span></code></pre></div></div>
+
+<p>E2E tests require <code class="language-plaintext highlighter-rouge">certs/admin.p12</code> and a reachable TAK Server. See <a href="https://github.com/BanterBoy/DigitalTAK/blob/prod/tests/e2e/README.md">tests/e2e/README.md</a> for full details.</p>
+
+<h3 id="what-the-tests-cover">What the tests cover</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Tests</th>
+      <th>Coverage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TAKServerPS</td>
+      <td>109</td>
+      <td>Module manifest, 44-function inventory, HTTP retry, auto-pagination, auth parameter sets</td>
+    </tr>
+    <tr>
+      <td>TAKInstall</td>
+      <td>70</td>
+      <td>Module manifest, 6-function inventory, bash escaping, SSH execution, service polling</td>
+    </tr>
+    <tr>
+      <td>Integration (09)</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">Remove-CivTAK.ps1</code> Windows cert store cleanup (skipped without elevation)</td>
+    </tr>
+    <tr>
+      <td>Integration (10)</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">New-TAKDataPackage.ps1</code> truststore lookup — <code class="language-plaintext highlighter-rouge">.jks</code> and <code class="language-plaintext highlighter-rouge">.p12</code> paths</td>
+    </tr>
+    <tr>
+      <td>Integration (11)</td>
+      <td>—</td>
+      <td><code class="language-plaintext highlighter-rouge">Remove-CivTAK.ps1</code> filesystem teardown (Steps 4 / 4b)</td>
+    </tr>
+    <tr>
+      <td>E2E (01–06)</td>
+      <td>—</td>
+      <td>Server status, cert auth, CoT tracking, GeoChat, mission packages, negative/security cases</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="ci-pipeline">CI Pipeline</h2>
+
+<p>Every push to <code class="language-plaintext highlighter-rouge">prod</code> and all pull requests run the full CI pipeline via GitHub Actions:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Job</th>
+      <th>Tool</th>
+      <th>What it checks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Pester</strong></td>
+      <td>PowerShell</td>
+      <td>Unit tests across TAKServerPS, TAKInstall, TAKDeploy, TAKOnboarding + integration test infrastructure</td>
+    </tr>
+    <tr>
+      <td><strong>PSScriptAnalyzer</strong></td>
+      <td>PowerShell</td>
+      <td>Code quality and best practices</td>
+    </tr>
+    <tr>
+      <td><strong>ShellCheck</strong></td>
+      <td>Bash</td>
+      <td>Shell script linting (severity: warning)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The GitHub Pages documentation site is built and deployed separately via <code class="language-plaintext highlighter-rouge">.github/workflows/pages.yml</code> on every push to <code class="language-plaintext highlighter-rouge">prod</code> that modifies <code class="language-plaintext highlighter-rouge">docs/**</code>.</p>
+
+<p>See <code class="language-plaintext highlighter-rouge">.github/workflows/ci.yml</code> for the full pipeline definition.</p>
+
+<hr />
+
+<h2 id="quick-start-takonboarding-module">Quick-Start: TAKOnboarding Module</h2>
+
+<p>Once TAK Server is deployed, use the TAKOnboarding module for one-command team onboarding:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKOnboarding\TAKOnboarding.psd1</span><span class="w">
+
+</span><span class="c"># Onboard a 10-person team — prompts for all credentials</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">alpha</span><span class="w"> </span><span class="nt">-TeamSize</span><span class="w"> </span><span class="nx">10</span><span class="w">
+
+</span><span class="c"># Custom roster from CSV</span><span class="w">
+</span><span class="n">Invoke-TAKOnboarding</span><span class="w"> </span><span class="nt">-ServerHost</span><span class="w"> </span><span class="nx">10.10.0.154</span><span class="w"> </span><span class="nt">-TeamName</span><span class="w"> </span><span class="nx">bravo</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RosterPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\onboarding\rosters\sample-roster-10.csv</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-AdminPfxPath</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w">
+</span></code></pre></div></div>
+
+<p>For the full cmdlet reference, see <a href="modules/TAKOnboarding/">TAKOnboarding Module</a>.</p>
+
+<hr />
+
+<h2 id="quick-start-takserverps-module">Quick-Start: TAKServerPS Module</h2>
+
+<p>Once you have a running TAK Server, use the REST API wrapper to manage it:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKServerPS\TAKServer.psd1</span><span class="w">
+
+</span><span class="c"># Connect using an admin PFX certificate (recommended)</span><span class="w">
+</span><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="s1">'Admin PFX password'</span><span class="w">
+</span><span class="n">Connect-TAKServer</span><span class="w"> </span><span class="nt">-HostName</span><span class="w"> </span><span class="s2">"10.0.0.10"</span><span class="w"> </span><span class="nt">-PfxPath</span><span class="w"> </span><span class="s2">".\admin.p12"</span><span class="w"> </span><span class="nt">-PfxPassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-SkipCertificateCheck</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+
+</span><span class="c"># List all provisioned user accounts</span><span class="w">
+</span><span class="n">Get-TAKUser</span><span class="w"> </span><span class="nt">-AccountList</span><span class="w">
+
+</span><span class="c"># Get version info</span><span class="w">
+</span><span class="n">Get-TAKVersion</span><span class="w">
+
+</span><span class="c"># List missions</span><span class="w">
+</span><span class="n">Get-TAKMission</span><span class="w">
+
+</span><span class="c"># Disconnect</span><span class="w">
+</span><span class="n">Disconnect-TAKServer</span><span class="w">
+</span></code></pre></div></div>
+
+<p class="note">39 of 46 end-to-end tests pass against a live TAK Server 5.7-RELEASE8 instance (April 2026). <code class="language-plaintext highlighter-rouge">New-TAKUser</code> REST and <code class="language-plaintext highlighter-rouge">Set-TAKUserGroup</code> have a known server-side ESAPI bug — use <code class="language-plaintext highlighter-rouge">UserManager.jar</code> over SSH as the workaround. See the <a href="../validation-report/">Validation Report</a> and <a href="../troubleshooting/#symptom-new-takuser-or-set-takusergroup-returns-http-500--nullpointerexception">Troubleshooting</a> for details.</p>
+
+<p>For the full cmdlet reference, see the <a href="../agents-skills-reference/">Agents &amp; Skills Reference</a> page or run <code class="language-plaintext highlighter-rouge">Get-Help &lt;CmdletName&gt; -Full</code> in PowerShell.</p>
+
+<hr />
+
+<h2 id="next-steps">Next Steps</h2>
+
+<ul>
+  <li><a href="../deployment/">Deploy a CivTAK Server</a> — full step-by-step guide</li>
+  <li><a href="../agent-configuration/">Agent Configuration</a> — manage deployments using AI agents</li>
+  <li><a href="../agents-skills-reference/">Agents &amp; Skills Reference</a> — full module and cmdlet reference</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

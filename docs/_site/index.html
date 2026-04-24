@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Home | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Home" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/" />
+<meta property="og:url" content="http://0.0.0.0:4000/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Home" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Home","name":"DigitalTAK","url":"http://0.0.0.0:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="digitaltak-documentation">DigitalTAK Documentation</h1>
+
+<p>Fully automated CivTAK deployment and management for Rocky Linux on Hyper-V.</p>
+
+<p><a href="getting-started/">Get Started</a> ·
+<a href="deployment/">Deployment Guide</a> ·
+<a href="api-reference/">API Reference</a></p>
+
+<hr />
+
+<h2 id="what-is-digitaltak">What is DigitalTAK?</h2>
+
+<p>DigitalTAK is a complete automation framework for deploying, configuring, and managing a <a href="https://tak.gov">TAK Server 5.7</a> instance on <strong>Rocky Linux 9.7</strong> running inside a <strong>Hyper-V Gen 2</strong> virtual machine.</p>
+
+<p>A single PowerShell script — <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> — takes you from zero to a fully running CivTAK instance with certificates, user management, and optional XMPP chat.</p>
+
+<blockquote>
+  <p><strong>Local docs preview:</strong> <code class="language-plaintext highlighter-rouge">cd docs &amp;&amp; docker compose up --build</code> → <a href="http://localhost:4000">http://localhost:4000</a></p>
+</blockquote>
+
+<h2 id="key-capabilities">Key Capabilities</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Capability</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>VM Provisioning</strong></td>
+      <td>Unattended Rocky Linux 9 install via Hyper-V + kickstart</td>
+    </tr>
+    <tr>
+      <td><strong>TAK Server Install</strong></td>
+      <td>RPM install over SSH with SELinux and firewalld configured</td>
+    </tr>
+    <tr>
+      <td><strong>Certificate Management</strong></td>
+      <td>CA, server certs, per-user client certs (.p12)</td>
+    </tr>
+    <tr>
+      <td><strong>Team Onboarding</strong></td>
+      <td>One-command provisioning — <code class="language-plaintext highlighter-rouge">Invoke-TAKOnboarding</code> (TAKOnboarding module) generates certs, creates users, and builds ATAK data packages</td>
+    </tr>
+    <tr>
+      <td><strong>REST API Wrapper</strong></td>
+      <td>44 PowerShell cmdlets for TAK Server 5.7 — 39/46 validated ✅ (<a href="validation-report/">Validation Report</a>)</td>
+    </tr>
+    <tr>
+      <td><strong>XMPP Chat</strong></td>
+      <td>Optional Openfire integration for TAK Chat</td>
+    </tr>
+    <tr>
+      <td><strong>Let’s Encrypt</strong></td>
+      <td>Optional public TLS via Certbot</td>
+    </tr>
+    <tr>
+      <td><strong>Rollback</strong></td>
+      <td>Snapshot-based phase rollback</td>
+    </tr>
+    <tr>
+      <td><strong>Teardown</strong></td>
+      <td>Full cleanup with <code class="language-plaintext highlighter-rouge">Remove-TAKDeployment</code> (TAKDeploy module) — VM, VHDX, all cert files, ATAK data packages, and Windows certificate store</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="documentation">Documentation</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Page</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="getting-started/">Getting Started</a></td>
+      <td>Prerequisites, repo layout, module installation, CI pipeline</td>
+    </tr>
+    <tr>
+      <td><a href="deployment/">Deployment Guide</a></td>
+      <td>Step-by-step <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> walkthrough with all parameters</td>
+    </tr>
+    <tr>
+      <td><a href="post-deployment/">Post-Deployment</a></td>
+      <td>What a successful deployment produces, validation tests, first access steps</td>
+    </tr>
+    <tr>
+      <td><a href="onboarding/">Team Onboarding</a></td>
+      <td>Per-user cert generation, user accounts, and ATAK data package distribution</td>
+    </tr>
+    <tr>
+      <td><a href="api-reference/">API Reference</a></td>
+      <td>Complete cmdlet reference for TAKDeploy, TAKInstall, TAKOnboarding, and TAKServerPS</td>
+    </tr>
+    <tr>
+      <td><a href="validation-report/">Validation Report</a></td>
+      <td>TAKServerPS end-to-end test results — 39/46 tests pass (April 2026)</td>
+    </tr>
+    <tr>
+      <td><a href="troubleshooting/">Troubleshooting</a></td>
+      <td>Diagnosis and fixes for common failures</td>
+    </tr>
+    <tr>
+      <td><a href="config/baseline/">Configuration Reference</a></td>
+      <td>CoreConfig.xml settings, certificate layout, port inventory</td>
+    </tr>
+    <tr>
+      <td><a href="config/database-backup/">Database Backup</a></td>
+      <td>PostgreSQL backup, restore, and automated retention for TAK Server</td>
+    </tr>
+    <tr>
+      <td><a href="agent-configuration/">Agent Configuration</a></td>
+      <td>Managing deployments with AI agents</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>Note:</strong> Machine rebuild runbook is forthcoming.</p>
+</blockquote>
+
+<h2 id="architecture-overview">Architecture Overview</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Deploy-TAKServer.ps1 (server entry point)
+├── TAKDeploy/          Hyper-V VM orchestration + teardown (5 cmdlets)
+│   ├── Start-TAKDeployment      end-to-end deployment
+│   ├── New-TAKVirtualMachine    VM creation
+│   ├── Wait-TAKLinuxInstall     SSH readiness
+│   ├── Remove-TAKDeployment     full teardown
+│   └── Invoke-TAKRollback       snapshot rollback
+├── TAKInstall/         Remote SSH provisioning (6 cmdlets)
+│   └── InstallShellScripts/   Bash scripts that run on Rocky Linux
+└── TAKServerPS/        REST API wrapper (44 cmdlets)
+
+TAKOnboarding/ (team onboarding module — 3 cmdlets)
+├── Invoke-TAKOnboarding    one-command onboarding pipeline
+│   ├── tak-team-certs.sh   Per-user cert generation (runs on TAK Server over SSH)
+│   ├── New-TAKTeamRoster   User account + group creation (via UserManager.jar)
+│   └── New-TAKDataPackage  Per-user ATAK .zip build
+│       └── dist\\ (output, git-ignored)
+└── (root Invoke-TAKOnboarding.ps1 is a thin wrapper)
+
+Remove-CivTAK.ps1 → thin wrapper → TAKDeploy\Remove-TAKDeployment
+</code></pre></div></div>
+
+<h2 id="target-environment">Target Environment</h2>
+
+<ul>
+  <li><strong>Host OS:</strong> Windows 10/11 or Windows Server with Hyper-V enabled</li>
+  <li><strong>Guest OS:</strong> Rocky Linux 9.7</li>
+  <li><strong>TAK Server:</strong> 5.7-RELEASE8</li>
+  <li><strong>PowerShell:</strong> 7.0+</li>
+  <li><strong>Required modules:</strong> <code class="language-plaintext highlighter-rouge">Posh-SSH</code>, <code class="language-plaintext highlighter-rouge">Pester</code> (for tests)</li>
+</ul>
+
+<h2 id="network-ports">Network Ports</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Port</th>
+      <th>Protocol</th>
+      <th>Service</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8089</td>
+      <td>TCP/TLS</td>
+      <td>CoT — ATAK client connections</td>
+    </tr>
+    <tr>
+      <td>8443</td>
+      <td>TCP/HTTPS</td>
+      <td>WebTAK UI, REST API, admin console</td>
+    </tr>
+    <tr>
+      <td>8446</td>
+      <td>TCP/HTTPS</td>
+      <td>Client certificate enrollment</td>
+    </tr>
+    <tr>
+      <td>5222/5223</td>
+      <td>TCP</td>
+      <td>Openfire XMPP client (optional)</td>
+    </tr>
+    <tr>
+      <td>9090/9091</td>
+      <td>TCP</td>
+      <td>Openfire admin console (optional)</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td>TCP/HTTP</td>
+      <td>Certbot ACME challenge (Let’s Encrypt only)</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

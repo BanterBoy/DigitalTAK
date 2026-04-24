@@ -3,6 +3,7 @@ tagline: "TAK Server 5.7 automation for Rocky Linux 9 on Hyper-V"
 description: "Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V"
 lang: en-GB
 baseurl: ""
+# url is used for SEO/sitemap generation and is ignored during local `jekyll serve`
 url: "https://digitaltak.lukeleigh.com"
 
 author:

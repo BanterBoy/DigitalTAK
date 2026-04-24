@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Client Validation | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Client Validation" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/config/client-validation/" />
+<meta property="og:url" content="http://0.0.0.0:4000/config/client-validation/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Client Validation" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Client Validation","url":"http://0.0.0.0:4000/config/client-validation/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="tak-client-validation-checklist">TAK Client Validation Checklist</h1>
+
+<blockquote>
+  <p><strong>Status:</strong> M4 deliverable — April 2026
+<strong>TAK Server version:</strong> 5.7-RELEASE8
+<strong>Covers:</strong> WinTAK, ATAK (Android), TAKChat (Openfire/XMPP)</p>
+</blockquote>
+
+<hr />
+
+<h2 id="purpose">Purpose</h2>
+
+<p>This checklist documents the expected behaviour when connecting WinTAK and ATAK clients to the DigitalTAK server. Each item is a pass/fail gate. Complete the checklist in order after every full deployment (i.e., after <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> completes successfully).</p>
+
+<p>Mark each item ✅ pass, ❌ fail, or ⬜ not tested.</p>
+
+<hr />
+
+<h2 id="1-pre-connection-prerequisites">1. Pre-Connection Prerequisites</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.1</td>
+      <td>TAK Server service running</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl status takserver</code> → <code class="language-plaintext highlighter-rouge">active (running)</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>1.2</td>
+      <td>Port 8089 reachable from client workstation</td>
+      <td><code class="language-plaintext highlighter-rouge">Test-NetConnection &lt;SERVER_IP&gt; -Port 8089</code> → <code class="language-plaintext highlighter-rouge">TcpTestSucceeded: True</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>1.3</td>
+      <td>Port 8443 reachable</td>
+      <td><code class="language-plaintext highlighter-rouge">Test-NetConnection &lt;SERVER_IP&gt; -Port 8443</code> → <code class="language-plaintext highlighter-rouge">TcpTestSucceeded: True</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>1.4</td>
+      <td>Port 8446 reachable</td>
+      <td><code class="language-plaintext highlighter-rouge">Test-NetConnection &lt;SERVER_IP&gt; -Port 8446</code> → <code class="language-plaintext highlighter-rouge">TcpTestSucceeded: True</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>1.5</td>
+      <td>Client cert <code class="language-plaintext highlighter-rouge">.p12</code> file available on device</td>
+      <td>File exists, not expired (<code class="language-plaintext highlighter-rouge">keytool -list -keystore client.p12</code>)</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>1.6</td>
+      <td>Server CA cert (<code class="language-plaintext highlighter-rouge">truststore-remote.p12</code>) available</td>
+      <td>Exported from <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/truststore-intermediate-ca.jks</code></td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="2-wintak-validation">2. WinTAK Validation</h2>
+
+<h3 id="21-installation">2.1 Installation</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.1.1</td>
+      <td>WinTAK version installed</td>
+      <td>WinTAK 5.x (current public release)</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.1.2</td>
+      <td>WinTAK launches without error</td>
+      <td>Application opens to map view</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="22-certificate-import">2.2 Certificate Import</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.2.1</td>
+      <td>Client <code class="language-plaintext highlighter-rouge">.p12</code> imported via Settings &gt; Network &gt; Manage Server Connections &gt; Certificate</td>
+      <td>Certificate appears in cert list</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.2.2</td>
+      <td>Server CA cert imported to trusted store</td>
+      <td>No SSL error on connection attempt</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="23-server-connection">2.3 Server Connection</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.3.1</td>
+      <td>Data package (<code class="language-plaintext highlighter-rouge">.dp</code>) imported</td>
+      <td>Settings pre-populated with server IP and port 8089</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.3.2</td>
+      <td>Connect to TAK Server port 8089 (SSL)</td>
+      <td>Status bar shows connected; no certificate errors in logs</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.3.3</td>
+      <td>Self-SA (own callsign blue force) visible on map</td>
+      <td>WinTAK icon appears at expected position</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.3.4</td>
+      <td>Server-side user entry visible in WebTAK admin</td>
+      <td>WebTAK <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code> &gt; Users shows WinTAK callsign</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="24-cot-exchange">2.4 CoT Exchange</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.4.1</td>
+      <td>Drop a map marker (CoT event) in WinTAK</td>
+      <td>Marker appears on server WebTAK map view</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.4.2</td>
+      <td>Second connected client sees marker</td>
+      <td>If two clients present, each sees the other’s SA</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.4.3</td>
+      <td>Chat message sent from WinTAK</td>
+      <td>Message visible in WebTAK chat or second client</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="25-mission-packages">2.5 Mission Packages</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.5.1</td>
+      <td>Mission package upload from WinTAK</td>
+      <td>Package appears in WebTAK &gt; Mission Packages</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.5.2</td>
+      <td>Mission package download to WinTAK</td>
+      <td>File received, no error</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="26-group-membership">2.6 Group Membership</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.6.1</td>
+      <td>WinTAK user assigned to group in WebTAK</td>
+      <td>User appears under group in Configuration &gt; Group Management</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>2.6.2</td>
+      <td>Group filtering applied</td>
+      <td>Client only sees SA from same group</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="3-atak-android-validation">3. ATAK (Android) Validation</h2>
+
+<h3 id="31-installation">3.1 Installation</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.1.1</td>
+      <td>ATAK version installed</td>
+      <td>ATAK 5.x (current public release); note FIPS-mode certs may not work — standard certs required</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.1.2</td>
+      <td>ATAK launches without error</td>
+      <td>Application opens to map view</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="32-certificate-import">3.2 Certificate Import</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.2.1</td>
+      <td>Data package (<code class="language-plaintext highlighter-rouge">.dp</code>) sideloaded or downloaded from TAK Server</td>
+      <td>Settings &gt; Import Manager shows package</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.2.2</td>
+      <td>Client cert and CA cert imported</td>
+      <td>No SSL error; cert appears under Manage Certificates</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="33-server-connection-port-8089">3.3 Server Connection (port 8089)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.3.1</td>
+      <td>Connect to TAK Server port 8089 (SSL, x509 auth)</td>
+      <td>Status bar shows connected</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.3.2</td>
+      <td>Own SA visible on map</td>
+      <td>ATAK icon at GPS position</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.3.3</td>
+      <td>Server-side user entry visible in WebTAK admin</td>
+      <td>WebTAK shows ATAK callsign</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="34-cot-exchange--feature-parity-with-wintak">3.4 CoT Exchange &amp; Feature Parity with WinTAK</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.4.1</td>
+      <td>Drop a map marker in ATAK</td>
+      <td>Marker visible in WebTAK and WinTAK (if connected)</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.4.2</td>
+      <td>WinTAK-created marker visible in ATAK</td>
+      <td>Matches 2.4.1 result</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.4.3</td>
+      <td>Chat message sent from ATAK</td>
+      <td>Message visible in WebTAK / WinTAK</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="35-certificate-enrollment-port-8446">3.5 Certificate Enrollment (port 8446)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.5.1</td>
+      <td>ATAK enrollment request sent to <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8446</code></td>
+      <td>TAK Server issues a device certificate</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>3.5.2</td>
+      <td>Enrolled cert used for subsequent connection</td>
+      <td>Connection succeeds with new per-device cert</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="4-openfire--takchat-validation">4. Openfire / TAKChat Validation</h2>
+
+<h3 id="41-openfire-service">4.1 Openfire Service</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>4.1.1</td>
+      <td>Openfire service running</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl status openfire-xmpp</code> → <code class="language-plaintext highlighter-rouge">active (running)</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>4.1.2</td>
+      <td>Port 5222 (XMPP STARTTLS) reachable</td>
+      <td><code class="language-plaintext highlighter-rouge">Test-NetConnection &lt;SERVER_IP&gt; -Port 5222</code> → <code class="language-plaintext highlighter-rouge">TcpTestSucceeded: True</code></td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>4.1.3</td>
+      <td>Openfire admin console accessible (if admin ports open)</td>
+      <td><code class="language-plaintext highlighter-rouge">http://&lt;SERVER_IP&gt;:9090</code> returns Openfire login page</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="42-takchat-in-wintak">4.2 TAKChat in WinTAK</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>4.2.1</td>
+      <td>TAKChat connection configured (server IP, port 5222)</td>
+      <td>Settings &gt; TAKChat shows server address</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>4.2.2</td>
+      <td>WinTAK connects to Openfire XMPP</td>
+      <td>TAKChat status shows connected / green</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>4.2.3</td>
+      <td>Chat message sent via TAKChat</td>
+      <td>Message delivered; no error in WinTAK logs</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="43-takchat-in-atak">4.3 TAKChat in ATAK</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Expected</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>4.3.1</td>
+      <td>ATAK XMPP chat configured to same Openfire server</td>
+      <td>Settings &gt; Network &gt; XMPP shows connected</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td>4.3.2</td>
+      <td>Cross-client chat (ATAK ↔ WinTAK via Openfire)</td>
+      <td>Message sent from ATAK received in WinTAK TAKChat and vice versa</td>
+      <td>⬜</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="5-failure-diagnostics">5. Failure Diagnostics</h2>
+
+<h3 id="51-certificate-errors">5.1 Certificate Errors</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Symptom</th>
+      <th>Likely Cause</th>
+      <th>Resolution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PKIX path building failed</code></td>
+      <td>Client does not trust the server CA</td>
+      <td>Re-import <code class="language-plaintext highlighter-rouge">truststore-remote.p12</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">bad_certificate</code> TLS alert</td>
+      <td>Server does not recognise client cert</td>
+      <td>Verify client cert was signed by the intermediate CA in <code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.jks</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Connection refused</code> on 8089</td>
+      <td>TAK Server not running, firewalld blocking</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl start takserver</code>; <code class="language-plaintext highlighter-rouge">firewall-cmd --list-ports</code></td>
+    </tr>
+    <tr>
+      <td>WinTAK prompt for password</td>
+      <td>Client cert password mismatch</td>
+      <td>Check <code class="language-plaintext highlighter-rouge">.pref</code> <code class="language-plaintext highlighter-rouge">clientPassword</code> field</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="52-openfiretakchat-issues">5.2 Openfire/TAKChat Issues</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Symptom</th>
+      <th>Likely Cause</th>
+      <th>Resolution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Port 5222 refused</td>
+      <td>Openfire not started</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl start openfire-xmpp</code></td>
+    </tr>
+    <tr>
+      <td>Cockpit blocking port 9090</td>
+      <td>Cockpit not disabled</td>
+      <td><code class="language-plaintext highlighter-rouge">systemctl disable --now cockpit.socket cockpit</code> (done by install script)</td>
+    </tr>
+    <tr>
+      <td>XMPP auth failure</td>
+      <td>User not provisioned in Openfire</td>
+      <td>Create user in Openfire admin console; Openfire user provisioning is not automated by this pipeline</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="53-useful-log-locations">5.3 Useful Log Locations</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Log path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TAK Server</td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/tak/logs/takserver-messaging.log</code>, <code class="language-plaintext highlighter-rouge">/opt/tak/logs/takserver-api.log</code></td>
+    </tr>
+    <tr>
+      <td>Openfire</td>
+      <td><code class="language-plaintext highlighter-rouge">/opt/openfire/logs/openfire.log</code>, <code class="language-plaintext highlighter-rouge">/opt/openfire/logs/error.log</code></td>
+    </tr>
+    <tr>
+      <td>firewalld</td>
+      <td><code class="language-plaintext highlighter-rouge">journalctl -u firewalld</code></td>
+    </tr>
+    <tr>
+      <td>WinTAK</td>
+      <td><code class="language-plaintext highlighter-rouge">%APPDATA%\WinTAK\logs\</code></td>
+    </tr>
+    <tr>
+      <td>ATAK</td>
+      <td>Device internal storage <code class="language-plaintext highlighter-rouge">Android/data/com.atakmap.app/files/logs/</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="6-sign-off">6. Sign-Off</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Validator</th>
+      <th>Date</th>
+      <th>Result</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="/config/data-packages/">data-packages.md</a> — building and distributing <code class="language-plaintext highlighter-rouge">.dp</code> files</li>
+  <li><a href="/config/baseline/">baseline.md</a> — port configuration reference</li>
+  <li><a href="/config/federation/">federation.md</a> — federation configuration</li>
+  <li><a href="../../Documentation/TAK_Server_Configuration_Guide_5.7.md">TAK Server 5.7 Configuration Guide</a> — §9 Configuration, §12 Federation</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

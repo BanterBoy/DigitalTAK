@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAKInstall Module | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAKInstall Module" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/modules/TAKInstall/" />
+<meta property="og:url" content="http://0.0.0.0:4000/modules/TAKInstall/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAKInstall Module" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAKInstall Module","url":"http://0.0.0.0:4000/modules/TAKInstall/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="takinstall-module">TAKInstall Module</h1>
+
+<p><strong>Version:</strong> 1.0.0
+<strong>PowerShell:</strong> 7.0+
+<strong>Required modules:</strong> <code class="language-plaintext highlighter-rouge">Posh-SSH</code></p>
+
+<h2 id="purpose">Purpose</h2>
+
+<p>TAKInstall provides cmdlets for remote provisioning of TAK Server 5.7 on a Rocky Linux 9 host over SSH. All operations run against an established <code class="language-plaintext highlighter-rouge">Posh-SSH</code> session — the target host is never required to have PowerShell installed.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>PowerShell 7.0 or later on the operator’s workstation</li>
+  <li><code class="language-plaintext highlighter-rouge">Posh-SSH</code> module: <code class="language-plaintext highlighter-rouge">Install-Module Posh-SSH -Scope CurrentUser</code></li>
+  <li>An active SSH session to a Rocky Linux 9 host (the target must have <code class="language-plaintext highlighter-rouge">sudo</code> privileges)</li>
+  <li>TAK Server 5.7-RELEASE8 RPM — obtained from tak.gov</li>
+  <li><em>(optional)</em> TAK Server GPG key for signature verification</li>
+</ul>
+
+<h2 id="installing">Installing</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Import-Module</span><span class="w"> </span><span class="o">.</span><span class="nx">\TAKInstall\TAKInstall.psd1</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="typical-workflow">Typical Workflow</h2>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$sess</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-SSHSession</span><span class="w"> </span><span class="nt">-ComputerName</span><span class="w"> </span><span class="s1">'192.168.1.50'</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="p">(</span><span class="n">Get-Credential</span><span class="p">)</span><span class="w"> </span><span class="nt">-AcceptKey</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="nt">-Prompt</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+
+</span><span class="n">Install-TAKServer</span><span class="w">         </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="p">(</span><span class="n">Get-Credential</span><span class="p">)</span><span class="w">
+</span><span class="n">New-TAKServerCertificate</span><span class="w">  </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'TX'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'AUSTIN'</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'MYORG'</span><span class="w"> </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'OPS'</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w">
+</span><span class="n">Set-TAKAdminCertificate</span><span class="w">   </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w">
+
+</span><span class="c"># Optional add-ons</span><span class="w">
+</span><span class="n">Install-TAKOpenfire</span><span class="w">               </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w">
+</span><span class="n">New-TAKLetsEncryptCertificate</span><span class="w">     </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-DomainName</span><span class="w"> </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-RenewalScriptPath</span><span class="w"> </span><span class="s1">'.\takserver_renewLECerts.sh'</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="cmdlet-reference">Cmdlet Reference</h2>
+
+<h3 id="install-takserver"><code class="language-plaintext highlighter-rouge">Install-TAKServer</code></h3>
+
+<p><strong>Synopsis:</strong> Installs TAK Server 5.7-RELEASE8 on a Rocky Linux 9 host via SSH.</p>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Raise open-files ulimit in <code class="language-plaintext highlighter-rouge">/etc/security/limits.conf</code></li>
+  <li>Install <code class="language-plaintext highlighter-rouge">dnf-plugins-core</code>, <code class="language-plaintext highlighter-rouge">vim</code>, and <code class="language-plaintext highlighter-rouge">epel-release</code></li>
+  <li>Add PostgreSQL PGDG repository; disable built-in <code class="language-plaintext highlighter-rouge">postgresql</code> module</li>
+  <li>Install OpenJDK 17; enable CRB repo; update system packages</li>
+  <li>Upload TAK Server RPM (and optional GPG key) via SCP</li>
+  <li><em>(optional)</em> Verify RPM GPG signature</li>
+  <li>Install TAK Server RPM via <code class="language-plaintext highlighter-rouge">dnf</code></li>
+  <li>Install <code class="language-plaintext highlighter-rouge">checkpolicy</code>; apply TAK SELinux policy; verify module</li>
+  <li><code class="language-plaintext highlighter-rouge">systemctl enable --now takserver</code>; wait for service ready</li>
+  <li>Install <code class="language-plaintext highlighter-rouge">firewalld</code>; open ports 8089, 8443, 8446</li>
+  <li>Deploy certificate helper scripts to <code class="language-plaintext highlighter-rouge">/opt/tak/certs/</code></li>
+</ol>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td>Yes</td>
+      <td>Active Posh-SSH session to the target host</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RpmPath</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Local path to <code class="language-plaintext highlighter-rouge">takserver-5.7-RELEASE8.noarch.rpm</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Credential</code></td>
+      <td>PSCredential</td>
+      <td>Yes</td>
+      <td>SSH credential for SCP file upload</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GpgKeyPath</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Local path to the TAK Server GPG signing key</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RemoteWorkDir</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Remote upload directory (default: <code class="language-plaintext highlighter-rouge">/tmp/tak_install</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SkipGpgVerification</code></td>
+      <td>Switch</td>
+      <td>No</td>
+      <td>Skip GPG check even when <code class="language-plaintext highlighter-rouge">GpgKeyPath</code> is supplied</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Basic install</span><span class="w">
+</span><span class="n">Install-TAKServer</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w">
+
+</span><span class="c"># With GPG verification and verbose output</span><span class="w">
+</span><span class="n">Install-TAKServer</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RpmPath</span><span class="w"> </span><span class="s1">'.\takserver-5.7-RELEASE8.noarch.rpm'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-GpgKeyPath</span><span class="w"> </span><span class="s1">'.\takserver-public-gpg.key'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Credential</span><span class="w"> </span><span class="nv">$cred</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Verbose</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="new-takservercertificate"><code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code></h3>
+
+<p><strong>Synopsis:</strong> Creates the TAK Server CA, server certificate, and configures TAK Server for x509 client authentication.</p>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Remove existing cert files from <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files</code></li>
+  <li>Patch <code class="language-plaintext highlighter-rouge">cert-metadata.sh</code> with supplied org details</li>
+  <li>Create Root CA (<code class="language-plaintext highlighter-rouge">makeRootCa.sh</code>)</li>
+  <li>Create Intermediate (signing) CA</li>
+  <li>Create TAK Server certificate</li>
+  <li>Create admin client certificate</li>
+  <li>Create initial user client certificate</li>
+  <li>Restart <code class="language-plaintext highlighter-rouge">takserver</code>; wait for service ready</li>
+  <li>Patch <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>: enable x509 TLS input on port 8089</li>
+  <li>Patch <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>: switch to intermediate CA trust store</li>
+  <li>Patch <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>: insert certificate signing block (30-day validity)</li>
+  <li>Patch <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>: enable x509 group cache</li>
+  <li>Final <code class="language-plaintext highlighter-rouge">takserver</code> restart</li>
+</ol>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td>Yes</td>
+      <td>Active Posh-SSH session</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">State</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>State/province — UPPERCASE, no spaces (e.g. <code class="language-plaintext highlighter-rouge">TX</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">City</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>City/locality — UPPERCASE, no spaces (e.g. <code class="language-plaintext highlighter-rouge">AUSTIN</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Organization</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Org name — UPPERCASE, no spaces (e.g. <code class="language-plaintext highlighter-rouge">MYORG</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OrganizationalUnit</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>OU — UPPERCASE, no spaces (e.g. <code class="language-plaintext highlighter-rouge">OPS</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CAName</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>Root CA identifier (default: <code class="language-plaintext highlighter-rouge">TAK-CA</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">KeystorePassword</code></td>
+      <td>SecureString</td>
+      <td>Yes</td>
+      <td>Password for JKS keystores and CoreConfig cert-signing block</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServiceRestartTimeout</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Seconds to wait for service after each restart (default: 300, max: 600)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">State</code>, <code class="language-plaintext highlighter-rouge">City</code>, <code class="language-plaintext highlighter-rouge">Organization</code>, and <code class="language-plaintext highlighter-rouge">OrganizationalUnit</code> must be uppercase with no spaces — TAK Server enforces this.</li>
+  <li>Certificate validity for enrolled user certs is 30 days (per TAK Server 5.7 Appendix C).</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="nt">-Prompt</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+
+</span><span class="n">New-TAKServerCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'TX'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'AUSTIN'</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'MYORG'</span><span class="w"> </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'OPS'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w">
+
+</span><span class="c"># Custom CA name with extended timeout</span><span class="w">
+</span><span class="n">New-TAKServerCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-State</span><span class="w"> </span><span class="s1">'VA'</span><span class="w"> </span><span class="nt">-City</span><span class="w"> </span><span class="s1">'RESTON'</span><span class="w"> </span><span class="nt">-Organization</span><span class="w"> </span><span class="s1">'TAKACME'</span><span class="w"> </span><span class="nt">-OrganizationalUnit</span><span class="w"> </span><span class="s1">'ADMIN'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-CAName</span><span class="w"> </span><span class="s1">'ACME-TAKCA'</span><span class="w"> </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="nt">-ServiceRestartTimeout</span><span class="w"> </span><span class="nx">600</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="set-takadmincertificate"><code class="language-plaintext highlighter-rouge">Set-TAKAdminCertificate</code></h3>
+
+<p><strong>Synopsis:</strong> Promotes the TAK Server admin certificate to the administrator role.</p>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Wait for <code class="language-plaintext highlighter-rouge">takserver</code> service and admin API to be ready</li>
+  <li>Run <code class="language-plaintext highlighter-rouge">UserManager.jar certmod -A admin.pem</code> (retries on Ignite startup errors)</li>
+  <li>Restart <code class="language-plaintext highlighter-rouge">takserver</code>; wait for service ready</li>
+  <li>Copy <code class="language-plaintext highlighter-rouge">admin.p12</code> to <code class="language-plaintext highlighter-rouge">/home/atak/admin.p12</code> (permissions 640)</li>
+</ol>
+
+<p>After this step, retrieve <code class="language-plaintext highlighter-rouge">/home/atak/admin.p12</code> and import it into your browser to access WebTAK as an administrator.</p>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td>Yes</td>
+      <td>Active Posh-SSH session</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServiceRestartTimeout</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Seconds to wait for service (default: 300)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-TAKAdminCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w">
+
+</span><span class="n">Set-TAKAdminCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-ServiceRestartTimeout</span><span class="w"> </span><span class="nx">600</span><span class="w"> </span><span class="nt">-Verbose</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="install-takopenfire"><code class="language-plaintext highlighter-rouge">Install-TAKOpenfire</code></h3>
+
+<p><strong>Synopsis:</strong> Installs Openfire XMPP Server on a Rocky Linux 9 TAK Server host via SSH.</p>
+
+<p>Must be run after <code class="language-plaintext highlighter-rouge">Install-TAKServer</code>.</p>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Disable Cockpit (frees port 9090)</li>
+  <li>Ensure Java 17 is installed</li>
+  <li>Download Openfire 5.0.3 RPM from GitHub</li>
+  <li>Repair <code class="language-plaintext highlighter-rouge">/etc/init.d</code> if it is a plain file rather than a directory</li>
+  <li>Install Openfire RPM via <code class="language-plaintext highlighter-rouge">dnf</code></li>
+  <li>Create native <code class="language-plaintext highlighter-rouge">openfire-xmpp.service</code> systemd unit</li>
+  <li>Stop legacy init.d Openfire process</li>
+  <li><code class="language-plaintext highlighter-rouge">systemctl enable --now openfire-xmpp.service</code>; wait for ready</li>
+  <li>Open firewall ports for XMPP and file transfer (5222, 5223, 5269, 7070, 7443, 7777, 8080)</li>
+  <li><em>(optional)</em> Open admin console ports 9090/9091</li>
+</ol>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td><em>(required)</em></td>
+      <td>Active Posh-SSH session</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OpenAdminPorts</code></td>
+      <td>Bool</td>
+      <td><code class="language-plaintext highlighter-rouge">$true</code></td>
+      <td>Open Openfire admin console ports (9090/9091) in firewalld</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">OpenFireVersion</code></td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">5.0.3</code></td>
+      <td>Openfire version to download (used to construct the GitHub URL)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li>Cockpit (port 9090) is disabled — do not use this cmdlet if Cockpit is required.</li>
+  <li>The Openfire RPM download has no hash verification (known limitation). For production use, verify the SHA256 manually against the Openfire release page.</li>
+  <li>After the cmdlet completes, browse to <code class="language-plaintext highlighter-rouge">http://&lt;server-ip&gt;:9090</code> to complete the Openfire setup wizard.</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Default install with admin ports open</span><span class="w">
+</span><span class="n">Install-TAKOpenfire</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w">
+
+</span><span class="c"># Without exposing admin console; access via SSH tunnel instead:</span><span class="w">
+</span><span class="c">#   ssh -L 9090:localhost:9090 user@server</span><span class="w">
+</span><span class="n">Install-TAKOpenfire</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="nt">-OpenAdminPorts</span><span class="p">:</span><span class="bp">$false</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="new-takletsencryptcertificate"><code class="language-plaintext highlighter-rouge">New-TAKLetsEncryptCertificate</code></h3>
+
+<p><strong>Synopsis:</strong> Issues a Let’s Encrypt TLS certificate for a TAK Server host.</p>
+
+<p><strong>Prerequisites:</strong></p>
+<ul>
+  <li>Server has a public IP address</li>
+  <li>A DNS A record for <code class="language-plaintext highlighter-rouge">-DomainName</code> points to the server’s public IP</li>
+  <li>Port 80 is reachable from the internet (ACME HTTP-01 challenge)</li>
+</ul>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Open firewall ports 8089, 8443, 8446, and 80</li>
+  <li>Install <code class="language-plaintext highlighter-rouge">snapd</code>; wait for seed</li>
+  <li>Install <code class="language-plaintext highlighter-rouge">certbot</code> via snap</li>
+  <li><code class="language-plaintext highlighter-rouge">certbot certonly --standalone</code> for the domain</li>
+  <li>Export PEM → PKCS12 → JKS using <code class="language-plaintext highlighter-rouge">openssl</code> and <code class="language-plaintext highlighter-rouge">keytool</code></li>
+  <li>Move JKS to <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></li>
+  <li>Stop <code class="language-plaintext highlighter-rouge">takserver</code>; patch 8446 connector in <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code> to use LE JKS; start <code class="language-plaintext highlighter-rouge">takserver</code></li>
+  <li>Write renewal config to <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code> (permissions 600)</li>
+  <li>Upload and install <code class="language-plaintext highlighter-rouge">takserver_renewLECerts.sh</code> to <code class="language-plaintext highlighter-rouge">/etc/cron.monthly/</code></li>
+</ol>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td>Yes</td>
+      <td>Active Posh-SSH session</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DomainName</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>FQDN for the certificate (e.g. <code class="language-plaintext highlighter-rouge">tak.example.com</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">KeystorePassword</code></td>
+      <td>SecureString</td>
+      <td>Yes</td>
+      <td>Password for PKCS12/JKS keystores and renewal conf</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RenewalScriptPath</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>Local path to <code class="language-plaintext highlighter-rouge">takserver_renewLECerts.sh</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code> stores the keystore password in plaintext (permissions 600, owned by root). For stricter environments, consider a secrets manager.</li>
+</ul>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="nt">-Prompt</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+</span><span class="n">New-TAKLetsEncryptCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-DomainName</span><span class="w"> </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-RenewalScriptPath</span><span class="w"> </span><span class="s1">'.\takserver_renewLECerts.sh'</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h3 id="update-takletsencryptcertificate"><code class="language-plaintext highlighter-rouge">Update-TAKLetsEncryptCertificate</code></h3>
+
+<p><strong>Synopsis:</strong> Renews the Let’s Encrypt TLS certificate on a TAK Server host.</p>
+
+<p>Run automatically by the cron job at <code class="language-plaintext highlighter-rouge">/etc/cron.monthly/takserver_renewLECerts.sh</code>. Use this cmdlet for manual renewal or to handle a domain name change.</p>
+
+<p><strong>Steps performed:</strong></p>
+<ol>
+  <li>Load domain and password from parameters or from <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code></li>
+  <li><code class="language-plaintext highlighter-rouge">certbot renew</code></li>
+  <li>Export PEM → PKCS12 → JKS</li>
+  <li>Replace existing JKS/P12 files in <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></li>
+  <li>Restore <code class="language-plaintext highlighter-rouge">/opt/tak</code> ownership to the <code class="language-plaintext highlighter-rouge">tak</code> user</li>
+  <li>Stop and restart <code class="language-plaintext highlighter-rouge">takserver</code></li>
+</ol>
+
+<p><strong>Parameters:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SshSession</code></td>
+      <td>SSH.SshSession</td>
+      <td>Yes</td>
+      <td>Active Posh-SSH session</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DomainName</code></td>
+      <td>String</td>
+      <td>No</td>
+      <td>FQDN to renew; reads from conf if omitted</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">KeystorePassword</code></td>
+      <td>SecureString</td>
+      <td>No</td>
+      <td>Keystore password; reads from conf if omitted</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ServiceRestartTimeout</code></td>
+      <td>Int</td>
+      <td>No</td>
+      <td>Seconds to wait for service restart (default: 180)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Examples:</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Renew using values from /etc/takserver_renew.conf</span><span class="w">
+</span><span class="n">Update-TAKLetsEncryptCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w">
+
+</span><span class="c"># Renew with explicit values</span><span class="w">
+</span><span class="nv">$pass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Read-Host</span><span class="w"> </span><span class="nt">-AsSecureString</span><span class="w"> </span><span class="nt">-Prompt</span><span class="w"> </span><span class="s1">'Keystore password'</span><span class="w">
+</span><span class="n">Update-TAKLetsEncryptCertificate</span><span class="w"> </span><span class="nt">-SshSession</span><span class="w"> </span><span class="nv">$sess</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-DomainName</span><span class="w"> </span><span class="s1">'tak.example.com'</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-KeystorePassword</span><span class="w"> </span><span class="nv">$pass</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Verifying renewal succeeded:</strong></p>
+
+<p>After the cmdlet returns, confirm the new certificate is active on port 8446:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check expiry via SSH</span><span class="w">
+</span><span class="n">Invoke-SSHCommand</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sess</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Command</span><span class="w"> </span><span class="s2">"sudo openssl x509 -enddate -noout -in /etc/letsencrypt/live/tak.example.com/cert.pem"</span><span class="w">
+
+</span><span class="c"># Confirm the cert is loaded on port 8446</span><span class="w">
+</span><span class="n">Invoke-SSHCommand</span><span class="w"> </span><span class="nt">-SessionId</span><span class="w"> </span><span class="nv">$sess</span><span class="o">.</span><span class="nf">SessionId</span><span class="w"> </span><span class="se">`
+</span><span class="w">    </span><span class="nt">-Command</span><span class="w"> </span><span class="s2">"echo | openssl s_client -connect localhost:8446 2&gt;/dev/null | openssl x509 -noout -dates"</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If port 8446 still shows the old expiry, TAK Server may not have restarted cleanly — check <code class="language-plaintext highlighter-rouge">ServiceRestartTimeout</code> or restart manually via SSH.</p>
+
+<hr />
+
+<h2 id="gaps-and-known-issues">Gaps and Known Issues</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Install-TAKServer</code> requires <code class="language-plaintext highlighter-rouge">-Credential</code> for SCP uploads because Posh-SSH 3.x does not support session-based SCP. The credential must match the SSH session.</li>
+  <li><code class="language-plaintext highlighter-rouge">Install-TAKOpenfire</code> downloads the Openfire RPM with no hash verification. Verify manually against the Openfire release SHA256 before use in production.</li>
+  <li><code class="language-plaintext highlighter-rouge">New-TAKLetsEncryptCertificate</code> stores the keystore password in plaintext in <code class="language-plaintext highlighter-rouge">/etc/takserver_renew.conf</code> (permissions 600). Consider replacing this with a secrets manager for classified or production deployments.</li>
+  <li><code class="language-plaintext highlighter-rouge">New-TAKServerCertificate</code> uses <code class="language-plaintext highlighter-rouge">sed</code> to patch <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>. If the expected XML patterns are absent (e.g. due to a version change), the patch will silently fail; a validation step checks the signing block and throws a terminating error if missing.</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

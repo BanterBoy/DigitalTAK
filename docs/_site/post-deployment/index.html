@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Post-Deployment | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Post-Deployment" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/post-deployment/" />
+<meta property="og:url" content="http://0.0.0.0:4000/post-deployment/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Post-Deployment" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"Post-Deployment","url":"http://0.0.0.0:4000/post-deployment/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item active"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 class="no_toc" id="post-deployment">Post-Deployment</h1>
+
+<p class="fs-6 fw-300">What a successful <code class="language-plaintext highlighter-rouge">Deploy-TAKServer.ps1</code> run produces and how to verify it.</p>
+
+<blockquote>
+  <p><em>Chuck Norris’s deployments always pass 22 out of 22 tests. There used to be a 23rd — “Is Chuck Norris satisfied?” — but it was retired for being redundant.</em></p>
+</blockquote>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#what-the-script-produces" id="markdown-toc-what-the-script-produces">What the Script Produces</a></li>
+  <li><a href="#example-deployment-report" id="markdown-toc-example-deployment-report">Example Deployment Report</a>    <ol>
+      <li><a href="#header" id="markdown-toc-header">Header</a></li>
+      <li><a href="#environment" id="markdown-toc-environment">Environment</a></li>
+      <li><a href="#certificate-configuration" id="markdown-toc-certificate-configuration">Certificate Configuration</a></li>
+      <li><a href="#credentials" id="markdown-toc-credentials">Credentials</a></li>
+      <li><a href="#installation-phases" id="markdown-toc-installation-phases">Installation Phases</a></li>
+      <li><a href="#post-deployment-validation-tests" id="markdown-toc-post-deployment-validation-tests">Post-Deployment Validation Tests</a></li>
+      <li><a href="#access-urls" id="markdown-toc-access-urls">Access URLs</a></li>
+    </ol>
+  </li>
+  <li><a href="#certificate-files" id="markdown-toc-certificate-files">Certificate Files</a>    <ol>
+      <li><a href="#on-the-vm" id="markdown-toc-on-the-vm">On the VM</a></li>
+      <li><a href="#downloaded-locally" id="markdown-toc-downloaded-locally">Downloaded Locally</a></li>
+    </ol>
+  </li>
+  <li><a href="#first-steps-after-deployment" id="markdown-toc-first-steps-after-deployment">First Steps After Deployment</a>    <ol>
+      <li><a href="#1--retrieve-the-admin-certificate-if-not-auto-downloaded" id="markdown-toc-1--retrieve-the-admin-certificate-if-not-auto-downloaded">1 — Retrieve the admin certificate (if not auto-downloaded)</a></li>
+      <li><a href="#2--import-into-your-browser" id="markdown-toc-2--import-into-your-browser">2 — Import into your browser</a></li>
+      <li><a href="#3--access-the-webtak-admin-ui" id="markdown-toc-3--access-the-webtak-admin-ui">3 — Access the WebTAK Admin UI</a></li>
+      <li><a href="#4--verify-cot-connectivity" id="markdown-toc-4--verify-cot-connectivity">4 — Verify CoT connectivity</a></li>
+    </ol>
+  </li>
+  <li><a href="#notes-on-port-8443-behaviour" id="markdown-toc-notes-on-port-8443-behaviour">Notes on Port 8443 Behaviour</a></li>
+  <li><a href="#next-steps" id="markdown-toc-next-steps">Next Steps</a></li>
+</ol>
+
+<hr />
+
+<h2 id="what-the-script-produces">What the Script Produces</h2>
+
+<p>When the deployment completes all phases, you will have:</p>
+
+<ul>
+  <li>A running Hyper-V Gen 2 VM with Rocky Linux 9.7 and TAK Server 5.7</li>
+  <li>A full certificate authority (CA) on the VM with server and admin certificates</li>
+  <li>Client certificate files (<code class="language-plaintext highlighter-rouge">admin.p12</code>, <code class="language-plaintext highlighter-rouge">user.p12</code>) downloaded to a local <code class="language-plaintext highlighter-rouge">certs/</code> directory</li>
+  <li>A deployment report at <code class="language-plaintext highlighter-rouge">reports/DEPLOYMENT-REPORT-&lt;timestamp&gt;.md</code></li>
+</ul>
+
+<hr />
+
+<h2 id="example-deployment-report">Example Deployment Report</h2>
+
+<p>The script generates a report at the end of every run. Below is an annotated example showing what each section contains.</p>
+
+<h3 id="header">Header</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># TAK Server Deployment Report
+
+Generated:  2026-04-02 13:18:11
+Duration:   00:11:12
+Result:     ALL TESTS PASSED
+</code></pre></div></div>
+
+<p>A failed deployment will show <code class="language-plaintext highlighter-rouge">FAILED</code> here and list which phase errored.</p>
+
+<hr />
+
+<h3 id="environment">Environment</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>VM Name</td>
+      <td>TAKServer</td>
+    </tr>
+    <tr>
+      <td>VM IP</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;assigned by DHCP or static — your network&gt;</code></td>
+    </tr>
+    <tr>
+      <td>SSH User</td>
+      <td>atak</td>
+    </tr>
+    <tr>
+      <td>OS</td>
+      <td>Rocky Linux release 9.7 (Blue Onyx)</td>
+    </tr>
+    <tr>
+      <td>Java</td>
+      <td>openjdk version “17.0.18” 2026-01-20 LTS</td>
+    </tr>
+    <tr>
+      <td>TAK Server</td>
+      <td>takserver-5.7-RELEASE8.noarch</td>
+    </tr>
+    <tr>
+      <td>Total Memory</td>
+      <td>7.5Gi</td>
+    </tr>
+    <tr>
+      <td>Disk Usage (/)</td>
+      <td>/dev/mapper/rl_takserver-root   48G  4.0G   44G   9% /</td>
+    </tr>
+    <tr>
+      <td>Hyper-V Generation</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>vCPU</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>RAM</td>
+      <td>8 GB (fixed)</td>
+    </tr>
+    <tr>
+      <td>VHD</td>
+      <td>80 GB (dynamic VHDX)</td>
+    </tr>
+    <tr>
+      <td>vSwitch</td>
+      <td>TAK-External</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The <code class="language-plaintext highlighter-rouge">VM IP</code> is the address you will use for all subsequent access. Note it down — it is not stored elsewhere by the script.</p>
+
+<hr />
+
+<h3 id="certificate-configuration">Certificate Configuration</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>State</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;value you supplied&gt;</code></td>
+    </tr>
+    <tr>
+      <td>City</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;value you supplied&gt;</code></td>
+    </tr>
+    <tr>
+      <td>Organization</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;value you supplied&gt;</code></td>
+    </tr>
+    <tr>
+      <td>OU</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;value you supplied&gt;</code></td>
+    </tr>
+    <tr>
+      <td>CA Name</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;CAName you supplied&gt;</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>These values are embedded in every certificate the CA issues. They cannot be changed without regenerating the full CA.</p>
+
+<hr />
+
+<h3 id="credentials">Credentials</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SSH user</td>
+      <td>atak</td>
+    </tr>
+    <tr>
+      <td>SSH user password</td>
+      <td><em>(your SSH password — not stored in report)</em></td>
+    </tr>
+    <tr>
+      <td>Root password</td>
+      <td><em>(your root password — not stored in report)</em></td>
+    </tr>
+    <tr>
+      <td>Keystore / PKCS#12 certificate password</td>
+      <td><em>(your <code class="language-plaintext highlighter-rouge">-KeystorePassword</code> value — not stored)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">The <code class="language-plaintext highlighter-rouge">-KeystorePassword</code> you supplied is used for <strong>all</strong> certificate material — it is written to <code class="language-plaintext highlighter-rouge">CAPASS</code> in <code class="language-plaintext highlighter-rouge">cert-metadata.sh</code>, applied to every Java keystore (<code class="language-plaintext highlighter-rouge">.jks</code>) generated by <code class="language-plaintext highlighter-rouge">makeCert.sh</code>, patched into <code class="language-plaintext highlighter-rouge">CoreConfig.xml</code>, and becomes the passphrase for every exported <code class="language-plaintext highlighter-rouge">.p12</code> file. Use this same password when importing <code class="language-plaintext highlighter-rouge">.p12</code> files into a browser or ATAK client.</p>
+
+<hr />
+
+<h3 id="installation-phases">Installation Phases</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Result</th>
+      <th>Typical Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Install TAK Server</td>
+      <td>Success</td>
+      <td>~3–4 min</td>
+    </tr>
+    <tr>
+      <td>Create Certificates</td>
+      <td>Success</td>
+      <td>~1–2 min</td>
+    </tr>
+    <tr>
+      <td>Promote Admin Cert</td>
+      <td>Success</td>
+      <td>~1 min</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If any phase fails, the script stops and reports the error. Re-running restores from the last successful phase snapshot automatically.</p>
+
+<hr />
+
+<h3 id="post-deployment-validation-tests">Post-Deployment Validation Tests</h3>
+
+<p>The script runs 22 automated checks over SSH immediately after install. All 22 must pass for the deployment to be marked successful.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Test</th>
+      <th>What It Verifies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver</code> service is active</td>
+      <td>systemd service running</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code class="language-plaintext highlighter-rouge">takserver</code> service is enabled</td>
+      <td>survives reboot</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Java 17 is installed</td>
+      <td>correct JDK version</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>PostgreSQL is running</td>
+      <td>database service active</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Port 8089 listening</td>
+      <td>CoT TCP socket open</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Port 8443 listening</td>
+      <td>WebTAK HTTPS socket open</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Port 8446 listening</td>
+      <td>cert enrollment socket open</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>firewalld is active</td>
+      <td>firewall service running</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Firewall has 8089/tcp</td>
+      <td>rule present</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Firewall has 8443/tcp</td>
+      <td>rule present</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Firewall has 8446/tcp</td>
+      <td>rule present</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>SELinux takserver module loaded</td>
+      <td>module installed</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>CoreConfig.xml exists</td>
+      <td>TAK config file present</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>CA truststore exists</td>
+      <td>JKS truststore created</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>Server certificate exists</td>
+      <td>server JKS created</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>Admin .p12 cert exists</td>
+      <td>admin cert under <code class="language-plaintext highlighter-rouge">/opt/tak/certs/files/</code></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>Admin .p12 in /home/atak/</td>
+      <td>copied to SSH user home</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>Cert enrollment HTTPS responds on 8446</td>
+      <td>HTTP 403 (unauthenticated — expected)</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>cert-metadata.sh has correct State</td>
+      <td>cert metadata patched correctly</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>TAK Server RPM installed</td>
+      <td>package registered with dnf</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>nofile ulimit configured</td>
+      <td>file-descriptor limit set (32768)</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>OS is Rocky Linux 9</td>
+      <td>correct OS</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h3 id="access-urls">Access URLs</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>URL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>WebTAK / Admin UI</td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code></td>
+    </tr>
+    <tr>
+      <td>Cursor-on-Target (CoT)</td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;SERVER_IP&gt;:8089</code> (TLS)</td>
+    </tr>
+    <tr>
+      <td>Certificate Enrollment</td>
+      <td><code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8446</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Replace <code class="language-plaintext highlighter-rouge">&lt;SERVER_IP&gt;</code> with the IP shown in the Environment section of your deployment report.</p>
+
+<hr />
+
+<h2 id="certificate-files">Certificate Files</h2>
+
+<h3 id="on-the-vm">On the VM</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opt/tak/certs/files/
+├── admin.p12                       ← admin client certificate
+├── user.p12                        ← default user client certificate
+├── truststore-root.jks
+├── truststore-intermediate-ca.jks
+└── takserver.jks                   ← server keystore
+</code></pre></div></div>
+
+<p>The admin <code class="language-plaintext highlighter-rouge">.p12</code> is also copied to <code class="language-plaintext highlighter-rouge">/home/atak/admin.p12</code> for easy retrieval.</p>
+
+<h3 id="downloaded-locally">Downloaded Locally</h3>
+
+<p>At the end of a successful run the script copies <code class="language-plaintext highlighter-rouge">.p12</code> files to <code class="language-plaintext highlighter-rouge">certs/</code> in your repo working directory:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certs/
+├── admin.p12
+└── user.p12
+</code></pre></div></div>
+
+<p class="warning">The <code class="language-plaintext highlighter-rouge">certs/</code> directory is excluded by <code class="language-plaintext highlighter-rouge">.gitignore</code>. Never commit <code class="language-plaintext highlighter-rouge">.p12</code> files to version control.</p>
+
+<hr />
+
+<h2 id="first-steps-after-deployment">First Steps After Deployment</h2>
+
+<h3 id="1--retrieve-the-admin-certificate-if-not-auto-downloaded">1 — Retrieve the admin certificate (if not auto-downloaded)</h3>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scp</span><span class="w"> </span><span class="nx">atak</span><span class="err">@&lt;</span><span class="nx">SERVER_IP</span><span class="err">&gt;</span><span class="p">:</span><span class="nx">/home/atak/admin.p12</span><span class="w"> </span><span class="o">.</span><span class="nx">\certs\admin.p12</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="2--import-into-your-browser">2 — Import into your browser</h3>
+
+<p>Most browsers read from the Windows certificate store. To import manually:</p>
+
+<ol>
+  <li>Settings → Privacy and security → Manage certificates</li>
+  <li>Personal tab → Import</li>
+  <li>Select <code class="language-plaintext highlighter-rouge">admin.p12</code></li>
+  <li>Enter your <code class="language-plaintext highlighter-rouge">-KeystorePassword</code> value</li>
+  <li>Place in <strong>Personal</strong> store</li>
+</ol>
+
+<h3 id="3--access-the-webtak-admin-ui">3 — Access the WebTAK Admin UI</h3>
+
+<p>Navigate to <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code> in your browser.<br />
+The browser will prompt you to select a client certificate — choose the imported <code class="language-plaintext highlighter-rouge">admin</code> cert.</p>
+
+<p>You will see the TAK Server admin interface. From here you can manage users, groups, data packages, and server settings.</p>
+
+<h3 id="4--verify-cot-connectivity">4 — Verify CoT connectivity</h3>
+
+<p>Point an ATAK or WinTAK client at <code class="language-plaintext highlighter-rouge">&lt;SERVER_IP&gt;:8089</code> with TLS enabled.<br />
+The client will need a server connection profile and the <code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.p12</code> file to validate the server certificate.</p>
+
+<hr />
+
+<h2 id="notes-on-port-8443-behaviour">Notes on Port 8443 Behaviour</h2>
+
+<p>Port 8443 enforces mutual TLS (mTLS). A browser or tool connecting <strong>without</strong> a client certificate will receive an SSL handshake rejection (curl shows <code class="language-plaintext highlighter-rouge">HTTP 000</code>). This is correct behaviour — not a firewall or service issue. The connection only succeeds once a certificate signed by the TAK CA is presented.</p>
+
+<hr />
+
+<h2 id="next-steps">Next Steps</h2>
+
+<ul>
+  <li><a href="../onboarding/">Team Onboarding</a> — generate per-user certificates and build ATAK data packages for a team</li>
+  <li><a href="../troubleshooting/">Troubleshooting</a> — common failure patterns and fixes</li>
+  <li><a href="../api-reference/">API Reference</a> — manage users, groups, and data packages via PowerShell cmdlets</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>

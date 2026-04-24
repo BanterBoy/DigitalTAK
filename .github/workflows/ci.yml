@@ -178,6 +178,20 @@ jobs:
           scandir: './InstallShellScripts'
           severity: warning
 
+  # ─── Jekyll docs build check ────────────────────────────────────────────────
+  docs-build:
+    name: Jekyll Docs Build
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build Jekyll docs (dry-run)
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+
   # ─── Live-VM integration tests (manual / release only) ─────────────────────
   #
   # This job runs the full integration + E2E test suite against a real deployed

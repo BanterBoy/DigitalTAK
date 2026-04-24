@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAK Data Packages | DigitalTAK</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAK Data Packages" />
+<meta name="author" content="Luke Leigh" />
+<meta property="og:locale" content="en_GB" />
+<meta name="description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<meta property="og:description" content="Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V" />
+<link rel="canonical" href="http://0.0.0.0:4000/config/data-packages/" />
+<meta property="og:url" content="http://0.0.0.0:4000/config/data-packages/" />
+<meta property="og:site_name" content="DigitalTAK" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAK Data Packages" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Luke Leigh","url":"https://github.com/BanterBoy"},"description":"Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V","headline":"TAK Data Packages","url":"http://0.0.0.0:4000/config/data-packages/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- CSS via jsDelivr — same styles as scripts.lukeleigh.com (Hyde/Poole theme) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/poole.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/syntax.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/hyde.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/BanterBoy/scripts-blog@prod/assets/css/themes.css">
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap">
+
+  <!-- Favicon (SVG inline fallback; replace with favicon.ico for broader browser support) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23202020'/><text y='72' x='50' text-anchor='middle' font-size='65' font-family='monospace' fill='%2340c0ff'>T</text></svg>">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <!-- Font Awesome 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"
+    integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- jQuery (required by theme toggle) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <!-- js-cookie v2 (required by site.js theme toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+
+  <!-- Theme toggle script -->
+  <script src="/assets/js/site.js"></script>
+</head>
+
+  <body>
+    
+
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="http://0.0.0.0:4000/">
+          DigitalTAK
+        </a>
+      </h1>
+      <p class="lead">Automated CivTAK deployment and management for Rocky Linux 9 on Hyper-V</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/">Home</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/getting-started/">Getting Started</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/deployment/">Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/post-deployment/">Post-Deployment</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/onboarding/">Team Onboarding</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/validation-report/">Validation Report</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agent-configuration/">Agent Configuration</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/api-reference/">API Reference</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/agents-skills-reference/">Agents &amp; Skills</a>
+      <a class="sidebar-nav-item"
+         href="http://0.0.0.0:4000/troubleshooting/">Troubleshooting</a>
+    </nav>
+  </div>
+
+  <div class="container sidebar-bottom-anchored">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK">GitHub Project</a>
+      <span class="sidebar-nav-item">TAK Server 5.7-RELEASE8</span><br>
+      <a class="sidebar-nav-item" href="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml">
+        <img src="https://github.com/BanterBoy/DigitalTAK/actions/workflows/ci.yml/badge.svg" alt="DigitalTAK CI Status">
+      </a>
+    </nav>
+    <p>&copy; 2026. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container" id="top">
+      <div class="theme-icons">
+  <span id="btnApplyDarkTheme" class="theme-icon" title="Turn off the lights">
+    <i class="far fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplyLightTheme" class="theme-icon" title="Turn on the lights">
+    <i class="fas fa-lightbulb fa-2x theme-icon"></i>
+  </span>
+  <span id="btnApplySystemTheme" class="theme-icon" title="Use system theme">
+    <i class="fas fa-microchip fa-2x theme-icon"></i>
+  </span>
+</div>
+
+
+      <article>
+        <div class="page">
+  <h1 id="tak-data-packages-dp">TAK Data Packages (.dp)</h1>
+
+<blockquote>
+  <p><strong>Status:</strong> M4 deliverable — April 2026
+<strong>TAK Server version:</strong> 5.7-RELEASE8
+<strong>Audience:</strong> Pipeline operators, TAK Server administrators</p>
+</blockquote>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<p>A TAK Data Package (<code class="language-plaintext highlighter-rouge">.dp</code>) is a ZIP archive distributed to ATAK/WinTAK clients via the TAK Server Mission Package service. It is the standard mechanism for pushing:</p>
+
+<ul>
+  <li>Server connection pre-configuration (<code class="language-plaintext highlighter-rouge">.pref</code> files)</li>
+  <li>Team certificates (<code class="language-plaintext highlighter-rouge">.p12</code> client certs)</li>
+  <li>Map overlays and custom symbol sets</li>
+  <li>Pre-built mission templates</li>
+</ul>
+
+<p>This document covers the structure, contents, and creation process for the standard DigitalTAK server-connection data package.</p>
+
+<hr />
+
+<h2 id="1-data-package-structure">1. Data Package Structure</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server-connect.dp          (ZIP, renamed from .zip to .dp)
+├── MANIFEST.xml           (required — package metadata)
+├── certs/
+│   └── truststore-remote.p12   (server CA cert in PKCS12 for client trust)
+└── config/
+    └── tak-server.pref    (ATAK/WinTAK connection preferences)
+</code></pre></div></div>
+
+<h3 id="11-manifestxml">1.1 MANIFEST.xml</h3>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;MissionPackageManifest</span> <span class="na">version=</span><span class="s">"2"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;Configuration&gt;</span>
+    <span class="nt">&lt;Parameter</span> <span class="na">name=</span><span class="s">"uid"</span>     <span class="na">value=</span><span class="s">"DIGITALTAK-SERVER-CONNECT-v1"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;Parameter</span> <span class="na">name=</span><span class="s">"name"</span>    <span class="na">value=</span><span class="s">"DigitalTAK Server Connection"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;Parameter</span> <span class="na">name=</span><span class="s">"onReceiveDelete"</span> <span class="na">value=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/Configuration&gt;</span>
+  <span class="nt">&lt;Contents&gt;</span>
+    <span class="nt">&lt;Content</span> <span class="na">ignore=</span><span class="s">"false"</span> <span class="na">zipEntry=</span><span class="s">"certs/truststore-remote.p12"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;Content</span> <span class="na">ignore=</span><span class="s">"false"</span> <span class="na">zipEntry=</span><span class="s">"config/tak-server.pref"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/Contents&gt;</span>
+<span class="nt">&lt;/MissionPackageManifest&gt;</span>
+</code></pre></div></div>
+
+<p><strong>Parameter notes:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">uid</code></td>
+      <td>Must be unique per package version; changing this forces re-import on clients</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">name</code></td>
+      <td>Displayed to users during import</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">onReceiveDelete</code></td>
+      <td><code class="language-plaintext highlighter-rouge">false</code> = keep package on device after import</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="12-pref-connection-file">1.2 <code class="language-plaintext highlighter-rouge">.pref</code> Connection File</h3>
+
+<p>Replace <code class="language-plaintext highlighter-rouge">&lt;SERVER_IP&gt;</code> and <code class="language-plaintext highlighter-rouge">&lt;CERT_PASSWORD&gt;</code> with deployment-specific values.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;preferences&gt;</span>
+  <span class="nt">&lt;preference</span> <span class="na">version=</span><span class="s">"1"</span> <span class="na">name=</span><span class="s">"com.atakmap.app_preferences"</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- Server connection --&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"locationCallsign"</span> <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>TAK-USER<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"locationTeam"</span>     <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>Cyan<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"locationRole"</span>     <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>Team Member<span class="nt">&lt;/entry&gt;</span>
+
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"serverConnectAddress"</span> <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;&lt;SERVER_IP&gt;&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"serverConnectPort"</span>    <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>8089<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"serverConnectProto"</span>   <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>ssl<span class="nt">&lt;/entry&gt;</span>
+
+    <span class="c">&lt;!-- Certificate auth --&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"certificateLocation"</span>      <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>cert/client.p12<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"clientPassword"</span>           <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;&lt;CERT_PASSWORD&gt;&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"caLocation"</span>               <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>cert/truststore-remote.p12<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"caPassword"</span>               <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;&lt;CERT_PASSWORD&gt;&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"useAuth"</span>                  <span class="na">class=</span><span class="s">"class java.lang.Boolean"</span><span class="nt">&gt;</span>true<span class="nt">&lt;/entry&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">key=</span><span class="s">"g_auth_type"</span>              <span class="na">class=</span><span class="s">"class java.lang.String"</span><span class="nt">&gt;</span>AUTO<span class="nt">&lt;/entry&gt;</span>
+
+  <span class="nt">&lt;/preference&gt;</span>
+<span class="nt">&lt;/preferences&gt;</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Security note:</strong> <code class="language-plaintext highlighter-rouge">clientPassword</code> is stored in the <code class="language-plaintext highlighter-rouge">.pref</code> file in plaintext. The data package must be protected in transit. Distribute only over TLS (i.e., via TAK Server mission package upload, not plain HTTP).</p>
+</blockquote>
+
+<hr />
+
+<h2 id="2-building-the-data-package">2. Building the Data Package</h2>
+
+<h3 id="21-prerequisites">2.1 Prerequisites</h3>
+
+<p>On the workstation used to build the package:</p>
+
+<ul>
+  <li>The server CA (<code class="language-plaintext highlighter-rouge">truststore-intermediate-ca.jks</code>) or derived PKCS12</li>
+  <li><code class="language-plaintext highlighter-rouge">keytool</code> (part of JDK 17) or <code class="language-plaintext highlighter-rouge">openssl</code></li>
+  <li>A ZIP utility</li>
+</ul>
+
+<h3 id="22-export-the-server-truststore-as-pkcs12">2.2 Export the Server Truststore as PKCS12</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On the TAK Server</span>
+keytool <span class="nt">-importkeystore</span> <span class="se">\</span>
+  <span class="nt">-srckeystore</span>  /opt/tak/certs/files/truststore-intermediate-ca.jks <span class="se">\</span>
+  <span class="nt">-srcstorepass</span> &lt;KEYSTORE_PASSWORD&gt; <span class="se">\</span>
+  <span class="nt">-destkeystore</span> /tmp/truststore-remote.p12 <span class="se">\</span>
+  <span class="nt">-deststoretype</span> PKCS12 <span class="se">\</span>
+  <span class="nt">-deststorepass</span> &lt;CERT_PASSWORD&gt;
+
+<span class="c"># Copy to build workstation</span>
+scp atak@&lt;SERVER_IP&gt;:/tmp/truststore-remote.p12 ./certs/
+</code></pre></div></div>
+
+<h3 id="23-assemble-the-package">2.3 Assemble the Package</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create directory layout</span>
+<span class="nb">mkdir</span> <span class="nt">-p</span> build/certs build/config
+
+<span class="c"># Copy assets</span>
+<span class="nb">cp </span>certs/truststore-remote.p12  build/certs/
+<span class="nb">cp </span>config/tak-server.pref        build/config/   <span class="c"># after substituting SERVER_IP / CERT_PASSWORD</span>
+<span class="nb">cp </span>MANIFEST.xml                  build/
+
+<span class="c"># Create the .dp (ZIP)</span>
+<span class="nb">cd </span>build
+zip <span class="nt">-r</span> ../server-connect.dp MANIFEST.xml certs/ config/
+<span class="nb">cd</span> ..
+</code></pre></div></div>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">.dp</code> extension is a ZIP archive. Most systems accept direct ZIP rename. The TAK Server distribution API accepts both <code class="language-plaintext highlighter-rouge">.dp</code> and <code class="language-plaintext highlighter-rouge">.zip</code>.</p>
+</blockquote>
+
+<h3 id="24-distribute-via-tak-server">2.4 Distribute via TAK Server</h3>
+
+<ol>
+  <li>Log in to the TAK Server WebTAK admin UI: <code class="language-plaintext highlighter-rouge">https://&lt;SERVER_IP&gt;:8443</code></li>
+  <li>Navigate to <strong>Mission Packages &gt; Upload Package</strong></li>
+  <li>Upload <code class="language-plaintext highlighter-rouge">server-connect.dp</code></li>
+  <li>Optionally set an expiry date and target group</li>
+  <li>Instruct clients to navigate to the server URL and download the package, or push via the <strong>Send Package</strong> feature</li>
+</ol>
+
+<h3 id="25-powershell-helper-optional">2.5 PowerShell Helper (optional)</h3>
+
+<p>A thin wrapper can automate the build step. Place in <code class="language-plaintext highlighter-rouge">scripts/New-DataPackage.ps1</code>:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">param</span><span class="p">(</span><span class="w">
+    </span><span class="p">[</span><span class="n">Parameter</span><span class="p">(</span><span class="n">Mandatory</span><span class="p">)][</span><span class="n">string</span><span class="p">]</span><span class="nv">$ServerIp</span><span class="p">,</span><span class="w">
+    </span><span class="p">[</span><span class="n">Parameter</span><span class="p">(</span><span class="n">Mandatory</span><span class="p">)][</span><span class="n">string</span><span class="p">]</span><span class="nv">$CertPassword</span><span class="p">,</span><span class="w">
+    </span><span class="p">[</span><span class="n">string</span><span class="p">]</span><span class="nv">$OutputPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".\server-connect.dp"</span><span class="w">
+</span><span class="p">)</span><span class="w">
+
+</span><span class="nv">$build</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">New-TemporaryFile</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">ForEach-Object</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Remove-Item</span><span class="w"> </span><span class="bp">$_</span><span class="p">;</span><span class="w"> </span><span class="n">New-Item</span><span class="w"> </span><span class="nt">-ItemType</span><span class="w"> </span><span class="nx">Directory</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="bp">$_</span><span class="o">.</span><span class="nf">FullName</span><span class="w"> </span><span class="p">}</span><span class="w">
+</span><span class="n">New-Item</span><span class="w"> </span><span class="nt">-ItemType</span><span class="w"> </span><span class="nx">Directory</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\certs"</span><span class="p">,</span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\config"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Out-Null</span><span class="w">
+
+</span><span class="n">Copy-Item</span><span class="w"> </span><span class="s2">"</span><span class="bp">$PSScriptRoot</span><span class="s2">\..\certs\truststore-remote.p12"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\certs\"</span><span class="w">
+
+</span><span class="nv">$pref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Content</span><span class="w"> </span><span class="s2">"</span><span class="bp">$PSScriptRoot</span><span class="s2">\..\config\tak-server.pref.template"</span><span class="w"> </span><span class="nt">-Raw</span><span class="w">
+</span><span class="nv">$pref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$pref</span><span class="o">.</span><span class="nf">Replace</span><span class="p">(</span><span class="s1">'&lt;SERVER_IP&gt;'</span><span class="p">,</span><span class="w"> </span><span class="nv">$ServerIp</span><span class="p">)</span><span class="o">.</span><span class="nf">Replace</span><span class="p">(</span><span class="s1">'&lt;CERT_PASSWORD&gt;'</span><span class="p">,</span><span class="w"> </span><span class="nv">$CertPassword</span><span class="p">)</span><span class="w">
+</span><span class="n">Set-Content</span><span class="w"> </span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\config\tak-server.pref"</span><span class="w"> </span><span class="nv">$pref</span><span class="w">
+
+</span><span class="n">Copy-Item</span><span class="w"> </span><span class="s2">"</span><span class="bp">$PSScriptRoot</span><span class="s2">\..\config\MANIFEST.xml"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\"</span><span class="w">
+
+</span><span class="n">Compress-Archive</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"</span><span class="nv">$build</span><span class="s2">\*"</span><span class="w"> </span><span class="nt">-DestinationPath</span><span class="w"> </span><span class="nv">$OutputPath</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="n">Remove-Item</span><span class="w"> </span><span class="nv">$build</span><span class="w"> </span><span class="nt">-Recurse</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+</span><span class="n">Write-Host</span><span class="w"> </span><span class="s2">"Package written to </span><span class="nv">$OutputPath</span><span class="s2">"</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="3-team-distribution-notes">3. Team Distribution Notes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scenario</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Initial field deployment</td>
+      <td>Upload to TAK Server; send download link via secure channel</td>
+    </tr>
+    <tr>
+      <td>Adding a new device</td>
+      <td>TAK Server enrollment at port 8446 (generates per-device cert + auto-sends pref)</td>
+    </tr>
+    <tr>
+      <td>Updating server address</td>
+      <td>Re-build <code class="language-plaintext highlighter-rouge">.dp</code> with new <code class="language-plaintext highlighter-rouge">SERVER_IP</code>, bump <code class="language-plaintext highlighter-rouge">uid</code> in MANIFEST.xml, re-upload</td>
+    </tr>
+    <tr>
+      <td>Symbols / maps</td>
+      <td>Add entries to MANIFEST.xml; place files in <code class="language-plaintext highlighter-rouge">assets/</code> sub-dir of package</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="4-known-limitations">4. Known Limitations</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Issue</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">.pref</code> passwords stored in plaintext</td>
+      <td>Expected TAK behavior; mitigate with short-lived cert passwords and TLS-only distribution</td>
+    </tr>
+    <tr>
+      <td>No per-device cert in generic package</td>
+      <td>A shared server-trust <code class="language-plaintext highlighter-rouge">.dp</code> is used for initial connection; per-device certs are issued via TAK Server enrollment on port 8446</td>
+    </tr>
+    <tr>
+      <td>MANIFEST <code class="language-plaintext highlighter-rouge">uid</code> collisions</td>
+      <td>If the same <code class="language-plaintext highlighter-rouge">uid</code> is re-used with different content, some clients may not re-import; always bump <code class="language-plaintext highlighter-rouge">uid</code> on content changes</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="../../Documentation/TAK_Server_Configuration_Guide_5.7.md">TAK Server 5.7 Configuration Guide</a> — §12.8 Data Package and Mission File Blocker</li>
+  <li><a href="/config/baseline/">baseline.md</a> — CoreConfig port and cert settings</li>
+  <li><a href="/config/client-validation/">client-validation.md</a> — WinTAK/ATAK validation checklist</li>
+</ul>
+
+</div>
+
+      </article>
+    </div>
+  </body>
+</html>
