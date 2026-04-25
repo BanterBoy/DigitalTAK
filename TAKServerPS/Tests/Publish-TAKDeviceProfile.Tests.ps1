@@ -20,19 +20,20 @@ BeforeAll {
         SkipCertCheck = $true
     }
 
-    # Minimal test ZIP
-    $script:TmpDir = Join-Path $env:TEMP "tak-dp-test-$(New-Guid)"
+    # Minimal test ZIP — use GetTempPath() for cross-platform compatibility ($env:TEMP is not set on Linux)
+    $tmpRoot = [System.IO.Path]::GetTempPath()
+    $script:TmpDir = Join-Path $tmpRoot "tak-dp-test-$(New-Guid)"
     $null = New-Item -ItemType Directory -Force -Path (Join-Path $script:TmpDir 'MANIFEST')
     Set-Content (Join-Path $script:TmpDir 'MANIFEST' 'manifest.xml') `
         '<MissionPackageManifest version="2"><Configuration><Parameter name="uid" value="test"/><Parameter name="name" value="test.zip"/></Configuration><Contents/></MissionPackageManifest>'
-    $script:TmpZip = Join-Path $env:TEMP "tak-dp-test-$(New-Guid).zip"
-    Compress-Archive -Path "$($script:TmpDir)\*" -DestinationPath $script:TmpZip -Force
+    $script:TmpZip = Join-Path $tmpRoot "tak-dp-test-$(New-Guid).zip"
+    Compress-Archive -Path (Join-Path $script:TmpDir '*') -DestinationPath $script:TmpZip -Force
 }
 
 AfterAll {
     Remove-Module 'TAKServer' -Force -ErrorAction SilentlyContinue
-    Remove-Item $script:TmpDir -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item $script:TmpZip -Force -ErrorAction SilentlyContinue
+    if ($script:TmpDir)  { Remove-Item $script:TmpDir  -Recurse -Force -ErrorAction SilentlyContinue }
+    if ($script:TmpZip) { Remove-Item $script:TmpZip  -Force         -ErrorAction SilentlyContinue }
 }
 
 Describe 'Publish-TAKDeviceProfile — Parameter Validation' {
