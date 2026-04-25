@@ -221,6 +221,45 @@ openssl pkcs12 -in /home/atak/admin.p12 -noout 2>&1
 
 ---
 
+### Symptom: ATAK shows "Registration failed — The TAK Server's identity could not be verified"
+
+**Cause:** This is a TLS trust failure, not an authentication failure. ATAK is attempting certificate enrollment on port 8446 but has no truststore installed for the TAK Server's self-signed CA, so it cannot verify the server's identity. This deployment uses a self-signed TAK CA — Quick Connect (trustless enrollment) only works with Let's Encrypt or DigiCert server certificates per the TAK Server Configuration Guide, Appendix E.
+
+**Resolution — Option A (recommended):** Import the user's personal data package `.zip` instead of enrolling:
+
+```
+ATAK → Files → Import Manager → Data Package → select <username>.zip
+```
+
+This installs both the client certificate and the server CA truststore in one step. No enrollment required.
+
+**Resolution — Option B:** If enrollment is required, the CA truststore must be installed on the device **before** connecting on port 8446:
+
+1. Distribute and import `<team>-enrollment.zip` first:
+   ```
+   ATAK → Files → Import Manager → Data Package → import <team>-enrollment.zip
+   ```
+2. Then enroll:
+   ```
+   Network → Manage Server Connections → select <server>:8446 → Enroll → enter username + password
+   ```
+
+**Server-side check** — verify `allowBasicAuth="true"` is set on the 8446 connector in `/opt/tak/CoreConfig.xml`:
+
+```bash
+grep 'cert_https' /opt/tak/CoreConfig.xml
+# Expected: <connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>
+```
+
+If the attribute is missing, `New-TAKServerCertificate` from an updated deployment will add it. To patch a running server:
+
+```bash
+sudo sed -i 's|<connector port="8446" clientAuth="false" _name="cert_https"/>|<connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>|g' /opt/tak/CoreConfig.xml
+sudo systemctl restart takserver
+```
+
+---
+
 ### Symptom: ATAK client connects but shows "Certificate not trusted"
 
 **Cause:** The client's trust anchor is not set to the TAK Server's intermediate CA.
@@ -231,7 +270,7 @@ openssl pkcs12 -in /home/atak/admin.p12 -noout 2>&1
    scp atak@<IP>:/opt/tak/certs/files/ca.pem ./ca.pem
    ```
 2. In ATAK → Settings → Network → TAK Servers → Add Server, import the CA `.pem` as the trust anchor.
-3. Alternatively, use ATAK's Certificate Enrollment (port 8446) to receive a full certificate package.
+3. Alternatively, use ATAK's Certificate Enrollment (port 8446) to receive a full certificate package — see the enrollment instructions in the [Onboarding guide](../onboarding/#option-b--certificate-enrollment-two-steps-required).
 
 ---
 
@@ -265,18 +304,52 @@ sudo systemctl status takserver
 sudo firewall-cmd --list-ports
 
 # Expected output should include:
-# 8089/tcp  8443/tcp  8446/tcp  22/tcp
+# 8089/tcp  8090/udp  8443/tcp  8446/tcp  22/tcp
 ```
 
 **Resolution:**
 ```bash
 # Re-apply firewall rules if missing
 sudo firewall-cmd --permanent --add-port=8089/tcp
+sudo firewall-cmd --permanent --add-port=8090/udp
 sudo firewall-cmd --permanent --add-port=8443/tcp
 sudo firewall-cmd --permanent --add-port=8446/tcp
 sudo firewall-cmd --reload
 
 # Restart TAK Server if stopped
+sudo systemctl restart takserver
+```
+
+---
+
+### Symptom: Port 8446 reachable but enrollment returns HTTP 401 or "Registration failed"
+
+**Cause:** TAK Server 5.7-RELEASE8 ships `CoreConfig.xml` without `allowBasicAuth="true"` on the enrollment connector. The server silently rejects HTTP Basic Auth on port 8446, returning HTTP 401 regardless of whether the credentials are valid.
+
+**Diagnosis on guest:**
+```bash
+# Verify the attribute is present
+grep 'cert_https' /opt/tak/CoreConfig.xml
+
+# Should contain:
+# <connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>
+
+# Quick functional test (replace bravo1:bravo1 with a real user)
+curl -sk -u bravo1:bravo1 https://localhost:8446/Marti/api/tls/config | head -3
+# Returns HTML (not 401) when correctly configured
+```
+
+**Resolution:**
+
+Fresh deployments are patched automatically by `New-TAKServerCertificate` (step 12c). For an existing server:
+
+```bash
+sudo sed -i 's|<connector port="8446" clientAuth="false" _name="cert_https"/>|<connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>|g' /opt/tak/CoreConfig.xml
+
+# Verify the change took effect
+grep 'cert_https' /opt/tak/CoreConfig.xml
+
+# Restart to apply
 sudo systemctl restart takserver
 ```
 

@@ -22,6 +22,7 @@ BeforeAll {
         'Remove-TAKMapLayer', 'Remove-TAKMission', 'Remove-TAKOutgoingConnection',
         'Remove-TAKSubscription', 'Remove-TAKToken', 'Remove-TAKUser', 'Remove-TAKVideo',
         'Set-TAKSecurityConfig', 'Set-TAKUserGroup', 'Set-TAKUserPassword',
+        'Publish-TAKDeviceProfile',
         'Unregister-TAKMissionSubscription'
     )
 }
@@ -45,9 +46,9 @@ Describe 'TAKServer — Module Manifest' {
         $m.RootModule | Should -Be 'TAKServer.psm1'
     }
 
-    It 'exports exactly 44 functions in the manifest' {
+    It 'exports exactly 45 functions in the manifest' {
         $m = Test-ModuleManifest -Path $script:ManifestPath -ErrorAction Stop
-        $m.ExportedFunctions.Count | Should -Be 44
+        $m.ExportedFunctions.Count | Should -Be 45
     }
 
     It 'declares a non-empty Author' {
@@ -77,8 +78,8 @@ Describe 'TAKServer — Module Import and Exports' {
         Get-Module -Name 'TAKServer' | Should -Not -BeNullOrEmpty
     }
 
-    It 'exports exactly 44 commands at runtime' {
-        (Get-Command -Module 'TAKServer').Count | Should -Be 44
+    It 'exports exactly 45 commands at runtime' {
+        (Get-Command -Module 'TAKServer').Count | Should -Be 45
     }
 
     It 'exports <_>' -ForEach @(
@@ -94,6 +95,7 @@ Describe 'TAKServer — Module Import and Exports' {
         'Remove-TAKCertificate', 'Remove-TAKDataFeed', 'Remove-TAKInput',
         'Remove-TAKMapLayer', 'Remove-TAKMission', 'Remove-TAKOutgoingConnection',
         'Remove-TAKSubscription', 'Remove-TAKToken', 'Remove-TAKUser', 'Remove-TAKVideo',
+        'Publish-TAKDeviceProfile',
         'Set-TAKSecurityConfig', 'Set-TAKUserGroup', 'Set-TAKUserPassword',
         'Unregister-TAKMissionSubscription'
     ) {

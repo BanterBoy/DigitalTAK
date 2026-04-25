@@ -51,6 +51,7 @@
         'Remove-TAKToken'
         'Remove-TAKUser'
         'Remove-TAKVideo'
+        'Publish-TAKDeviceProfile'
         'Set-TAKSecurityConfig'
         'Set-TAKUserGroup'
         'Set-TAKUserPassword'

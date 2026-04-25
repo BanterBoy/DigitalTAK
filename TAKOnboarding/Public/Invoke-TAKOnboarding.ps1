@@ -102,6 +102,15 @@
 .PARAMETER SkipDataPackages
     Skip ATAK data package build step.
 
+.PARAMETER IncludeATAKMaps
+    Download the latest ATAK-Maps release ZIP from GitHub and embed the base-map
+    XML source files into every per-user data package. When ATAK imports the
+    package, the map sources are installed automatically — no manual file placement
+    required. The full atak-maps.zip is also saved to the dist folder for iOS users
+    who need to import it separately via the Files app or AirDrop.
+
+    Requires internet access to github.com during the run.
+
 .PARAMETER Force
     Suppress confirmation prompts for destructive steps (cert deletion from server).
 
@@ -225,6 +234,12 @@ function Invoke-TAKOnboarding {
         [switch] $SkipDataPackages,
 
         [Parameter()]
+        [switch] $IncludeATAKMaps,
+
+        [Parameter()]
+        [switch] $SkipDeviceProfile,
+
+        [Parameter()]
         [switch] $Force
         #endregion
     )
@@ -285,6 +300,11 @@ function Invoke-TAKOnboarding {
     Write-TAKOk "Cert staging : $resolvedCertDir"
     Write-TAKOk "Data packages: $resolvedOutputDir"
 
+    $reportsDir       = Join-Path $DeploymentRoot 'reports'
+    $null = New-Item -ItemType Directory -Force -Path $reportsDir
+    $reportTimestamp  = Get-Date -Format 'yyyyMMddHHmmss'
+    $reportPath       = Join-Path $reportsDir "Onboarding-Report-$TeamName-$reportTimestamp.md"
+
     $resolvedUserList = if ($PSCmdlet.ParameterSetName -eq 'CustomRoster') {
         $imported = Import-TAKRosterFile -Path $RosterPath -TeamFilter $TeamName
         Write-TAKOk "Custom roster: $($imported.Count) users from $(Split-Path $RosterPath -Leaf) (team: $TeamName)"
@@ -297,8 +317,13 @@ function Invoke-TAKOnboarding {
     }
 
     # ── Steps 2-4: Certificates ───────────────────────────────────────────────────
-    $sshSession  = $null
-    $sftpSession = $null
+    $sshSession       = $null
+    $sftpSession      = $null
+    $groupAssignments = @{}
+    $xmlFileCount     = 0
+    $created          = 0
+    $skipped          = 0
+    $failed           = 0
 
     try {
         if (-not $SkipCertGeneration) {
@@ -461,42 +486,49 @@ function Invoke-TAKOnboarding {
             $allUsersGroup = $TeamName
             $leadsGroup    = "${TeamName}-Lead"
 
+            # TAK Server UserManager replaces ALL group memberships on each call.
+            # Multiple separate usermod -g calls therefore overwrite each other —
+            # only the last call wins.  The fix: use certmod with ALL group flags
+            # in a single command so the server sees the complete membership in one
+            # atomic operation.  certmod uses the per-user .pem file as the cert
+            # identity anchor.
             foreach ($user in $resolvedUserList) {
                 $username    = $user.Username
                 $role        = $user.Role
                 $extraGroups = if ($user.ExtraGroups) { $user.ExtraGroups } else { @() }
 
+                # Build the complete list of groups this user should belong to.
+                # All assignments use -g (Both direction = read + write) so team
+                # members can see and share with everyone in their group.
+                $assignedGroups = [System.Collections.Generic.List[string]]::new()
+                $assignedGroups.Add($allUsersGroup)
+
+                if ($role -in 'Team Lead', 'Assistant Lead') {
+                    $assignedGroups.Add($leadsGroup)
+                }
+                foreach ($xGroup in $extraGroups) {
+                    if ($xGroup) { $assignedGroups.Add($xGroup) }
+                }
+
+                # Build the certmod argument string:  -g Group1 -g Group2 ...
+                $groupFlags = ($assignedGroups | ForEach-Object { "-g '$_'" }) -join ' '
+                $pemPath    = "/opt/tak/certs/files/${username}.pem"
+
                 try {
-                    Invoke-TAKSSHCommand $sshSession "sudo java -jar /opt/tak/utils/UserManager.jar usermod -g $allUsersGroup $username" "group: $username -> $allUsersGroup" | Out-Null
-                    Write-TAKOk "$username -> $allUsersGroup"
+                    Invoke-TAKSSHCommand $sshSession `
+                        "sudo java -jar /opt/tak/utils/UserManager.jar certmod $groupFlags '$pemPath'" `
+                        "group: $username" | Out-Null
+                    Write-TAKOk "$username -> $($assignedGroups -join ', ')"
+                    $groupAssignments[$username] = $assignedGroups.ToArray()
                 }
                 catch {
                     Write-TAKWarn "$username group assignment failed: $($_.Exception.Message)"
                 }
-
-                if ($role -in 'Team Lead', 'Assistant Lead') {
-                    try {
-                        Invoke-TAKSSHCommand $sshSession "sudo java -jar /opt/tak/utils/UserManager.jar usermod -g $leadsGroup $username" "group: $username -> $leadsGroup" | Out-Null
-                        Write-TAKOk "$username -> $leadsGroup"
-                    }
-                    catch {
-                        Write-TAKWarn "$username leads group failed: $($_.Exception.Message)"
-                    }
-                }
-
-                foreach ($xGroup in $extraGroups) {
-                    try {
-                        Invoke-TAKSSHCommand $sshSession "sudo java -jar /opt/tak/utils/UserManager.jar usermod -g $xGroup $username" "group: $username -> $xGroup" | Out-Null
-                        Write-TAKOk "$username -> $xGroup (extra)"
-                    }
-                    catch {
-                        Write-TAKWarn "$username extra group '$xGroup' failed: $($_.Exception.Message)"
-                    }
-                }
             }
 
             Write-Host ''
-            Write-Host "  Groups: $allUsersGroup (all), $leadsGroup (leads only)" -ForegroundColor DarkGray
+            Write-Host "  Groups: $allUsersGroup (all members), $leadsGroup (Team Lead + Assistant Lead only)" -ForegroundColor DarkGray
+            Write-Host "  Isolation: $allUsersGroup members cannot see or communicate with other teams." -ForegroundColor DarkGray
         }
         else {
             Write-TAKStep 5 'User creation skipped (-SkipUserCreation)'
@@ -506,20 +538,109 @@ function Invoke-TAKOnboarding {
         if (-not $SkipDataPackages) {
             Write-TAKStep 7 'Building ATAK data packages'
 
-            New-TAKDataPackage `
-                -ManifestPath         (Join-Path $resolvedCertDir 'manifest.json') `
-                -CertDir              $resolvedCertDir `
-                -ServerHostname       $ServerHost `
-                -ServerPort           $CotPort `
-                -ServerDescription    $ServerDescription `
-                -CertPassphrase       $KeystorePassword `
-                -TrustStorePassphrase $KeystorePassword `
-                -OutputDir            $resolvedOutputDir
+            # Optionally download ATAK-Maps and extract XML map sources.
+            $resolvedMapSourcesDir = $null
+            if ($IncludeATAKMaps) {
+                Write-Host '  Downloading ATAK-Maps from GitHub...' -ForegroundColor DarkGray
+                try {
+                    $release    = Invoke-RestMethod 'https://api.github.com/repos/joshuafuller/ATAK-Maps/releases/latest'
+                    $asset      = $release.assets | Where-Object { $_.name -match '\.zip$' } | Select-Object -First 1
+                    if (-not $asset) { throw 'No ZIP asset found in latest ATAK-Maps release.' }
+
+                    $mapsZipDst = Join-Path $resolvedOutputDir 'atak-maps.zip'
+                    Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $mapsZipDst
+                    Write-TAKOk "ATAK-Maps downloaded: $($asset.name) -> $mapsZipDst"
+
+                    # Extract base-map XML files (exclude GRG overlays) to a temp dir.
+                    $mapsExtractDir = Join-Path $env:TEMP "atak-maps-extract-$(New-Guid)"
+                    Expand-Archive -Path $mapsZipDst -DestinationPath $mapsExtractDir -Force
+
+                    # Collect all .xml files except GRG overlays (grg_*.xml)
+                    $xmlFiles = @(Get-ChildItem -Path $mapsExtractDir -Filter '*.xml' -Recurse |
+                                  Where-Object { $_.Name -notlike 'grg_*' -and $_.Name -ne 'manifest.xml' })
+                    if ($xmlFiles.Count -gt 0) {
+                        $resolvedMapSourcesDir = Join-Path $mapsExtractDir 'mapsources'
+                        $null = New-Item -ItemType Directory -Force -Path $resolvedMapSourcesDir
+                        $xmlFiles | Copy-Item -Destination $resolvedMapSourcesDir
+                        $xmlFileCount = $xmlFiles.Count
+                        Write-TAKOk "Map sources staged: $xmlFileCount XML files"
+                    }
+                    else {
+                        Write-TAKWarn 'No map source XML files found in ATAK-Maps ZIP'
+                    }
+                }
+                catch {
+                    Write-TAKWarn "ATAK-Maps download failed: $($_.Exception.Message). Continuing without maps."
+                }
+            }
+
+            $dataPackageSplat = @{
+                ManifestPath         = (Join-Path $resolvedCertDir 'manifest.json')
+                CertDir              = $resolvedCertDir
+                ServerHostname       = $ServerHost
+                ServerPort           = $CotPort
+                ServerDescription    = $ServerDescription
+                CertPassphrase       = $KeystorePassword
+                TrustStorePassphrase = $KeystorePassword
+                OutputDir            = $resolvedOutputDir
+            }
+            if ($resolvedMapSourcesDir) { $dataPackageSplat['MapSourcesDir'] = $resolvedMapSourcesDir }
+
+            New-TAKDataPackage @dataPackageSplat
 
             Write-TAKOk "Data packages written to: $resolvedOutputDir"
+            if ($IncludeATAKMaps -and (Test-Path (Join-Path $resolvedOutputDir 'atak-maps.zip'))) {
+                Write-TAKOk "ATAK-Maps ZIP: $(Join-Path $resolvedOutputDir 'atak-maps.zip')"
+            }
         }
         else {
             Write-TAKStep 7 'Data package build skipped (-SkipDataPackages)'
+        }
+
+        # ── Step 8: Device Profile (enrollment package) ───────────────────────────
+        if (-not $SkipDeviceProfile) {
+            Write-TAKStep 8 'Publishing enrollment Device Profile'
+
+            # Locate the truststore for this team
+            $trustStorePath = Join-Path $resolvedCertDir 'truststore-intermediate-ca.p12'
+            if (-not (Test-Path $trustStorePath)) {
+                Write-TAKWarn "Truststore not found at $trustStorePath — skipping Device Profile upload."
+            }
+            else {
+                try {
+                    $enrollZipPath = Join-Path $resolvedOutputDir "$TeamName-enrollment.zip"
+
+                    $enrollPackageSplat = @{
+                        ServerHostname       = $ServerHost
+                        CotPort              = $CotPort
+                        ServerDescription    = $ServerDescription
+                        TrustStorePath       = $trustStorePath
+                        TrustStorePassphrase = $KeystorePassword
+                        OutputPath           = $enrollZipPath
+                    }
+                    if ($resolvedMapSourcesDir) { $enrollPackageSplat['MapSourcesDir'] = $resolvedMapSourcesDir }
+
+                    New-TAKEnrollmentPackage @enrollPackageSplat
+
+                    $profileName = "$TeamName-enrollment"
+                    Publish-TAKDeviceProfile `
+                        -Name        $profileName `
+                        -ProfileType 'Enrollment' `
+                        -ZipPath     $enrollZipPath `
+                        -Groups      @($TeamName) `
+                        -Active      $true `
+                        -Confirm:$false
+
+                    Write-TAKOk "Device Profile published: $profileName (type=Enrollment, group=$TeamName)"
+                }
+                catch {
+                    Write-TAKWarn "Device Profile upload failed: $($_.Exception.Message)"
+                    Write-TAKWarn 'Onboarding will continue — run Publish-TAKDeviceProfile manually to retry.'
+                }
+            }
+        }
+        else {
+            Write-TAKStep 8 'Device Profile upload skipped (-SkipDeviceProfile)'
         }
     }
     finally {
@@ -549,13 +670,167 @@ function Invoke-TAKOnboarding {
     Write-Host '  [ ] ATAK (Android) : Files > Import Manager > Data Package'
     Write-Host '  [ ] WinTAK         : Tools > Data Package > Import'
     Write-Host '  [ ] iTAK (iOS)     : AirDrop .p12 + Apple Configurator'
+    if ($IncludeATAKMaps) {
+        Write-Host '  [*] Map sources embedded in each .zip — ATAK installs them on import'
+        Write-Host '  [ ] atak-maps.zip also in dist folder — send to iOS users separately'
+    }
+    else {
+        Write-Host '  [ ] No map sources included — re-run with -IncludeATAKMaps to embed map sources'
+    }
     Write-Host "  [ ] Users change password at: https://$ServerHost`:$TakPort/userManagement"
     Write-Host "  [ ] Delete .\certs\$TeamName\ from this workstation after distribution"
     Write-Host ''
     Write-Host '--- Next Steps -------------------------------------------------------' -ForegroundColor Yellow
-    Write-Host "  WebTAK admin : https://$ServerHost`:$TakPort"
-    Write-Host "  CoT TLS port : $ServerHost`:$CotPort"
-    Write-Host "  Cert enroll  : https://$ServerHost`:8446"
+    Write-Host "  WebTAK admin  : https://$ServerHost`:$TakPort"
+    Write-Host "  CoT TLS port  : $ServerHost`:$CotPort"
+    Write-Host "  QUIC port     : $ServerHost`:8090  (WinTAK/ATAK: Manage Server Connections > Add Item > Protocol: QUIC)"
+    Write-Host "  Cert enroll   : $ServerHost`:8446"
+    if (-not $SkipDeviceProfile) {
+        Write-Host ''
+        Write-Host '--- Client Connection Options ----------------------------------------' -ForegroundColor Yellow
+        Write-Host ''
+        Write-Host '  OPTION A — Import data package (recommended, works immediately):' -ForegroundColor Cyan
+        Write-Host "    Each user imports their personal <username>.zip via:"
+        Write-Host '    ATAK   : Files > Import Manager > Data Package > select your .zip'
+        Write-Host '    WinTAK : Tools > Data Package > Import'
+        Write-Host '    Client cert + server trust are configured automatically.'
+        Write-Host ''
+        Write-Host '  OPTION B — Certificate enrollment (self-signed CA, two steps):' -ForegroundColor Cyan
+        Write-Host "    Step 1: Import the team enrollment package to install the server CA trust:"
+        Write-Host "            ATAK : Files > Import Manager > Data Package > import $TeamName-enrollment.zip"
+        Write-Host "    Step 2: Network > Manage Server Connections > select $ServerHost`:8446 > Enroll"
+        Write-Host '    Enter username + password when prompted. ATAK issues your client cert automatically.'
+        Write-Host ''
+        Write-Host '  NOTE: Enrollment without first importing the CA truststore will fail with'
+        Write-Host "        'identity could not be verified'. Use Option A unless enrollment is required." -ForegroundColor Yellow
+    }
     Write-Host ''
     Write-Host 'Onboarding complete.' -ForegroundColor Green
+
+    # ── Report file ───────────────────────────────────────────────────────────────
+    $rDate       = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $reportLines = [System.Collections.Generic.List[string]]::new()
+
+    $reportLines.Add("# TAK Onboarding Report — $TeamName — $rDate")
+    $reportLines.Add('')
+    $reportLines.Add('## Summary')
+    $reportLines.Add('')
+    $reportLines.Add('| Field | Value |')
+    $reportLines.Add('|-------|-------|')
+    $reportLines.Add("| Team | $TeamName |")
+    $reportLines.Add("| Server | https://$ServerHost`:$TakPort |")
+    $reportLines.Add("| Date | $rDate |")
+    $reportLines.Add("| Users | $($resolvedUserList.Count) |")
+
+    if ($SkipCertGeneration) {
+        $reportLines.Add('| Certificates | Skipped (existing) |')
+    } else {
+        $reportLines.Add("| Certificates | Generated ($($resolvedUserList.Count)) |")
+    }
+
+    if ($SkipUserCreation) {
+        $reportLines.Add('| User accounts | Skipped |')
+    } else {
+        $acctMsg = "| User accounts | $created created"
+        if ($skipped -gt 0) { $acctMsg += ", $skipped skipped" }
+        if ($failed  -gt 0) { $acctMsg += ", $failed FAILED" }
+        $reportLines.Add("$acctMsg |")
+    }
+
+    if ($SkipDataPackages) {
+        $reportLines.Add('| Data packages | Skipped |')
+    } else {
+        $builtCount = ($resolvedUserList | Where-Object { Test-Path (Join-Path $resolvedOutputDir "$($_.Username).zip") }).Count
+        $reportLines.Add("| Data packages | $builtCount built |")
+    }
+
+    if ($IncludeATAKMaps) {
+        $reportLines.Add("| ATAK-Maps | Included ($xmlFileCount XML files) |")
+    } else {
+        $reportLines.Add('| ATAK-Maps | Not included |')
+    }
+
+    if ($SkipDeviceProfile) {
+        $reportLines.Add('| Device Profile | Skipped (-SkipDeviceProfile) |')
+    } else {
+        $enrollZipCheck = Test-Path (Join-Path $resolvedOutputDir "$TeamName-enrollment.zip")
+        $dpStatus = if ($enrollZipCheck) { "Published ($TeamName-enrollment)" } else { 'Skipped (truststore not found)' }
+        $reportLines.Add("| Device Profile | $dpStatus |")
+    }
+
+    $reportLines.Add('')
+    $reportLines.Add('## Users')
+    $reportLines.Add('')
+    $reportLines.Add('| Username | Role | Groups | Data Package |')
+    $reportLines.Add('|----------|------|--------|--------------|')
+
+    foreach ($u in $resolvedUserList) {
+        $uGroups  = if ($groupAssignments.ContainsKey($u.Username)) { $groupAssignments[$u.Username] -join ', ' } else { '—' }
+        $zipCheck = if (-not $SkipDataPackages -and (Test-Path (Join-Path $resolvedOutputDir "$($u.Username).zip"))) { 'Yes' } else { 'No' }
+        $reportLines.Add("| $($u.Username) | $($u.Role) | $uGroups | $zipCheck |")
+    }
+
+    $reportLines.Add('')
+    $reportLines.Add('## Distribution Checklist')
+    $reportLines.Add('')
+    $reportLines.Add('- [ ] Send each user their `.zip` via an encrypted channel (Signal, encrypted USB — never plain email)')
+    $reportLines.Add('- [ ] ATAK (Android): Files > Import Manager > Data Package')
+    $reportLines.Add('- [ ] WinTAK: Tools > Data Package > Import')
+    $reportLines.Add('- [ ] iTAK (iOS): AirDrop `.p12` + Apple Configurator')
+    if ($IncludeATAKMaps) {
+        $reportLines.Add('- [x] Map sources embedded in each `.zip` — ATAK installs them on import')
+        $reportLines.Add('- [ ] `atak-maps.zip` also in dist folder — send to iOS users separately')
+    }
+    $reportLines.Add("- [ ] Users change password at: https://$ServerHost`:$TakPort/userManagement")
+    $reportLines.Add("- [ ] Delete `.\certs\$TeamName\` from this workstation after distribution")
+
+    $reportLines.Add('')
+    $reportLines.Add('## Next Steps')
+    $reportLines.Add('')
+    $reportLines.Add('| Service | Address |')
+    $reportLines.Add('|---------|---------|')
+    $reportLines.Add("| WebTAK admin | https://$ServerHost`:$TakPort |")
+    $reportLines.Add("| CoT TLS port | $ServerHost`:$CotPort |")
+    $reportLines.Add("| QUIC port | $ServerHost`:8090 |")
+    $reportLines.Add("| Cert enrollment | $ServerHost`:8446 |")
+    if (-not $SkipDeviceProfile) {
+        $reportLines.Add('')
+        $reportLines.Add('### Client Connection Options')
+        $reportLines.Add('')
+        $reportLines.Add('> **This deployment uses a self-signed TAK CA.** ATAK cannot verify the server until the CA truststore is installed. Choose one of the options below.')
+        $reportLines.Add('')
+        $reportLines.Add('#### Option A — Import data package (recommended)')
+        $reportLines.Add('')
+        $reportLines.Add('Each user receives their personal `<username>.zip`. Importing it installs their client certificate and the server CA trust in one step — no enrollment required.')
+        $reportLines.Add('')
+        $reportLines.Add('| Client | Steps |')
+        $reportLines.Add('|--------|-------|')
+        $reportLines.Add('| ATAK (Android) | Files > Import Manager > Data Package > select `<username>.zip` |')
+        $reportLines.Add('| WinTAK (Windows) | Tools > Data Package > Import > select `<username>.zip` |')
+        $reportLines.Add('| iTAK (iOS) | AirDrop `.p12` + Apple Configurator |')
+        $reportLines.Add('')
+        $reportLines.Add('#### Option B — Certificate enrollment (two steps required)')
+        $reportLines.Add('')
+        $reportLines.Add('Enrollment requires the server CA truststore to be installed **before** connecting to port 8446. Skipping Step 1 causes the "identity could not be verified" error.')
+        $reportLines.Add('')
+        $reportLines.Add("**Step 1** — Distribute and import `$TeamName-enrollment.zip` to install the server CA trust:")
+        $reportLines.Add('')
+        $reportLines.Add('| Client | Steps |')
+        $reportLines.Add('|--------|-------|')
+        $reportLines.Add("| ATAK (Android) | Files > Import Manager > Data Package > import `$TeamName-enrollment.zip` |")
+        $reportLines.Add("| WinTAK (Windows) | Tools > Data Package > Import > import `$TeamName-enrollment.zip` |")
+        $reportLines.Add('')
+        $reportLines.Add("**Step 2** — Enroll for a client certificate (enrollment port: `$ServerHost`:8446`):")
+        $reportLines.Add('')
+        $reportLines.Add('| Client | Steps |')
+        $reportLines.Add('|--------|-------|')
+        $reportLines.Add("| ATAK (Android) | Network > Manage Server Connections > select `$ServerHost`:8446` > **Enroll** > enter username + password |")
+        $reportLines.Add("| WinTAK (Windows) | Network > Manage Server Connections > **Enroll** > enter username + password |")
+    }
+    $reportLines.Add('')
+    $reportLines.Add('---')
+    $reportLines.Add("*Generated by Invoke-TAKOnboarding on $rDate*")
+
+    $reportLines -join "`n" | Set-Content -Path $reportPath -Encoding UTF8
+    Write-Host "  Report saved: $reportPath" -ForegroundColor DarkGray
 }

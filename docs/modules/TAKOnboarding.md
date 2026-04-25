@@ -133,9 +133,11 @@ Invoke-TAKOnboarding -ServerHost 10.10.0.154 -TeamName bravo -TeamSize 10 `
 For each user in a team manifest (produced by `tak-team-certs.sh` or by `Invoke-TAKOnboarding`), creates an ATAK-compatible Mission Package ZIP containing:
 
 - `MANIFEST/manifest.xml` — ATAK package manifest
-- `MANIFEST/connection.pref` — server connection preferences
+- `MANIFEST/connection.pref` — server connection preferences (CoT port 8089, description, server hostname)
 - `certs/<username>.p12` — user client certificate (PKCS12)
 - `certs/truststore.p12` — server CA truststore (PKCS12, converted from JKS if needed)
+
+`Invoke-TAKOnboarding` additionally produces a `<team>-enrollment.zip` team enrollment package. This contains only the CA truststore and server connection profile — no client certificate. Use it to bootstrap the CA trust anchor on devices that will subsequently enroll via port 8446 (Option B in the [Onboarding Guide](../../onboarding/#option-b--certificate-enrollment-two-steps-required)).
 
 **Parameters:**
 
@@ -154,7 +156,9 @@ For each user in a team manifest (produced by `tak-team-certs.sh` or by `Invoke-
 **Notes:**
 - JDK 11+ with `keytool` on PATH is required for truststore conversion.
 - TAK Server 5.7-RELEASE8 stages a `.p12` truststore; earlier releases use `.jks`. Both are handled automatically.
-- Android ATAK: **Files → Import Manager → Data Package**. WinTAK: **Tools → Data Package → Import**. iOS/iTAK does not support Mission Packages — see the [Onboarding Guide](../../onboarding/#ios--itak) for manual steps.
+- **Option A (recommended):** Android ATAK: **Files → Import Manager → Data Package**. WinTAK: **Tools → Data Package → Import**. Importing the personal `.zip` installs the client certificate and the CA truststore in one step — no enrollment needed.
+- **Option B (enrollment):** Distribute and import `<team>-enrollment.zip` first to install CA trust, then enroll via `https://<server>:8446` with username + password. Port 8446 requires `allowBasicAuth="true"` in `CoreConfig.xml` — this is patched automatically during deployment by `New-TAKServerCertificate`.
+- iOS/iTAK does not support Mission Packages — see the [Onboarding Guide](../../onboarding/#ios--itak) for manual steps.
 
 **Examples:**
 

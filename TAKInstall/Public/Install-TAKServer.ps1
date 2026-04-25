@@ -196,7 +196,7 @@ function Install-TAKServer {
     Invoke-TAKRemoteCommand -Session $SshSession -Description 'Install and enable firewalld' -Command `
         'sudo dnf install -y firewalld && sudo systemctl enable --now firewalld'
 
-    foreach ($portProto in @('8089/tcp', '8443/tcp', '8446/tcp')) {
+    foreach ($portProto in @('8089/tcp', '8443/tcp', '8446/tcp', '8090/udp')) {
         Invoke-TAKRemoteCommand -Session $SshSession -Description "Open port $portProto" -Command `
             "sudo firewall-cmd --zone=public --permanent --add-port=$portProto"
     }

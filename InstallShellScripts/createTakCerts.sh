@@ -113,6 +113,22 @@ if ! grep -q 'auth="x509"' /opt/tak/CoreConfig.xml; then
 fi
 echo "X509 input configured."
 
+echo "adding QUIC input on port 8090 (Quick UDP Internet Connection)"
+sed -i 's|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>\n    <input _name="quic-server" protocol="quic" port="8090" archive="false"/>|g' /opt/tak/CoreConfig.xml
+if ! grep -q 'protocol="quic"' /opt/tak/CoreConfig.xml; then
+    echo "ERROR: Failed to add QUIC input in CoreConfig.xml."
+    exit 1
+fi
+echo "QUIC input configured on port 8090."
+
+echo "configuring QUIC input on port 8090"
+sed -i 's|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>\n    <input _name="quic-server" protocol="quic" port="8090" archive="false"/>|g' /opt/tak/CoreConfig.xml
+if ! grep -q 'protocol="quic"' /opt/tak/CoreConfig.xml; then
+    echo "ERROR: Failed to configure QUIC input in CoreConfig.xml."
+    exit 1
+fi
+echo "QUIC input configured on port 8090."
+
 echo "configuring intermediate ca for use"
 
 sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="certs/files/truststore-intermediate-ca.jks|g' /opt/tak/CoreConfig.xml
@@ -125,9 +141,18 @@ echo "Intermediate CA truststore configured."
 echo "enabling TAKserver signing, enrolled user certificates will be valid for 30 days"
 
 escapedTakCertPass="$(sed_replace_quote "$takCertPass")"
-sed -i "s|<vbm enabled=\"false\"/>|<certificateSigning CA=\"TAKServer\"><certificateConfig>\\n<nameEntries>\\n<nameEntry name=\"O\" value=\"TAK\"/>\\n<nameEntry name=\"OU\" value=\"TAK\"/>\\n</nameEntries>\\n</certificateConfig>\\n<TAKServerCAConfig keystore=\"JKS\" keystoreFile=\"certs/files/intermediate-ca-signing.jks\" keystorePass=\"$escapedTakCertPass\" validityDays=\"30\" signatureAlg=\"SHA256WithRSA\" />\\n</certificateSigning>\\n <vbm enabled=\"false\"/>|g" /opt/tak/CoreConfig.xml
+sed -i "s|<vbm enabled=\"false\"/>|<vbm enabled=\"true\"/>\\n    <certificateSigning CA=\"TAKServer\"><certificateConfig>\\n<nameEntries>\\n<nameEntry name=\"O\" value=\"TAK\"/>\\n<nameEntry name=\"OU\" value=\"TAK\"/>\\n</nameEntries>\\n</certificateConfig>\\n<TAKServerCAConfig keystore=\"JKS\" keystoreFile=\"certs/files/intermediate-ca-signing.jks\" keystorePass=\"$escapedTakCertPass\" validityDays=\"30\" signatureAlg=\"SHA256WithRSA\" />\\n</certificateSigning>|g" /opt/tak/CoreConfig.xml
 if ! grep -q 'keystorePass=' /opt/tak/CoreConfig.xml; then
 	echo "ERROR: CoreConfig.xml certificate signing block was not written. Verify <vbm enabled=\"false\"/> is present in CoreConfig.xml."
+	exit 1
+fi
+if ! grep -q 'vbm enabled=\"true\"' /opt/tak/CoreConfig.xml; then
+	echo "ERROR: CoreConfig.xml VBM was not enabled. Check vbm element replacement."
+	exit 1
+fi
+echo "VBM enabled for Mission (COP) Manager."
+if ! grep -q 'vbm enabled="true"' /opt/tak/CoreConfig.xml; then
+	echo "ERROR: VBM was not enabled in CoreConfig.xml. Check the sed replacement."
 	exit 1
 fi
 

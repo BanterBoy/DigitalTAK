@@ -142,11 +142,11 @@ sudo systemctl enable --now firewalld
 
 
 #configure firewall
-#8089 = tls client traffic, 8443 - WebTAK, 8446 - certificate enrollment
+#8089 = tls client traffic, 8443 - WebTAK, 8446 - certificate enrollment, 8090/udp - QUIC
 sudo firewall-cmd --zone=public --permanent --add-port=8089/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=8443/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=8446/tcp
-sudo firewall-cmd --reload
+sudo firewall-cmd --zone=public --permanent --add-port=8090/udpsudo firewall-cmd --zone=public --permanent --add-port=8090/udpsudo firewall-cmd --reload
 
 echo "Install Complete, creating tak certificates!!"
 

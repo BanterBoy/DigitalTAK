@@ -18,6 +18,7 @@ admin.p12
 
 # ── Deployment reports contain credentials and must never be committed ──────
 reports/DEPLOYMENT-REPORT-*.md
+reports/Onboarding-Report-*.md
 
 # Integration test XML results
 reports/TestResults-Integration.xml

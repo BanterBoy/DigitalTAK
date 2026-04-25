@@ -681,6 +681,18 @@ if ($resumePhase -le 4) {
     $tests += Test-Remote -Name 'Firewall has 8446/tcp open' `
         -Command 'sudo firewall-cmd --list-ports' -Expected '8446/tcp'
 
+    # Test 21: QUIC firewall port
+    $tests += Test-Remote -Name 'Firewall has 8090/udp open' `
+        -Command 'sudo firewall-cmd --list-ports' -Expected '8090/udp'
+
+    # Test 22: QUIC input in CoreConfig.xml
+    $tests += Test-Remote -Name 'CoreConfig.xml has QUIC input' `
+        -Command 'sudo grep -c ''protocol="quic"'' /opt/tak/CoreConfig.xml' -Expected '[1-9]'
+
+    # Test 23: VBM enabled in CoreConfig.xml
+    $tests += Test-Remote -Name 'VBM Mode is enabled in CoreConfig.xml' `
+        -Command 'sudo grep -c ''vbm enabled="true"'' /opt/tak/CoreConfig.xml' -Expected '[1-9]'
+
     # Test 10: SELinux takserver module loaded
     $tests += Test-Remote -Name 'SELinux takserver module loaded' `
         -Command 'sudo semodule -l | grep takserver' -Expected 'takserver'
@@ -724,6 +736,18 @@ if ($resumePhase -le 4) {
     # Test 20: OS is Rocky Linux 9
     $tests += Test-Remote -Name 'OS is Rocky Linux 9' `
         -Command 'cat /etc/redhat-release' -Expected 'Rocky Linux.*9'
+
+    # Test 21: QUIC firewall port open
+    $tests += Test-Remote -Name 'Firewall has 8090/udp open (QUIC)' `
+        -Command 'sudo firewall-cmd --list-ports' -Expected '8090/udp'
+
+    # Test 22: QUIC input configured in CoreConfig.xml
+    $tests += Test-Remote -Name 'CoreConfig.xml has QUIC input (port 8090)' `
+        -Command 'sudo grep -c ''protocol="quic"'' /opt/tak/CoreConfig.xml' -Expected '[1-9]'
+
+    # Test 23: VBM enabled in CoreConfig.xml (required for Mission/COP Manager)
+    $tests += Test-Remote -Name 'CoreConfig.xml has VBM enabled' `
+        -Command 'sudo grep -c ''vbm enabled="true"'' /opt/tak/CoreConfig.xml' -Expected '[1-9]'
 
     # Collect OS info for report
     $osInfo = (Invoke-SSHCommand -SessionId $session.SessionId -Command 'cat /etc/redhat-release').Output -join ''

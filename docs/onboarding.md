@@ -193,9 +193,7 @@ New-TAKDataPackage `
     -TrustStorePassphrase (Read-Host -AsSecureString 'Truststore passphrase')
 ```
 
-The cert enrollment endpoint at `https://<server>:8446` is an alternative for distributing client certificates directly to ATAK and WinTAK without building data packages.
-
-Output: `.\dist\alpha\<username>.zip` — one `.zip` per team member.
+Output: `.\dist\alpha\<username>.zip` — one `.zip` per team member plus a `<team>-enrollment.zip` team enrollment package when `Invoke-TAKOnboarding` is used.
 
 {: .note }
 The script overwrites existing `.zip` files on re-run. This is safe as each run produces identical packages from the same cert inputs.
@@ -204,15 +202,38 @@ The script overwrites existing `.zip` files on re-run. This is safe as each run 
 
 ## Step 5 — Distribute to Users
 
-### Android — ATAK
+{: .important }
+**Self-signed CA deployment — read before distributing.** This deployment uses a TAK-generated CA, not Let's Encrypt. ATAK cannot verify the server until the CA truststore is installed on the device. Clients that attempt enrollment without the truststore first will see **"The TAK Server's identity could not be verified"** and registration will fail. Use Option A where possible.
 
-Send each user their personal `.zip` via an encrypted channel (Signal, encrypted USB).
+### Option A — Import data package (recommended)
 
-> **Files → Import Manager → Data Package** → import the `.zip`
+Send each user their personal `.zip` via an encrypted channel (Signal, encrypted USB). Importing it installs the client certificate **and** the server CA trust in a single step — no enrollment, no separate cert import.
 
-### Windows — WinTAK
+| Client | Steps |
+|--------|-------|
+| ATAK (Android) | **Files → Import Manager → Data Package** → select `<username>.zip` |
+| WinTAK (Windows) | **Tools → Data Package → Import** → select `<username>.zip` |
 
-> **Tools → Data Package → Import**
+### Option B — Certificate enrollment (two steps required)
+
+Use this path only when direct data-package distribution is not possible (e.g., large teams onboarding themselves remotely).
+
+{: .warning }
+Skipping Step 1 causes the **"identity could not be verified"** error. The enrollment ZIP must be imported **before** connecting on port 8446.
+
+**Step 1 — Install server CA trust** by distributing and importing `<team>-enrollment.zip`:
+
+| Client | Steps |
+|--------|-------|
+| ATAK (Android) | **Files → Import Manager → Data Package** → import `<team>-enrollment.zip` |
+| WinTAK (Windows) | **Tools → Data Package → Import** → import `<team>-enrollment.zip` |
+
+**Step 2 — Enroll for a client certificate** (enrollment port: 8446):
+
+| Client | Steps |
+|--------|-------|
+| ATAK (Android) | Network → Manage Server Connections → select `<server>:8446` → **Enroll** → enter username + password |
+| WinTAK (Windows) | Network → Manage Server Connections → **Enroll** → enter username + password |
 
 ### iOS — iTAK
 

@@ -118,6 +118,11 @@ Describe 'firewalld TAK Port Policy' -Tag 'Integration', 'TAKServer', 'Firewall'
         $r = Invoke-TAKSSHCommand -Session $script:SSH -Command 'sudo firewall-cmd --list-ports'
         $r.Output | Should -Match '8446/tcp'
     }
+
+    It 'firewalld has 8090/udp open (QUIC)' -Skip:$script:Skip {
+        $r = Invoke-TAKSSHCommand -Session $script:SSH -Command 'sudo firewall-cmd --list-ports'
+        $r.Output | Should -Match '8090/udp'
+    }
 }
 
 # ── SELinux module ─────────────────────────────────────────────────────────────
@@ -141,6 +146,18 @@ Describe 'TAK Server Configuration Files' -Tag 'Integration', 'TAKServer', 'Conf
 
     It 'CoreConfig.xml references the takserver keystore' -Skip:$script:Skip {
         $r = Invoke-TAKSSHCommand -Session $script:SSH -Command 'sudo grep -c "keystore" /opt/tak/CoreConfig.xml'
+        [int]$count = $r.Output
+        $count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'CoreConfig.xml has VBM enabled (required for Mission/COP Manager)' -Skip:$script:Skip {
+        $r = Invoke-TAKSSHCommand -Session $script:SSH -Command 'sudo grep -c ''vbm enabled="true"'' /opt/tak/CoreConfig.xml'
+        [int]$count = $r.Output
+        $count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'CoreConfig.xml has QUIC input configured on port 8090' -Skip:$script:Skip {
+        $r = Invoke-TAKSSHCommand -Session $script:SSH -Command 'sudo grep -c ''protocol="quic"'' /opt/tak/CoreConfig.xml'
         [int]$count = $r.Output
         $count | Should -BeGreaterOrEqual 1
     }

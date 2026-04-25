@@ -134,7 +134,7 @@ The script runs 22 automated checks over SSH immediately after install. All 22 m
 | 15 | Server certificate exists | server JKS created |
 | 16 | Admin .p12 cert exists | admin cert under `/opt/tak/certs/files/` |
 | 17 | Admin .p12 in /home/atak/ | copied to SSH user home |
-| 18 | Cert enrollment HTTPS responds on 8446 | HTTP 403 (unauthenticated — expected) |
+| 18 | Cert enrollment HTTPS responds on 8446 | HTTP 200/302 — Basic Auth accepted (requires `allowBasicAuth="true"` in `CoreConfig.xml`) |
 | 19 | cert-metadata.sh has correct State | cert metadata patched correctly |
 | 20 | TAK Server RPM installed | package registered with dnf |
 | 21 | nofile ulimit configured | file-descriptor limit set (32768) |
@@ -144,13 +144,29 @@ The script runs 22 automated checks over SSH immediately after install. All 22 m
 
 ### Access URLs
 
-| Service | URL |
-|---------|-----|
-| WebTAK / Admin UI | `https://<SERVER_IP>:8443` |
-| Cursor-on-Target (CoT) | `<SERVER_IP>:8089` (TLS) |
-| Certificate Enrollment | `https://<SERVER_IP>:8446` |
+| Service | URL | Auth |
+|---------|-----|------|
+| WebTAK / Admin UI | `https://<SERVER_IP>:8443` | Client certificate (mTLS) |
+| Cursor-on-Target (CoT) TLS | `<SERVER_IP>:8089` | Client certificate |
+| QUIC (WinTAK/ATAK) | `<SERVER_IP>:8090` UDP | Client certificate |
+| Certificate Enrollment | `https://<SERVER_IP>:8446` | HTTP Basic Auth (username + password) |
 
 Replace `<SERVER_IP>` with the IP shown in the Environment section of your deployment report.
+
+{: .important }
+**Port 8446 — `allowBasicAuth` requirement.** TAK Server 5.7-RELEASE8 ships `CoreConfig.xml` with the 8446 connector missing `allowBasicAuth="true"`. Without it, every enrollment attempt fails with "Registration failed — identity could not be verified" even when credentials are correct. `New-TAKServerCertificate` (step 12c) patches this automatically in fresh deployments. To verify a running server:
+
+```bash
+grep 'cert_https' /opt/tak/CoreConfig.xml
+# Expected: <connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>
+```
+
+If the attribute is absent, patch it:
+
+```bash
+sudo sed -i 's|<connector port="8446" clientAuth="false" _name="cert_https"/>|<connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>|g' /opt/tak/CoreConfig.xml
+sudo systemctl restart takserver
+```
 
 ---
 
@@ -211,8 +227,10 @@ You will see the TAK Server admin interface. From here you can manage users, gro
 
 ### 4 — Verify CoT connectivity
 
-Point an ATAK or WinTAK client at `<SERVER_IP>:8089` with TLS enabled.  
-The client will need a server connection profile and the `truststore-intermediate-ca.p12` file to validate the server certificate.
+Point an ATAK or WinTAK client at `<SERVER_IP>:8089` with TLS enabled, or `<SERVER_IP>:8090` UDP for QUIC.
+The client will need a server connection profile and the `truststore-intermediate-ca.p12` file to validate the server certificate. Both are included automatically in each user's `.zip` data package produced by `Invoke-TAKOnboarding`.
+
+See the [Onboarding guide](../onboarding/) for client connection options (data package import vs. certificate enrollment).
 
 ---
 

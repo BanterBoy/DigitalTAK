@@ -11,6 +11,7 @@ BeforeAll {
     $script:ExpectedFunctions = @(
         'Invoke-TAKOnboarding',
         'New-TAKDataPackage',
+        'New-TAKEnrollmentPackage',
         'New-TAKTeamRoster'
     )
 }
@@ -34,9 +35,9 @@ Describe 'TAKOnboarding — Module Manifest' {
         $m.RootModule | Should -Be 'TAKOnboarding.psm1'
     }
 
-    It 'exports exactly 3 functions in the manifest' {
+    It 'exports exactly 4 functions in the manifest' {
         $m = Test-ModuleManifest -Path $script:ManifestPath -ErrorAction Stop
-        $m.ExportedFunctions.Count | Should -Be 3
+        $m.ExportedFunctions.Count | Should -Be 4
     }
 
     It 'requires the Posh-SSH module' {
@@ -69,13 +70,14 @@ Describe 'TAKOnboarding — Module Import and Exports' {
         Get-Module -Name 'TAKOnboarding' | Should -Not -BeNullOrEmpty
     }
 
-    It 'exports exactly 3 commands at runtime' {
-        (Get-Command -Module 'TAKOnboarding').Count | Should -Be 3
+    It 'exports exactly 4 commands at runtime' {
+        (Get-Command -Module 'TAKOnboarding').Count | Should -Be 4
     }
 
     It 'exports <_>' -ForEach @(
         'Invoke-TAKOnboarding',
         'New-TAKDataPackage',
+        'New-TAKEnrollmentPackage',
         'New-TAKTeamRoster'
     ) {
         Get-Command -Name $_ -Module 'TAKOnboarding' -ErrorAction SilentlyContinue |

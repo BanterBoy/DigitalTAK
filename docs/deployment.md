@@ -108,7 +108,7 @@ The script executes in 9 phases. A Hyper-V snapshot is taken after key phases so
 | 0 | Create VM | Hyper-V Gen 2 VM created, Rocky Linux kickstart delivered via OEMDRV VHDX | **Yes** — `Phase0-RockyInstalled` |
 | 1 | SSH | Establishes SSH session to the new VM | No |
 | 2 | TAK Install | Installs TAK Server RPM, configures SELinux and firewalld | **Yes** — `Phase2-TAKInstalled` |
-| 3 | Create Certs | Creates CA, server certificates, client certificates, patches CoreConfig.xml | No |
+| 3 | Create Certs | Creates CA, server certificates, client certificates, patches CoreConfig.xml — including `allowBasicAuth="true"` on the port 8446 enrollment connector and firewall rules for 8089/8443/8446 | No |
 | 4 | Promote Admin | Promotes admin.pem to TAK Server administrator | **Yes** — `Phase4-CertsAndAdmin` |
 | 5 | Validation | 22 post-deployment tests (service, ports, firewall, certs, SELinux, OS) | No |
 | 6 | Download Certs | Transfers `.p12` client certificates via SFTP | No |
@@ -251,15 +251,19 @@ By default this preserves the TAK Server install on the guest. To uninstall TAK 
 
 Once the deployment completes:
 
-| Interface | URL / Address |
-|-----------|---------------|
-| **WebTAK UI** | `https://<VM-IP>:8443/webtak` |
-| **Admin Console** | `https://<VM-IP>:8443/` |
-| **REST API** | `https://<VM-IP>:8443/` |
-| **CoT (ATAK clients)** | `<VM-IP>:8089` |
-| **Client cert enrollment** | `https://<VM-IP>:8446` |
+| Interface | URL / Address | Auth |
+|-----------|---------------|------|
+| **WebTAK UI** | `https://<VM-IP>:8443/webtak` | Client certificate (mTLS) |
+| **Admin Console** | `https://<VM-IP>:8443/` | Client certificate (mTLS) |
+| **REST API** | `https://<VM-IP>:8443/` | Client certificate (mTLS) |
+| **CoT / ATAK TLS** | `<VM-IP>:8089` (TCP) | Client certificate |
+| **CoT / ATAK QUIC** | `<VM-IP>:8090` (UDP) | Client certificate |
+| **Client cert enrollment** | `https://<VM-IP>:8446` | HTTP Basic Auth (username + password) |
 
 Default admin credentials are set during the Promote Admin phase. Import the downloaded `.p12` certificate from `certs/` into your ATAK client.
+
+{: .note }
+Port 8446 uses HTTP Basic Auth for certificate enrollment. The deployment patches `CoreConfig.xml` to include `allowBasicAuth="true"` on this connector. Without this attribute TAK Server rejects all enrollment attempts with HTTP 401 regardless of valid credentials.
 
 ---
 

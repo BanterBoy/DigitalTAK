@@ -18,6 +18,7 @@
     FunctionsToExport = @(
         'Invoke-TAKOnboarding'
         'New-TAKDataPackage'
+        'New-TAKEnrollmentPackage'
         'New-TAKTeamRoster'
     )
 

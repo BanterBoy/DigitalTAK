@@ -121,7 +121,11 @@ function New-TAKDataPackage {
         [System.Security.SecureString] $TrustStorePassphrase,
 
         [Parameter()]
-        [string] $OutputDir
+        [string] $OutputDir,
+
+        [Parameter()]
+        [ValidateScript({ -not $_ -or (Test-Path $_ -PathType Container) })]
+        [string] $MapSourcesDir
     )
 
     Set-StrictMode -Version Latest
@@ -198,6 +202,14 @@ function New-TAKDataPackage {
         $null = New-Item -ItemType Directory -Force -Path $resolvedOutputDir
     }
 
+    # ── Collect map source XML files (optional) ──────────────────────────────────
+    $mapSourceFiles = @()
+    if ($MapSourcesDir -and (Test-Path $MapSourcesDir -PathType Container)) {
+        $mapSourceFiles = @(Get-ChildItem -Path $MapSourcesDir -Filter '*.xml' -Recurse |
+                           Where-Object { $_.Name -notlike 'grg_*' })
+        Write-Host "Map sources : $($mapSourceFiles.Count) XML files from $(Split-Path $MapSourcesDir -Leaf)" -ForegroundColor DarkGray
+    }
+
     Write-Host "Team       : $teamName"
     Write-Host "Server     : ${ServerHostname}:${ServerPort}:ssl"
     Write-Host "Output dir : $resolvedOutputDir"
@@ -228,6 +240,16 @@ function New-TAKDataPackage {
             try {
                 # ── MANIFEST/manifest.xml ──────────────────────────────────────────
                 $packageUid  = [System.Guid]::NewGuid().ToString()
+                # Build map source Content entries for the manifest.
+                $mapContentEntries = ''
+                if ($mapSourceFiles.Count -gt 0) {
+                    $sb = [System.Text.StringBuilder]::new()
+                    foreach ($mf in $mapSourceFiles) {
+                        [void]$sb.AppendLine("      <Content ignore=`"false`" zipEntry=`"mapsources/$($mf.Name)`"/>")
+                    }
+                    $mapContentEntries = $sb.ToString().TrimEnd()
+                }
+
                 $manifestXml = @"
 <MissionPackageManifest version="2">
    <Configuration>
@@ -238,7 +260,7 @@ function New-TAKDataPackage {
    <Contents>
       <Content ignore="false" zipEntry="certs/$username.p12"/>
       <Content ignore="false" zipEntry="certs/truststore.p12"/>
-      <Content ignore="false" zipEntry="MANIFEST/connection.pref"/>
+      <Content ignore="false" zipEntry="MANIFEST/connection.pref"/>$(if ($mapContentEntries) { "`n$mapContentEntries" })
    </Contents>
 </MissionPackageManifest>
 "@
@@ -285,6 +307,15 @@ function New-TAKDataPackage {
                 $tsBytes     = [System.IO.File]::ReadAllBytes($trustP12)
                 $entryStream.Write($tsBytes, 0, $tsBytes.Length)
                 $entryStream.Dispose()
+
+                # ── mapsources/*.xml (optional) ───────────────────────────────────
+                foreach ($mf in $mapSourceFiles) {
+                    $entry       = $zipArchive.CreateEntry("mapsources/$($mf.Name)")
+                    $entryStream = $entry.Open()
+                    $mfBytes     = [System.IO.File]::ReadAllBytes($mf.FullName)
+                    $entryStream.Write($mfBytes, 0, $mfBytes.Length)
+                    $entryStream.Dispose()
+                }
             }
             finally {
                 $zipArchive.Dispose()

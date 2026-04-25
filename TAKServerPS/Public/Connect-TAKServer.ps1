@@ -120,14 +120,18 @@ function Connect-TAKServer {
         }
         'Pfx' {
             try {
+                # Resolve to an absolute path so the .NET X509Certificate2 constructor
+                # can find the file regardless of differences between PowerShell's $PWD
+                # and [System.Environment]::CurrentDirectory.
+                $resolvedPfxPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PfxPath)
                 if ($PfxPassword) {
                     $session.Certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
-                        $PfxPath, $PfxPassword
+                        $resolvedPfxPath, $PfxPassword
                     )
                 }
                 else {
                     $session.Certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
-                        $PfxPath
+                        $resolvedPfxPath
                     )
                 }
             }

@@ -214,7 +214,11 @@ sudo sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="c
         # ── 11. CoreConfig.xml — certificate signing block ───────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Patching CoreConfig.xml (signing)' -PercentComplete 72
         # Build the sed replacement command; password is bash-single-quoted.
-        $signingBlock  = '<certificateSigning CA="TAKServer">'
+        # <vbm enabled="true"/> is preserved in-place so Mission (COP) Manager
+        # does not display the "VBM Mode not enabled" banner.  The certificateSigning
+        # block is inserted immediately after the vbm element.
+        $signingBlock  = '<vbm enabled="true"/>'
+        $signingBlock += '\n    <certificateSigning CA="TAKServer">'
         $signingBlock += '<certificateConfig>'
         $signingBlock += '<nameEntries>'
         $signingBlock += '<nameEntry name="O" value="TAK"/>'
@@ -223,10 +227,10 @@ sudo sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="c
         $signingBlock += '</certificateConfig>'
         $signingBlock += "<TAKServerCAConfig keystore=`"JKS`" keystoreFile=`"certs/files/intermediate-ca-signing.jks`" keystorePass=`"$bPass`" validityDays=`"30`" signatureAlg=`"SHA256WithRSA`" />"
         $signingBlock += '</certificateSigning>'
-        $signingBlock += ' <vbm enabled="false"/>'
+        $signingBlock += ' <vbm enabled="true"/>'
 
         $signingCmd = "sudo sed -i 's|<vbm enabled=`"false`"/>|$signingBlock|g' /opt/tak/CoreConfig.xml"
-        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Insert certificate signing block' -Command $signingCmd
+        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Insert certificate signing block and enable VBM' -Command $signingCmd
 
         # Validate that the keystorePass attribute was written with XML quotes.
         $validate = Invoke-TAKRemoteCommand -Session $SshSession -Description 'Validate CoreConfig.xml signing block' -Command `
@@ -242,7 +246,14 @@ sudo sed -i 's|truststoreFile="certs/files/truststore-root.jks|truststoreFile="c
             $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
 
-        # ── 12. CoreConfig.xml — enable group cache for x509 ─────────────────
+        # ── 12. CoreConfig.xml — QUIC input on port 8090 ─────────────────────
+        # Injects the QUIC input element immediately after the stdssl TLS input so
+        # WinTAK/ATAK devices can connect via QUIC (UDP) as an alternative to TLS.
+        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Add QUIC input on port 8090' -Command @'
+sudo sed -i 's|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>|<input auth="x509" _name="stdssl" protocol="tls" port="8089"/>\n    <input _name="quic-server" protocol="quic" port="8090" archive="false"/>|g' /opt/tak/CoreConfig.xml
+'@
+
+        # ── 12a. CoreConfig.xml — enable group cache for x509 ────────────────
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Enable x509 group cache' -Command @'
 sudo sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
 '@
@@ -259,6 +270,15 @@ sudo sed -i 's|<auth>|<auth x509useGroupCache="true">|g' /opt/tak/CoreConfig.xml
         # occurrence.  The same safe-escaping pattern used in Step 2b is applied.
         $tlsPassCmd = 'CAPASS_VAL=' + $bPass + '; SAFE=$(printf ''%s'' "$CAPASS_VAL" | sed ''s/[\\|&]/\\&/g''); sudo sed -i "s|keystorePass=\"atakatak\"|keystorePass=\"${SAFE}\"|g; s|truststorePass=\"atakatak\"|truststorePass=\"${SAFE}\"|g" /opt/tak/CoreConfig.xml'
         Invoke-TAKRemoteCommand -Session $SshSession -Description 'Patch main TLS connector passwords in CoreConfig.xml' -Command $tlsPassCmd
+
+        # ── 12c. CoreConfig.xml — enable Basic Auth on enrollment connector ──────
+        # Per TAK Server Configuration Guide Appendix C, the 8446 connector must have
+        # allowBasicAuth="true" for ATAK/WinTAK certificate enrollment to succeed.
+        # The RPM ships the connector without this attribute, causing HTTP 401 on every
+        # enrollment attempt even when credentials are valid.
+        Invoke-TAKRemoteCommand -Session $SshSession -Description 'Enable Basic Auth on 8446 enrollment connector' -Command @'
+sudo sed -i 's|<connector port="8446" clientAuth="false" _name="cert_https"/>|<connector port="8446" clientAuth="false" _name="cert_https" allowBasicAuth="true"/>|g' /opt/tak/CoreConfig.xml
+'@
 
         # ── 13. Second takserver restart ──────────────────────────────────────
         Write-Progress -Activity 'Creating TAK certificates' -Status 'Restarting takserver (2/2)' -PercentComplete 88
