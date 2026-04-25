@@ -76,9 +76,12 @@ Describe 'Publish-TAKDeviceProfile — Parameter Validation' {
     }
 
     It 'defaults ProfileType to Enrollment' {
-        $cmd = Get-Command 'Publish-TAKDeviceProfile'
-        $default = $cmd.Parameters['ProfileType'].DefaultValue
-        $default | Should -Be 'Enrollment'
+        # ParameterMetadata.DefaultValue is not populated for script functions;
+        # inspect the AST directly to verify the default value in the param block.
+        $ast = (Get-Command 'Publish-TAKDeviceProfile').ScriptBlock.Ast
+        $paramNode = $ast.Body.ParamBlock.Parameters |
+            Where-Object { $_.Name.VariablePath.UserPath -eq 'ProfileType' }
+        $paramNode.DefaultValue.Value | Should -Be 'Enrollment'
     }
 }
 
@@ -116,21 +119,15 @@ Describe 'Publish-TAKDeviceProfile — Behaviour (mocked)' {
     }
 
     It 'calls Invoke-RestMethod at least 3 times (create, update, upload)' {
-        Mock -ModuleName TAKServer Invoke-RestMethod { return [PSCustomObject]@{ data = [PSCustomObject]@{ id = 1; name = 'n' } } }
+        $null = Publish-TAKDeviceProfile -Name 'test-profile' -ZipPath $script:TmpZip -Confirm:$false
 
-        Publish-TAKDeviceProfile -Name 'test-profile' -ZipPath $script:TmpZip -Confirm:$false
-
-        Should -Invoke -ModuleName TAKServer Invoke-RestMethod -Times 3 -Minimum
+        Should -Invoke -ModuleName TAKServer Invoke-RestMethod -Times 3
     }
 
     It 'sends SkipCertificateCheck when session has SkipCertCheck = true' {
-        Mock -ModuleName TAKServer Invoke-RestMethod -ParameterFilter { $SkipCertificateCheck -eq $true } {
-            return [PSCustomObject]@{ data = [PSCustomObject]@{ id = 1; name = 'n' } }
-        }
+        $null = Publish-TAKDeviceProfile -Name 'test-profile' -ZipPath $script:TmpZip -Confirm:$false
 
-        Publish-TAKDeviceProfile -Name 'test-profile' -ZipPath $script:TmpZip -Confirm:$false
-
-        Should -Invoke -ModuleName TAKServer Invoke-RestMethod -ParameterFilter { $SkipCertificateCheck -eq $true } -Times 1 -Minimum
+        Should -Invoke -ModuleName TAKServer Invoke-RestMethod -ParameterFilter { $SkipCertificateCheck -eq $true } -Times 1
     }
 
     It 'respects -WhatIf and makes no HTTP calls' {

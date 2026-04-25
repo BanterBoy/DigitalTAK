@@ -148,15 +148,21 @@ function Publish-TAKDeviceProfile {
                    -Method Get @irmBase -ErrorAction Stop
     $profileData = if ($created.PSObject.Properties.Name -contains 'data') { $created.data } else { $created }
 
-    # Mutate only the fields we control; preserve id, updated, tool from server
-    $profileData.type              = $ProfileType
-    $profileData.active            = $Active
-    $profileData.applyOnEnrollment = ($ProfileType -eq 'Enrollment')
-    $profileData.applyOnConnect    = ($ProfileType -eq 'Connection')
-    $profileData.groups            = if ($Groups) { @($Groups) } else { @() }
+    # Build a clean update body — do not mutate the server-returned object.
+    # Set-StrictMode -Version Latest prevents setting properties that do not exist
+    # on a PSCustomObject, and the server may not return all fields on creation.
+    $updateBody = [ordered]@{
+        id               = $profileData.id
+        name             = $Name
+        type             = $ProfileType
+        active           = $Active
+        applyOnEnrollment = ($ProfileType -eq 'Enrollment')
+        applyOnConnect   = ($ProfileType -eq 'Connection')
+        groups           = if ($Groups) { @($Groups) } else { @() }
+    }
 
     Invoke-RestMethod -Uri "$baseUrl/Marti/api/device/profile/$encodedName" `
-        -Method Put -Body ($profileData | ConvertTo-Json -Compress) `
+        -Method Put -Body ($updateBody | ConvertTo-Json -Compress) `
         -ContentType 'application/json' @irmBase -ErrorAction Stop | Out-Null
     Write-Verbose "Updated profile '$Name' — type=$ProfileType, groups=$($Groups -join ',')"
 
