@@ -16,11 +16,12 @@ Provides Bash shell scripts and two PowerShell modules (`TAKServerPS`, `TAKInsta
 ```
 DigitalTAK/
 ├── InstallShellScripts/        ← Bash deployment scripts (run on the server)
-├── TAKServerPS/                ← PowerShell module — TAK Server REST API (44 cmdlets)
+├── TAKServerPS/                ← PowerShell module — TAK Server REST API (45 cmdlets)
 ├── TAKInstall/                 ← PowerShell module — remote provisioning via SSH (6 cmdlets)
-├── TAKDeploy/                  ← PowerShell module — Hyper-V VM creation & orchestration (3 cmdlets)
+├── TAKDeploy/                  ← PowerShell module — Hyper-V VM creation & orchestration (5 cmdlets)
+├── TAKOnboarding/              ← PowerShell module — team onboarding orchestrator (4 cmdlets)
 ├── onboarding/                 ← Team onboarding assets (roster scripts, cert batch, data package builder)
-├── tests/integration/          ← Pester 5 integration tests (45 tests across 12 test files)
+├── tests/integration/          ← Pester 5 integration tests (212 tests across 12 test files)
 ├── dist/                       ← Per-user ATAK .zip data packages (generated; git-ignored)
 ├── certs/                      ← Downloaded client certificates per team (generated; git-ignored)
 ├── Documentation/              ← Official TAK Server 5.7 & Federation Hub guides (PDF)
@@ -179,7 +180,7 @@ Both modules require **PowerShell 7.0+** and follow Microsoft best practices —
 **Path:** `TAKServerPS/`  
 **Manifest:** `TAKServer.psd1` · **Version:** 1.0.0
 
-Wraps the TAK Server 5.x REST API. Authenticate once with `Connect-TAKServer`; all 44 cmdlets share the session automatically.
+Wraps the TAK Server 5.x REST API. Authenticate once with `Connect-TAKServer`; all 45 cmdlets share the session automatically.
 
 #### Installation
 
@@ -218,7 +219,7 @@ Connect-TAKServer -Server 'takserver.example.com' -Port 8443 -Token $secureToken
 | **Inputs** | `Get-TAKInput`, `New-TAKInput`, `Remove-TAKInput` |
 | **Outgoing Connections** | `Get-TAKOutgoingConnection`, `New-TAKOutgoingConnection`, `Remove-TAKOutgoingConnection` |
 | **CoT** | `Get-TAKCoT` |
-| **Device Profiles** | `Get-TAKDeviceProfile` |
+| **Device Profiles** | `Get-TAKDeviceProfile`, `Publish-TAKDeviceProfile` |
 | **Map Layers** | `Get-TAKMapLayer`, `Remove-TAKMapLayer` |
 | **Video** | `Get-TAKVideo`, `New-TAKVideo`, `Remove-TAKVideo` |
 | **Plugins** | `Get-TAKPlugin` |
@@ -290,6 +291,59 @@ New-TAKLetsEncryptCertificate -SshSession $ssh -Domain 'tak.example.com' -Email 
 
 ---
 
+### TAKDeploy — Hyper-V Deployment Module
+
+**Path:** `TAKDeploy/`  
+**Manifest:** `TAKDeploy.psd1` · **Version:** 1.1.0  
+**Requires:** [Posh-SSH](https://github.com/darkoperator/Posh-SSH)
+
+Automates Hyper-V VM creation and the end-to-end TAK Server deployment orchestration pipeline. Provides the building blocks consumed by `Deploy-TAKServer.ps1`.
+
+#### Installation
+
+```powershell
+Install-Module Posh-SSH -Scope CurrentUser
+Import-Module .\TAKDeploy\TAKDeploy.psd1
+```
+
+#### Cmdlet Reference
+
+| Cmdlet | Purpose |
+|--------|---------|
+| `New-TAKVirtualMachine` | Creates a Hyper-V Gen 2 VM with an OEMDRV kickstart VHDX for unattended Rocky Linux 9 installation. |
+| `Wait-TAKLinuxInstall` | Polls Hyper-V until the OS install completes and the VM reboots into the installed system. |
+| `Start-TAKDeployment` | Orchestrates the full deployment pipeline (Phases 0–8) with snapshot-based resume. |
+| `Remove-TAKDeployment` | Removes a CivTAK VM, all its snapshots, and its VHDX disk. |
+| `Invoke-TAKRollback` | Restores a VM to a named Phase snapshot (Phase0, Phase2, or Phase4) for retry or re-testing. |
+
+---
+
+### TAKOnboarding — Team Onboarding Module
+
+**Path:** `TAKOnboarding/`  
+**Manifest:** `TAKOnboarding.psd1` · **Version:** 1.0.0  
+**Requires:** [Posh-SSH](https://github.com/darkoperator/Posh-SSH), JDK 11+ with `keytool` on PATH (for data packages)
+
+Orchestrates the complete zero-to-team onboarding workflow — certificate generation, user provisioning, and ATAK data package construction — as a single command. Consumed by `Invoke-TAKOnboarding.ps1`.
+
+#### Installation
+
+```powershell
+Install-Module Posh-SSH -Scope CurrentUser
+Import-Module .\TAKOnboarding\TAKOnboarding.psd1
+```
+
+#### Cmdlet Reference
+
+| Cmdlet | Purpose |
+|--------|---------|
+| `Invoke-TAKOnboarding` | Full onboarding pipeline: certs → user accounts → group assignment → data packages. |
+| `New-TAKDataPackage` | Builds a per-user ATAK data package (`.zip`) containing the user's `.p12` cert and server connection preferences. |
+| `New-TAKEnrollmentPackage` | Builds a team-level ATAK enrollment data package for use as a TAK Server Device Profile (password-based enrollment; no per-user cert required). |
+| `New-TAKTeamRoster` | Generates a team roster CSV from an auto-numbered template or custom input. |
+
+---
+
 ## Network Ports
 
 | Port | Protocol | Service |
@@ -308,27 +362,53 @@ New-TAKLetsEncryptCertificate -SshSession $ssh -Domain 'tak.example.com' -Email 
 
 ## Tests
 
-Both modules include Pester 5 unit tests in their `Tests/` subdirectories. An additional suite of integration tests (no live server required) validates the onboarding pipeline and teardown scripts. All 224 tests pass.
+All four modules include Pester 5 unit tests in their `Tests/` subdirectories. An integration suite covers the full deployment and teardown pipeline. All 375 unit tests pass.
 
 ```
-TAKServerPS/Tests/
-    TAKServerPS.Module.Tests.ps1      ← manifest + 44-function inventory (73 tests)
-    Invoke-TAKRequest.Tests.ps1       ← HTTP helper unit tests (22 tests)
-    Connect-TAKServer.Tests.ps1       ← auth parameter sets (19 tests)
+TAKServerPS/Tests/  (171 tests — 8 files)
+    TAKServerPS.Module.Tests.ps1          ← manifest + 45-function inventory
+    Connect-TAKServer.Tests.ps1           ← auth parameter sets (cert, token, credential)
+    Invoke-TAKRequest.Tests.ps1           ← HTTP helper, retry logic, error handling
+    Get-TAKVersion.Tests.ps1              ← GET version endpoint
+    Invoke-TAKCertificateSign.Tests.ps1   ← cert signing pipeline
+    New-TAKUser.Tests.ps1                 ← user creation + ShouldProcess
+    Remove-TAKUser.Tests.ps1              ← user deletion + ShouldProcess
+    Publish-TAKDeviceProfile.Tests.ps1    ← device profile lifecycle (create, update, upload)
 
-TAKInstall/Tests/
-    TAKInstall.Module.Tests.ps1       ← manifest + 6-function inventory (31 tests)
-    ConvertTo-TAKBashArg.Tests.ps1    ← bash arg escaping (4 tests)
-    Invoke-TAKRemoteCommand.Tests.ps1 ← SSH command executor (16 tests)
-    Wait-TAKServiceReady.Tests.ps1    ← service polling helper (14 tests)
+TAKInstall/Tests/  (92 tests — 5 files)
+    TAKInstall.Module.Tests.ps1           ← manifest + 6-function inventory
+    ConvertTo-TAKBashArg.Tests.ps1        ← bash argument escaping
+    Invoke-TAKRemoteCommand.Tests.ps1     ← SSH command executor
+    Wait-TAKServiceReady.Tests.ps1        ← service polling helper
+    Wait-TAKAdminApiReady.Tests.ps1       ← admin API readiness probe
 
-tests/integration/
-    09-RemovalVerification.Tests.ps1  ← Remove-CivTAK.ps1 Windows cert store cleanup
-    10-DataPackageBuild.Tests.ps1     ← New-TAKDataPackage.ps1 truststore logic
-    11-CertDistCleanup.Tests.ps1      ← Remove-CivTAK.ps1 filesystem teardown (Steps 4 / 4b)
+TAKDeploy/Tests/  (85 tests — 7 files)
+    TAKDeploy.Module.Tests.ps1            ← manifest + 5-function inventory
+    New-TAKVirtualMachine.Tests.ps1       ← Hyper-V VM creation
+    Wait-TAKLinuxInstall.Tests.ps1        ← install-completion polling
+    Start-TAKDeployment.Tests.ps1         ← full pipeline orchestration
+    Remove-TAKDeployment.Tests.ps1        ← VM and VHDX teardown
+    Invoke-TAKRollback.Tests.ps1          ← snapshot restore
+
+TAKOnboarding/Tests/  (27 tests — 1 file)
+    TAKOnboarding.Module.Tests.ps1        ← manifest + 4-function inventory + onboarding logic
+
+tests/integration/  (212 tests across 12 files — 72 pass without live server, 140 require TAK_INTEGRATION_HOST)
+    00-PreflightChecks.Tests.ps1          ← environment and prerequisites
+    01-VMProvisioning.Tests.ps1           ← Hyper-V VM creation
+    02-OSInstall.Tests.ps1                ← Rocky Linux kickstart install
+    03-TAKServerHealth.Tests.ps1          ← TAK service, ports, SELinux, firewall
+    04-Certificates.Tests.ps1             ← CA + server + client cert generation
+    05-UserManagement.Tests.ps1           ← user CRUD via UserManager.jar
+    06-CertPasswordFlow.Tests.ps1         ← cert password and SFTP download
+    07-LetsEncryptRenewal.Tests.ps1       ← LE cert issuance and renewal
+    08-GroupManagement.Tests.ps1          ← group assignment
+    09-RemovalVerification.Tests.ps1      ← Remove-CivTAK.ps1 Windows cert store cleanup
+    10-DataPackageBuild.Tests.ps1         ← New-TAKDataPackage truststore logic
+    11-CertDistCleanup.Tests.ps1          ← Remove-CivTAK.ps1 filesystem teardown
 ```
 
-> **Note:** Integration tests 09 and 11 require Administrator privileges to write to `Cert:\CurrentUser\Root`. They are automatically skipped in non-elevated sessions.
+> **Note:** Integration tests 09 and 11 require Administrator privileges to write to `Cert:\CurrentUser\Root`. Tests in 01–08 require `TAK_INTEGRATION_HOST` to be set; they auto-skip in CI when no live server is available.
 
 Run a single file to avoid memory pressure:
 
@@ -349,7 +429,7 @@ Primary reference: **[https://digitaltak.lukeleigh.com/](https://digitaltak.luke
 |------|-----------|
 | [Getting Started](https://digitaltak.lukeleigh.com/getting-started/) | Prerequisites, repo layout, module installation, CI pipeline |
 | [Deployment Guide](https://digitaltak.lukeleigh.com/deployment/) | Step-by-step `Deploy-TAKServer.ps1` guide |
-| [API Reference](https://digitaltak.lukeleigh.com/api-reference/) | Complete cmdlet reference — TAKDeploy, TAKInstall, TAKServerPS (53 cmdlets) |
+| [API Reference](https://digitaltak.lukeleigh.com/api-reference/) | Complete cmdlet reference — TAKDeploy, TAKInstall, TAKOnboarding, TAKServerPS (60 cmdlets) |
 | [Troubleshooting](https://digitaltak.lukeleigh.com/troubleshooting/) | Common failures and fixes |
 | [Configuration Reference](https://digitaltak.lukeleigh.com/config/baseline/) | CoreConfig.xml, certificate layout, port inventory, security gaps |
 
